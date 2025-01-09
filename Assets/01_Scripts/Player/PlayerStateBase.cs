@@ -6,6 +6,8 @@ namespace Player.State
 {
     public abstract class PlayerStateBase
     {
+        public abstract void EnterState();
 
+        public abstract void ExitState();
     }
 }
