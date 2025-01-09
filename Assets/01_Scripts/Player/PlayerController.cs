@@ -1,18 +1,27 @@
+using Player.State;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+namespace Player
 {
-    // Start is called before the first frame update
-    void Start()
+    public class PlayerController : MonoBehaviour
     {
-        
-    }
+        private PlayerStateBase[] states = new PlayerStateBase[4];
+        private PlayerStateMachine playerStateMachine = new();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        void Start()
+        {
+            states[(int)EPlayerState.Idle] = new PlayerIdleState(this);
+            states[(int)EPlayerState.Move] = new PlayerMoveState(this);
+            states[(int)EPlayerState.Attack] =  new PlayerAttachState(this);
+            states[(int)EPlayerState.Die] = new PlayerDieState(this);
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            playerStateMachine.Updated();
+        }
     }
 }
