@@ -4,13 +4,8 @@ using UnityEngine;
 
 namespace Player.State
 {
-    public class PlayerStateMachine
+    public abstract class PlayerStateBase
     {
-        public void ChangeState()
-        {
-
-        }
-
 
     }
 }
