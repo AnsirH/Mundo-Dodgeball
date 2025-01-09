@@ -7,18 +7,14 @@ namespace Player
 {
     public class PlayerController : MonoBehaviour
     {
-        private PlayerStateBase[] states = new PlayerStateBase[4];
-        private PlayerStateMachine playerStateMachine = new();
+        private PlayerStateMachine playerStateMachine;
 
         void Start()
         {
-            states[(int)EPlayerState.Idle] = new PlayerIdleState(this);
-            states[(int)EPlayerState.Move] = new PlayerMoveState(this);
-            states[(int)EPlayerState.Attack] =  new PlayerAttachState(this);
-            states[(int)EPlayerState.Die] = new PlayerDieState(this);
+            playerStateMachine = new(this);
+            playerStateMachine.ChangeState(EPlayerState.Idle);
         }
 
-        // Update is called once per frame
         void Update()
         {
             playerStateMachine.Updated();
