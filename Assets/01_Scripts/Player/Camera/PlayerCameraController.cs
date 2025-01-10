@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player.Camera
+namespace PlayerCharacterControl.Camera
 {
     public class PlayerCameraController : MonoBehaviour
     {

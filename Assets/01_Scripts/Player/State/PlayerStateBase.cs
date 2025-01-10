@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player.State
+namespace PlayerCharacterControl.State
 {
     // 플레이어 상태 베이스
     public abstract class PlayerStateBase

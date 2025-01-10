@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-namespace Player.Camera
+namespace PlayerCharacterControl.Camera
 {
     using UnityEngine;
 
@@ -11,11 +11,13 @@ namespace Player.Camera
             playerCamera = GetComponent<Camera>();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             MoveCamera();
+            ClampPosition();
         }
 
+        // 카메라 이동
         private void MoveCamera()
         {
             Vector2 mousePoint = Input.mousePosition;
@@ -33,6 +35,16 @@ namespace Player.Camera
             playerCamera.transform.Translate(moveSpeed * Time.deltaTime * cameraMovement.normalized, Space.World);
         }
 
+        // 위치 제한
+        private void ClampPosition()
+        {
+            float clampedX = Mathf.Clamp(transform.position.x, clampCenter.x - clampOffset.x * 0.5f, clampCenter.x + clampOffset.x * 0.5f);
+            float clampedZ = Mathf.Clamp(transform.position.z, clampCenter.x - clampOffset.z * 0.5f, clampCenter.x + clampOffset.z * 0.5f);
+
+            transform.position = new Vector3(clampedX, transform.position.y, clampedZ);
+        }
+
+        // 테두리에 마우스 위치 확인
         private bool IsMouseInOutline(Vector2 mousePosition, Vector2 direction)
         {
             bool horizontalCheck = (direction.x < 0 && mousePosition.x <= margin) || (direction.x > 0 && mousePosition.x >= Screen.width - margin);
@@ -45,6 +57,8 @@ namespace Player.Camera
         [Header("수치")]
         public float moveSpeed = 5.0f;
         public float margin = 20.0f;
+        public Vector3 clampCenter;
+        public Vector3 clampOffset;
 
         private Camera playerCamera;
 
@@ -59,5 +73,15 @@ namespace Player.Camera
             new (-1,  0),  // LEFT
             new (-1,  1)   // LEFT UP
         };
+
+#if UNITY_EDITOR
+        
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+
+            Gizmos.DrawWireCube(clampCenter, clampOffset);
+        }
+#endif
     }
 }

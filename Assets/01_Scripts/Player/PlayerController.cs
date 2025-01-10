@@ -1,18 +1,24 @@
-using Player.State;
+using PlayerCharacterControl.State;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player
+namespace PlayerCharacterControl
 {
     public class PlayerController : MonoBehaviour
     {
         private PlayerStateMachine playerStateMachine;
+        private PlayerMovement playerMovement;
 
-        void Start()
+        public PlayerStateMachine StateMachine => playerStateMachine;
+        public PlayerMovement Movement => playerMovement;
+
+        void Awake()
         {
             playerStateMachine = new(this);
-            playerStateMachine.ChangeState(EPlayerState.Idle); // Idle 상태로 초기화
+            playerStateMachine.ChangeState(EPlayerState.Idle);
+
+            playerMovement = GetComponent<PlayerMovement>();
         }
 
         void Update()

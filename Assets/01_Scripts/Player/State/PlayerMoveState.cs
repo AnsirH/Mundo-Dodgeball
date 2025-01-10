@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Player.State
+namespace PlayerCharacterControl.State
 {
     public class PlayerMoveState : PlayerStateBase
     {
@@ -22,7 +22,8 @@ namespace Player.State
 
         public override void UpdateState()
         {
-            //Debug.Log($"{GetType().Name} 상태 실행 중");
+            if (PlayerController.Movement.IsMove == false)
+                PlayerController.StateMachine.ChangeState(EPlayerState.Idle);
         }
     }
 }
