@@ -21,67 +21,139 @@ public class SteamManager : MonoBehaviour
         }
     }
 
-    // 스크립트가 생성(오브젝트가 로드)될 때 자동으로 호출
     void Awake()
     {
-        // 만약 이미 instance가 존재한다면(= 다른 SteamManager가 있다면),
-        // 중복 생성을 막기 위해 이 오브젝트는 제거
         if (instance != null)
         {
             Destroy(gameObject);
             return;
         }
-
-        // 그렇지 않다면, 이 오브젝트를 싱글톤으로 설정
         instance = this;
-
-        // 씬 전환 시에도 파괴되지 않도록 설정 (Steam API는 게임 전체에서 유지가 필요)
         DontDestroyOnLoad(gameObject);
 
         try
         {
-            // Steamworks.Net 사용: Steam 클라이언트와 연결 시도
-            // - 정상 연결되면 true 반환, 실패 시 false
             initialized = SteamAPI.Init();
             if (!initialized)
             {
-                // 실패 시 에러 메시지 출력
                 Debug.LogError("SteamAPI.Init() failed.");
             }
         }
         catch (System.DllNotFoundException e)
         {
-            // steam_api.dll 또는 libsteam_api.so 파일을 찾지 못할 경우
             Debug.LogError("[Steamworks] Could not load steam_api: " + e);
             return;
         }
     }
 
-    // 매 프레임마다 Unity가 자동으로 호출
     void Update()
     {
-        // Steam API가 정상적으로 초기화되었을 때만 콜백 실행
         if (initialized)
         {
-            // RunCallbacks()는 Steamworks에서 이벤트(업적, 통계 업데이트 등)를
-            // 전달받는 핵심 메서드. 매 프레임마다 호출해주어야 콜백이 정상 처리됨
             SteamAPI.RunCallbacks();
         }
     }
 
-    // 오브젝트가 제거될 때(씬 종료 혹은 게임 종료 시) 자동으로 호출
     void OnDestroy()
     {
-        // 싱글톤 인스턴스와 동일한 오브젝트인지 확인
         if (instance == this)
         {
-            // Steam이 초기화되어 있었다면, 안전하게 Shutdown() 호출
             if (initialized)
             {
                 SteamAPI.Shutdown();
             }
-            // 싱글톤 참조 해제
             instance = null;
         }
+    }
+
+    /// <summary>
+    /// 현재 로그인된 스팀 유저의 닉네임을 반환한다.
+    /// 스팀이 초기화되지 않았다면 에러 로그를 남기고 "Unknown" 반환.
+    /// </summary>
+    public static string GetSteamName()
+    {
+        if (!Initialized)
+        {
+            Debug.LogError("Steam is not initialized. Cannot get Steam name.");
+            return "Unknown";
+        }
+
+        // SteamFriends.GetPersonaName() 로컬 유저의 프로필 이름 반환
+        return SteamFriends.GetPersonaName();
+    }
+
+    public static Sprite GetSteamAvatar()
+    {
+        if (!Initialized)
+        {
+            Debug.LogError("Steam is not initialized. Cannot get Steam avatar.");
+            return null;
+        }
+
+        // 로컬 유저의 SteamID
+        CSteamID steamId = SteamUser.GetSteamID();
+
+        // 큰 사이즈 아바타 이미지 핸들
+        int avatarInt = SteamFriends.GetLargeFriendAvatar(steamId);
+        if (avatarInt == 0)
+        {
+            Debug.LogWarning("Failed to get large avatar handle. (Avatar might not be loaded yet)");
+            return null;
+        }
+
+        // 이미지 크기(Width, Height) 가져오기
+        uint width, height;
+        bool success = SteamUtils.GetImageSize(avatarInt, out width, out height);
+        if (!success || width == 0 || height == 0)
+        {
+            Debug.LogWarning("Invalid avatar dimensions.");
+            return null;
+        }
+
+        // RGBA 형식으로 픽셀 데이터를 가져올 버퍼 생성
+        byte[] imageData = new byte[width * height * 4];
+
+        // 픽셀 데이터 로드
+        bool gotImage = SteamUtils.GetImageRGBA(avatarInt, imageData, (int)(width * height * 4));
+        if (!gotImage)
+        {
+            Debug.LogWarning("Could not get avatar RGBA data.");
+            return null;
+        }
+
+        // <--- 추가된 부분: 위아래 뒤집기 --->
+        imageData = FlipVerticallyRGBA(imageData, width, height);
+
+        // 바이트 배열 -> Texture2D 변환
+        Texture2D texture = new Texture2D((int)width, (int)height, TextureFormat.RGBA32, false);
+        texture.LoadRawTextureData(imageData);
+        texture.Apply();
+
+        // Texture2D -> Sprite 변환
+        Rect rect = new Rect(0, 0, (int)width, (int)height);
+        Vector2 pivot = new Vector2(0.5f, 0.5f); // 스프라이트 중심
+        Sprite newSprite = Sprite.Create(texture, rect, pivot);
+
+        return newSprite;
+    }
+
+    /// <summary>
+    /// RGBA 바이트 배열을 세로 방향으로 뒤집어주는 메서드
+    /// </summary>
+    private static byte[] FlipVerticallyRGBA(byte[] original, uint width, uint height)
+    {
+        int rowSize = (int)(width * 4);
+        byte[] flipped = new byte[original.Length];
+
+        for (int y = 0; y < height; y++)
+        {
+            int srcIndex = y * rowSize;
+            int dstIndex = (int)((height - 1 - y) * rowSize);
+
+            // 한 줄(rowSize 바이트)을 통째로 복사
+            System.Buffer.BlockCopy(original, srcIndex, flipped, dstIndex, rowSize);
+        }
+
+        return flipped;
     }
 }
