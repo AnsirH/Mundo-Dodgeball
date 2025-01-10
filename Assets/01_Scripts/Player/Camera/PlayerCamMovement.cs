@@ -30,7 +30,7 @@ namespace Player.Camera
                 }
             }
 
-            playerCamera.transform.Translate(cameraMovement.normalized * moveSpeed * Time.deltaTime, Space.World);
+            playerCamera.transform.Translate(moveSpeed * Time.deltaTime * cameraMovement.normalized, Space.World);
         }
 
         private bool IsMouseInOutline(Vector2 mousePosition, Vector2 direction)
