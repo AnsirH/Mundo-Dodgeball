@@ -12,7 +12,7 @@ namespace Player
         void Start()
         {
             playerStateMachine = new(this);
-            playerStateMachine.ChangeState(EPlayerState.Idle);
+            playerStateMachine.ChangeState(EPlayerState.Idle); // Idle 상태로 초기화
         }
 
         void Update()
