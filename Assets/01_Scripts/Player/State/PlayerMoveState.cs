@@ -13,11 +13,13 @@ namespace PlayerCharacterControl.State
         public override void EnterState()
         {
             Debug.Log($"{GetType().Name} 상태 진입");
+            playerController.Anim.SetBool("IsMove", true);
         }
 
         public override void ExitState()
         {
             Debug.Log($"{GetType().Name} 상태 종료");
+            playerController.Anim.SetBool("IsMove", false);
         }
 
         public override void UpdateState()

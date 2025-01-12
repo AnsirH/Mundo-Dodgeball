@@ -339,6 +339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a81442b606c73e647abb041030fd7359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  anim: {fileID: 1212439188}
 --- !u!4 &1118867327
 Transform:
   m_ObjectHideFlags: 0
@@ -367,12 +368,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81fd2b8ce1cbe154fb5117e003571cb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
-  rotateSpeed: 180
+  moveSpeed: 3
+  rotateSpeed: 1080
   playerCamera: {fileID: 2146479575}
 --- !u!4 &1212439187 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3654844498296744909, guid: ac7297b35e3cd4d40b4b304588dac441, type: 3}
+  m_PrefabInstance: {fileID: 7968258715360205105}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1212439188 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 7230724229685670327, guid: ac7297b35e3cd4d40b4b304588dac441, type: 3}
   m_PrefabInstance: {fileID: 7968258715360205105}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1641783610

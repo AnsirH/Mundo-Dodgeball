@@ -9,9 +9,11 @@ namespace PlayerCharacterControl
     {
         private PlayerStateMachine playerStateMachine;
         private PlayerMovement playerMovement;
+        [SerializeField] private Animator anim;
 
         public PlayerStateMachine StateMachine => playerStateMachine;
         public PlayerMovement Movement => playerMovement;
+        public Animator Anim => anim;
 
         void Awake()
         {
