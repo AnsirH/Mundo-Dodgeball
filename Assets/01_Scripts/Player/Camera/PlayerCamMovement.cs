@@ -9,6 +9,7 @@ namespace PlayerCharacterControl.Camera
         private void Awake()
         {
             playerCamera = GetComponent<Camera>();
+            transform.rotation = Quaternion.Euler(60, 0, 0);
         }
 
         private void LateUpdate()
@@ -39,7 +40,7 @@ namespace PlayerCharacterControl.Camera
         private void ClampPosition()
         {
             float clampedX = Mathf.Clamp(transform.position.x, clampCenter.x - clampOffset.x * 0.5f, clampCenter.x + clampOffset.x * 0.5f);
-            float clampedZ = Mathf.Clamp(transform.position.z, clampCenter.x - clampOffset.z * 0.5f, clampCenter.x + clampOffset.z * 0.5f);
+            float clampedZ = Mathf.Clamp(transform.position.z, clampCenter.z - clampOffset.z * 0.5f, clampCenter.z + clampOffset.z * 0.5f);
 
             transform.position = new Vector3(clampedX, transform.position.y, clampedZ);
         }
