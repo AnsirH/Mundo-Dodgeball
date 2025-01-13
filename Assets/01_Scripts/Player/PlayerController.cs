@@ -9,16 +9,19 @@ namespace PlayerCharacterControl
     {
         private PlayerStateMachine playerStateMachine;
         private PlayerMovement playerMovement;
+        private PlayerAttack playerAttack;
         [SerializeField] private Animator anim;
 
         public PlayerStateMachine StateMachine => playerStateMachine;
         public PlayerMovement Movement => playerMovement;
+        public PlayerAttack Attack => playerAttack;
         public Animator Anim => anim;
 
         void Awake()
         {
             playerStateMachine = new(this);
             playerStateMachine.ChangeState(EPlayerState.Idle);
+            playerAttack = new();
 
             playerMovement = GetComponent<PlayerMovement>();
         }
@@ -26,6 +29,7 @@ namespace PlayerCharacterControl
         void Update()
         {
             playerStateMachine.Updated();
+            playerAttack.Cooldown();
         }
     }
 }

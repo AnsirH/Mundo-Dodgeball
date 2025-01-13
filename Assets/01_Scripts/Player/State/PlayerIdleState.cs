@@ -22,6 +22,9 @@ namespace PlayerCharacterControl.State
 
         public override void UpdateState()
         {
+            if (playerController.Attack.CheckAttack())
+                playerController.StateMachine.ChangeState(EPlayerState.Attack);
+
             if (playerController.Movement.IsMove)
                 playerController.StateMachine.ChangeState(EPlayerState.Move);
         }

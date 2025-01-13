@@ -10,7 +10,7 @@ namespace PlayerCharacterControl.State
         {
             states[(int)EPlayerState.Idle] = new PlayerIdleState(playerController);
             states[(int)EPlayerState.Move] = new PlayerMoveState(playerController);
-            states[(int)EPlayerState.Attack] = new PlayerAttachState(playerController);
+            states[(int)EPlayerState.Attack] = new PlayerAttakState(playerController);
             states[(int)EPlayerState.Die] = new PlayerDieState(playerController);
         }
 
@@ -36,8 +36,6 @@ namespace PlayerCharacterControl.State
             currentState.EnterState();
         }
 
-        PlayerStateBase currentState;
-
         // 이전 상태로 전환
         public void UndoState()
         {
@@ -47,11 +45,15 @@ namespace PlayerCharacterControl.State
             }
         }
 
-        PlayerStateBase prevState;
-
         public void Updated()
         {
             currentState?.UpdateState();
         }
+
+        PlayerStateBase currentState;
+        PlayerStateBase prevState;
+
+        public PlayerStateBase CurrentState => currentState;
+        public PlayerStateBase PrevState => prevState;
     }
 }
