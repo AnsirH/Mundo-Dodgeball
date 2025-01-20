@@ -9,4 +9,10 @@ namespace PlayerCharacterControl.State
         Attack,
         Die
     }
+    ///<summary>ÆË¾÷ Á¾·ù</summary>
+    public enum EPopupType
+    {
+        None = -1,
+        GameSelect = 0
+    }
 }

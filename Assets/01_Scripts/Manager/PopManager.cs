@@ -1,3 +1,4 @@
+using PlayerCharacterControl.State;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -57,10 +58,9 @@ public class PopManager : ManagerBase<PopManager>
     {
         
     }
-
-    // Update is called once per frame
-    void Update()
+    public void OpenPopBtn(EPopupType type)
     {
-        
+        if ((int)type < 0 || (int)type >= pops.Count) { Debug.LogError("This is not the scope of Popuplist."); }
+        pops[(int)type].Open();
     }
 }
