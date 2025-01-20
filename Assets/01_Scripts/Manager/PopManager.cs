@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class PopManager : ManagerBase<PopManager>
 {
+    public List<PopBase> pops = new List<PopBase>();
+    #region Pop Active
     private List<PopBase> openPops = new List<PopBase>();
-    
+    private List<GameObject> DetailOpenPops = new List<GameObject>();
     public void OpenPop(PopBase pop)
     {
         if(!openPops.Contains(pop))
@@ -13,21 +15,44 @@ public class PopManager : ManagerBase<PopManager>
             openPops.Add(pop);
         }
     }
-    public void ClosePop(PopBase pop, bool isAllClose)
+    public void ClosePop(PopBase pop)
     {
         if (openPops.Contains(pop))
         {
             openPops.Remove(pop);
         }
-        if(isAllClose)
+        if(openPops.Count > 0)
         {
-            foreach(PopBase p in openPops)
+            foreach (PopBase p in openPops)
             {
                 p.gameObject.SetActive(false);
             }
             openPops.Clear();
         }
+        if(DetailOpenPops.Count > 0)
+        {
+            foreach (GameObject p in DetailOpenPops)
+            {
+                p.gameObject.SetActive(false);
+            }
+            DetailOpenPops.Clear();
+        }
     }
+    public void DetailOpenPop(GameObject pop)
+    {
+        if (!DetailOpenPops.Contains(pop))
+        {
+            DetailOpenPops.Add(pop);
+        }
+    }
+    public void DetailClosePop(GameObject pop)
+    {
+        if (DetailOpenPops.Contains(pop))
+        {
+            DetailOpenPops.Remove(pop);
+        }
+    }
+    #endregion
     void Start()
     {
         
