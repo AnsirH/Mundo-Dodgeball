@@ -10,26 +10,42 @@ namespace PlayerCharacterControl
         private PlayerStateMachine playerStateMachine;
         private PlayerMovement playerMovement;
         private PlayerAttack playerAttack;
-        [SerializeField] private Animator anim;
+        private AxeShooter axeShooter;
+        [SerializeField] private Animator playerAnim;
+        [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
 
         public PlayerStateMachine StateMachine => playerStateMachine;
         public PlayerMovement Movement => playerMovement;
         public PlayerAttack Attack => playerAttack;
-        public Animator Anim => anim;
+        public Animator Anim => playerAnim;
+        public AxeShooter AxeShooter => axeShooter;
 
         void Awake()
         {
+            playerAnimEventHandler.OnAnimationEventActions.AddListener(ActEvent);
+
+            playerMovement = GetComponent<PlayerMovement>();
+            axeShooter = GetComponent<AxeShooter>();
+
             playerStateMachine = new(this);
             playerStateMachine.ChangeState(EPlayerState.Idle);
             playerAttack = new();
-
-            playerMovement = GetComponent<PlayerMovement>();
         }
 
         void Update()
         {
-            playerStateMachine.Updated();
+            playerStateMachine.UpdateCurrentState();
             playerAttack.Cooldown();
+        }
+
+        private void ActEvent(string tag)
+        {
+            switch (tag)
+            {
+                case "Throw Axe":
+                    axeShooter.SpawnAxe();
+                    break;
+            }
         }
     }
 }

@@ -45,7 +45,7 @@ namespace PlayerCharacterControl.State
             }
         }
 
-        public void Updated()
+        public void UpdateCurrentState()
         {
             currentState?.UpdateState();
         }

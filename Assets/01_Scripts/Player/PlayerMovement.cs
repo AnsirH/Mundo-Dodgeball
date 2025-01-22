@@ -36,10 +36,15 @@ namespace PlayerCharacterControl
             Vector3 direction = targetPoint - transform.position;
 
             transform.position += moveSpeed * Time.deltaTime * direction.normalized;
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Time.deltaTime);
+            RotateToTarget(direction);
 
             if (Vector3.Distance(transform.position, targetPoint) <= 0.1f)
                 isMove = false;
+        }
+
+        public void RotateToTarget(Vector3 direction)
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Time.deltaTime);
         }
 
         private bool isMove = false;

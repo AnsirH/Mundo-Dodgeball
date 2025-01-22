@@ -8,6 +8,14 @@ namespace PlayerCharacterControl.State
     {
         public PlayerAttakState(PlayerController playerController) : base(playerController)
         {
+            AnimationClip[] animationClips = playerController.Anim.runtimeAnimatorController.animationClips;
+            for (int i = 0; i < animationClips.Length; i++)
+            {
+                if (animationClips[i].name == AttackAnimationName)
+                {
+                    attackAnimationActionTime = animationClips[i].events[0].time;
+                }
+            }            
         }
 
         public override void EnterState()
@@ -33,16 +41,30 @@ namespace PlayerCharacterControl.State
                 playerController.Movement.enabled = true;
                 isMoving = false;
             }
+
+            doAnimationAction = false;
         }
 
         public override void UpdateState()
         {
-            if (playerController.Anim.GetCurrentAnimatorStateInfo(0).IsName("Attack03_End") && playerController.Anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.5f)
+            if (playerController.Anim.GetCurrentAnimatorStateInfo(0).IsName(AttackAnimationName))
             {
-                playerController.StateMachine.ChangeState(isMoving ? EPlayerState.Move : EPlayerState.Idle);
+                if (playerController.Anim.IsInTransition(0))
+                {
+                    playerController.StateMachine.ChangeState(isMoving ? EPlayerState.Move : EPlayerState.Idle);
+                }
+
+                else if (playerController.Anim.GetCurrentAnimatorStateInfo(0).normalizedTime > attackAnimationActionTime && !doAnimationAction)
+                {
+                    doAnimationAction = true;
+                    Debug.Log("µµ³¢ ´øÁ®");
+                }
             }
         }
 
         bool isMoving = false;
+        private readonly string AttackAnimationName = "Attack03_End";
+        private float attackAnimationActionTime = 0.0f;
+        private bool doAnimationAction = false;
     }
 }

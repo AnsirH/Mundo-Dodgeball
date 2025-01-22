@@ -12,11 +12,6 @@ namespace PlayerCharacterControl
             return canAttack && Input.GetKeyDown(KeyCode.Q);
         }
 
-        public void RotateTowardTarget()
-        {
-
-        }
-
         public void Cooldown()
         {
             if (!canAttack && currentCoolTime > 0.0f)
