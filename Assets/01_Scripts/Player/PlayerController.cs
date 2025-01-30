@@ -35,7 +35,10 @@ namespace PlayerCharacterControl
         void Update()
         {
             playerStateMachine.UpdateCurrentState();
-            playerAttack.Cooldown();
+
+            if (playerAttack.CanAttack == false)
+                playerAttack.Cooldown();
+
         }
 
         private void ActEvent(string tag)

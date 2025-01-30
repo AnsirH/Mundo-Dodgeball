@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace PlayerCharacterControl
@@ -14,7 +13,7 @@ namespace PlayerCharacterControl
 
         public void Cooldown()
         {
-            if (!canAttack && currentCoolTime > 0.0f)
+            if (currentCoolTime > 0.0f)
             {
                 currentCoolTime -= Time.deltaTime;
             }

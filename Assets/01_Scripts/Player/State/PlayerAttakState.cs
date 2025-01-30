@@ -8,14 +8,6 @@ namespace PlayerCharacterControl.State
     {
         public PlayerAttakState(PlayerController playerController) : base(playerController)
         {
-            AnimationClip[] animationClips = playerController.Anim.runtimeAnimatorController.animationClips;
-            for (int i = 0; i < animationClips.Length; i++)
-            {
-                if (animationClips[i].name == AttackAnimationName)
-                {
-                    attackAnimationActionTime = animationClips[i].events[0].time;
-                }
-            }            
         }
 
         public override void EnterState()
@@ -31,6 +23,8 @@ namespace PlayerCharacterControl.State
             playerController.Attack.StartAttack();
 
             playerController.Anim.SetTrigger("Attack"); // 상수로 변경할 것.
+
+            //playerController.AxeShooter.targetDirection = 
         }
 
         public override void ExitState()
@@ -41,8 +35,6 @@ namespace PlayerCharacterControl.State
                 playerController.Movement.enabled = true;
                 isMoving = false;
             }
-
-            doAnimationAction = false;
         }
 
         public override void UpdateState()
@@ -53,18 +45,10 @@ namespace PlayerCharacterControl.State
                 {
                     playerController.StateMachine.ChangeState(isMoving ? EPlayerState.Move : EPlayerState.Idle);
                 }
-
-                else if (playerController.Anim.GetCurrentAnimatorStateInfo(0).normalizedTime > attackAnimationActionTime && !doAnimationAction)
-                {
-                    doAnimationAction = true;
-                    Debug.Log("도끼 던져");
-                }
             }
         }
 
         bool isMoving = false;
         private readonly string AttackAnimationName = "Attack03_End";
-        private float attackAnimationActionTime = 0.0f;
-        private bool doAnimationAction = false;
     }
 }
