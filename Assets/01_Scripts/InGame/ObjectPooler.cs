@@ -9,7 +9,7 @@ public class ObjectPooler : MonoBehaviour
     static ObjectPooler inst;
     private void Awake() => inst = this;
 
-    [SerializeField]
+    [System.Serializable]
     public class Pool
     {
         public string tag;
@@ -17,7 +17,7 @@ public class ObjectPooler : MonoBehaviour
         public int size;
     }
 
-    [SerializeField] Pool[] pools;
+    public Pool[] pools;
     public Dictionary<string, ObjectPool<GameObject>> poolDictionary = new();
 
     private void Start()
@@ -36,13 +36,28 @@ public class ObjectPooler : MonoBehaviour
             poolDictionary.Add(newPool.tag,
                 new ObjectPool<GameObject>(
                     createFunc: () => OnNewObjCreate(newPool.prefab),
-                    actionOnGet: obj => obj.SetActive(true),
-                    actionOnRelease: obj => obj.SetActive(false),
-                    actionOnDestroy: obj => Destroy(obj),
+                    actionOnGet: obj => OnGetAction(obj),
+                    actionOnRelease: obj => OnReleaseAction(obj),
+                    actionOnDestroy: obj => OnDestroyAction(obj),
                     collectionCheck: false,
                     maxSize: newPool.size
                     ));
         }
+    }
+
+    private void OnGetAction(GameObject obj)
+    {
+        obj.SetActive(true);
+    }
+
+    private void OnReleaseAction(GameObject obj)
+    {
+        obj.SetActive(false);
+    }
+
+    private void OnDestroyAction(GameObject obj)
+    {
+        Destroy(obj);
     }
 
     private GameObject OnNewObjCreate(GameObject newObj)
@@ -52,7 +67,7 @@ public class ObjectPooler : MonoBehaviour
         return obj;
     }
 
-    public static GameObject SpawnFromPool(string tag)
+    public static GameObject Get(string tag)
     {
         if (inst.poolDictionary.TryGetValue(tag, out ObjectPool<GameObject> pool))
         {
@@ -61,6 +76,18 @@ public class ObjectPooler : MonoBehaviour
         else
         {
             return null;
+        }
+    }
+
+    public static void Release(string tag, GameObject obj)
+    {
+        if (inst.poolDictionary.TryGetValue(tag, out ObjectPool<GameObject> pool))
+        {
+            pool.Release(obj);
+        }
+        else
+        {
+            return;
         }
     }
 }

@@ -20,7 +20,7 @@ public class Axe : MonoBehaviour
             yield return null;
         }
 
-        Destroy(gameObject);
+        ObjectPooler.Release("Axe", gameObject);
     }
 
     public float flySpeed = 5.0f;

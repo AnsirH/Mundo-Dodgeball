@@ -6,9 +6,9 @@ public class AxeShooter : MonoBehaviour
 {
     public void SpawnAxe()
     {
-        Instantiate(axePrefab, spawnPoint.position, Quaternion.LookRotation(transform.forward));
+        GameObject axeObj = ObjectPooler.Get("Axe");
+        axeObj.transform.position = spawnPoint.position;
+        axeObj.transform.rotation = Quaternion.LookRotation(transform.forward);
     }
-
-    public GameObject axePrefab;
     public Transform spawnPoint;
 }
