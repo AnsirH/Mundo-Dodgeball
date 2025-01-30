@@ -6,23 +6,6 @@ using UnityEngine;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
-    void Start()
-    {
-        PhotonNetwork.ConnectUsingSettings();
-    }
-    // 마스터 서버랑 연결되고 콜백으로 로비입장.
-    public override void OnConnectedToMaster()
-    {
-        Debug.Log("Connected to MasterServer.");
-        PhotonNetwork.JoinLobby();
-    }
-
-    // 로비 입장 성공
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("Joined Lobby. (Now you can create or join rooms)");
-    }
-
     #region 방생성 로직
     public void CreateRoom(string roomName)
     {
@@ -34,7 +17,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         // 방 옵션 지정 (예시: 최대 4명)
         RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 4;
+        roomOptions.MaxPlayers = 2;
 
         // 방 생성 시도
         PhotonNetwork.CreateRoom(roomName, roomOptions, TypedLobby.Default);
