@@ -9,8 +9,7 @@ namespace PlayerCharacterControl
     {
         private PlayerStateMachine playerStateMachine;
         private PlayerMovement playerMovement;
-        private PlayerAttack playerAttack;
-        private AxeShooter axeShooter;
+        [SerializeField] private PlayerAttack playerAttack;
         [SerializeField] private Animator playerAnim;
         [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
 
@@ -18,27 +17,20 @@ namespace PlayerCharacterControl
         public PlayerMovement Movement => playerMovement;
         public PlayerAttack Attack => playerAttack;
         public Animator Anim => playerAnim;
-        public AxeShooter AxeShooter => axeShooter;
 
         void Awake()
         {
             playerAnimEventHandler.OnAnimationEventActions.AddListener(ActEvent);
 
             playerMovement = GetComponent<PlayerMovement>();
-            axeShooter = GetComponent<AxeShooter>();
 
             playerStateMachine = new(this);
             playerStateMachine.ChangeState(EPlayerState.Idle);
-            playerAttack = new();
         }
 
         void Update()
         {
             playerStateMachine.UpdateCurrentState();
-
-            if (playerAttack.CanAttack == false)
-                playerAttack.Cooldown();
-
         }
 
         private void ActEvent(string tag)
@@ -46,7 +38,11 @@ namespace PlayerCharacterControl
             switch (tag)
             {
                 case "Throw Axe":
-                    axeShooter.SpawnAxe();
+                    playerAttack.SpawnAxe();
+                    break;
+
+                case "Reset Axe":
+                    playerAttack.ResetAxe();
                     break;
             }
         }

@@ -12,7 +12,7 @@ namespace PlayerCharacterControl.State
 
         public override void EnterState()
         {
-            Debug.Log($"{GetType().Name} 상태 진입");
+            playerController.Attack.CancelAttack();
             playerController.Anim.SetBool("IsMove", true);
         }
 
@@ -24,7 +24,7 @@ namespace PlayerCharacterControl.State
 
         public override void UpdateState()
         {
-            if (playerController.Attack.CheckAttack())
+            if (playerController.Attack.CanAttackable && playerController.Attack.AttackTrigger)
                 playerController.StateMachine.ChangeState(EPlayerState.Attack);
 
             if (PlayerController.Movement.IsMove == false)

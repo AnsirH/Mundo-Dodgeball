@@ -1,28 +1,22 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Axe : MonoBehaviour
 {
-    private void OnEnable()
+    public void OnEnable()
     {
-        StartCoroutine(FlyCoroutine());
+        modelTrf.localRotation = Quaternion.Euler(startRotation);
     }
 
-
-    private IEnumerator FlyCoroutine()
+    public void FlyToTarget(Vector3 targetPoint, float flyTime)
     {
-        Vector3 destination = transform.position + transform.forward * flyDistance;
-
-        while (Vector3.Distance(transform.position, destination) > 0.1f)
-        {
-            transform.Translate(transform.forward * flySpeed * Time.deltaTime, Space.World);
-            yield return null;
-        }
-
-        ObjectPooler.Release("Axe", gameObject);
+        transform.DOMove(targetPoint, flyTime).SetEase(Ease.Linear).onComplete += () => ObjectPooler.Release("Axe", gameObject);
+        modelTrf.DOLocalRotate(new Vector3(0.0f, 810.0f, 0.0f), flyTime, RotateMode.LocalAxisAdd).SetEase(Ease.Linear);
     }
 
-    public float flySpeed = 5.0f;
-    public float flyDistance = 5.0f;
+    public Transform modelTrf;
+
+    private Vector3 startRotation = new Vector3(-30.0f, 0.0f, -90.0f);
 }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8595978757007591156}
   - component: {fileID: 2906718286990866916}
   m_Layer: 0
-  m_Name: Prefab_Axe
+  m_Name: Axe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,7 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d7e4512580f1bb45908b948bd21e92c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flySpeed: 20
+  modelTrf: {fileID: 2447936654747462844}
+  rotateSpeed: 1440
 --- !u!1001 &2770391171134655319
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -72,23 +73,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17e83658388c9f64e968012444679fad, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.5000001
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17e83658388c9f64e968012444679fad, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17e83658388c9f64e968012444679fad, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17e83658388c9f64e968012444679fad, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.5
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17e83658388c9f64e968012444679fad, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17e83658388c9f64e968012444679fad, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -96,7 +97,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 17e83658388c9f64e968012444679fad, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 17e83658388c9f64e968012444679fad, type: 3}
       propertyPath: m_Name

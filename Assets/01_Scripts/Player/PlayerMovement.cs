@@ -6,25 +6,6 @@ namespace PlayerCharacterControl
 {
     public class PlayerMovement : MonoBehaviour
     {
-        private void Update()
-        {
-            if (playerCamera == null)
-            {
-                Debug.Log($"{gameObject.name} PlayerMovement에 플레이어 카메라 할당 안되어 있음. 이동 불가");
-                return;
-            }
-
-            if (Input.GetMouseButtonDown(1))
-            {
-                RaycastHit hit;
-                if (Physics.Raycast(playerCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
-                {
-                    targetPoint = hit.point;
-                    isMove = true;
-                }
-            }
-        }
-
         private void LateUpdate()
         {
             if (IsMove)
@@ -45,6 +26,16 @@ namespace PlayerCharacterControl
         public void RotateToTarget(Vector3 direction)
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Time.deltaTime);
+        }
+
+        public void OnMove()
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(playerCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
+            {
+                targetPoint = hit.point;
+                isMove = true;
+            }
         }
 
         private bool isMove = false;

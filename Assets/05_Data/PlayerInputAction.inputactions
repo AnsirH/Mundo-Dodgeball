@@ -1,0 +1,74 @@
+{
+    "name": "PlayerInputAction",
+    "maps": [
+        {
+            "name": "Player Input",
+            "id": "e5310efd-4fbe-491f-a140-01473b5bc5fc",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Button",
+                    "id": "fb4d9b74-bab2-4114-81e7-94819ae14e9b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Attack",
+                    "type": "Button",
+                    "id": "fb6e9c8b-89a7-463b-9bb9-56f120473c78",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Select",
+                    "type": "Button",
+                    "id": "a5b1f991-1d93-4015-a2c9-4f49d4e25c1c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "802cf0de-21de-4f3e-b70e-505a543c06e4",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1b1a19cf-dac8-45fb-818a-3e91f9494a17",
+                    "path": "<Keyboard>/q",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c0163e52-ca43-4e89-b24c-eddf9855a5d6",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
