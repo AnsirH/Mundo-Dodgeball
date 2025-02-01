@@ -32,8 +32,9 @@ public class GameSelectPop : PopBase
     {
         base.DetailClose(g);
     }
-    public void ActivePassWord(bool on)
+    public void ActivePassWord()
     {
+        bool on = isSecret.isOn;
         passWordFieldObj.SetActive(on);
     }
     public void CreateRoom()
