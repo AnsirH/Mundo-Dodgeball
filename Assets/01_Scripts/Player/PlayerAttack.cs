@@ -40,6 +40,12 @@ namespace PlayerCharacterControl
             }
         }
 
+        public void OnMove()
+        {
+            if (canAttackable)
+                CancelAttack();
+        }
+
         public void OnSelect()
         {
             if (canAttackable)

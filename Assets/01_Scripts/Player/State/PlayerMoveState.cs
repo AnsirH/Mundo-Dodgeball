@@ -12,7 +12,6 @@ namespace PlayerCharacterControl.State
 
         public override void EnterState()
         {
-            playerController.Attack.CancelAttack();
             playerController.Anim.SetBool("IsMove", true);
         }
 
