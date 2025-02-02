@@ -7,7 +7,7 @@ using UnityEngine;
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     #region 방생성 로직
-    public void CreateRoom(string roomName)
+    public void CreateRoom(string roomName, bool isVisible, string password)
     {
         // 방 이름이 빈 문자열이면 임의 이름으로
         if (string.IsNullOrEmpty(roomName))
@@ -18,7 +18,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
         // 방 옵션 지정 (예시: 최대 4명)
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 2;
-
+        roomOptions.IsVisible = isVisible;
+        var customProps = new Hashtable();
+        if(!string.IsNullOrEmpty(password))
+        {
+            customProps["Password"] = password;
+        }
         // 방 생성 시도
         PhotonNetwork.CreateRoom(roomName, roomOptions, TypedLobby.Default);
     }
@@ -26,6 +31,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
     // 방 생성 성공 시
     public override void OnCreatedRoom()
     {
+        base.OnCreatedRoom();
+        UIManager.instance.ChangeRoomUI();
         Debug.Log($"Room Created: {PhotonNetwork.CurrentRoom.Name}");
     }
 
@@ -55,4 +62,15 @@ public class RoomManager : MonoBehaviourPunCallbacks
         Debug.LogWarning($"Join Room Failed: {message}");
     }
     #endregion
+    // 방 목록이 갱신될 때마다 Photon이 이 콜백을 호출해줌
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        PopManager.instance.
+        // 여기서 roomList를 순회하며 RoomInfo를 얻을 수 있음
+        foreach (RoomInfo info in roomList)
+        {
+            Debug.Log($"Room Name: {info.Name}, PlayerCount: {info.PlayerCount}/{info.MaxPlayers}");
+            // 원하는 UI 표시나 추가 로직 작성
+        }
+    }
 }

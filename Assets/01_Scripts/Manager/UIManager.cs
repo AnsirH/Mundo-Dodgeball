@@ -4,9 +4,16 @@ using UnityEngine;
 
 public class UIManager : ManagerBase<UIManager>
 {
-    // Start is called before the first frame update
+    [SerializeField] GameObject lobbyUI;
+    [SerializeField] RoomUI roomUI;
     void Start()
     {
         
+    }
+    public void ChangeRoomUI()
+    {
+        roomUI.gameObject.SetActive(true);
+        lobbyUI.SetActive(false);
+        PopManager.instance.AllPopClose();
     }
 }

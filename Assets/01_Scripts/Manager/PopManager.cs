@@ -63,4 +63,14 @@ public class PopManager : ManagerBase<PopManager>
         if ((int)type < 0 || (int)type >= pops.Count) { Debug.LogError("This is not the scope of Popuplist."); }
         pops[(int)type].Open();
     }
+    public void AllPopClose()
+    {
+        if(pops.Count > 0)
+        {
+            foreach(PopBase p in pops)
+            {
+                p.Close();
+            }
+        }
+    }
 }

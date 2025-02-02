@@ -10,12 +10,14 @@ public class GameSelectPop : PopBase
     [SerializeField] GameObject roomCreatePopObj;
     [SerializeField] GameObject passWordFieldObj;
     [SerializeField] TMP_InputField passWordField;
+    [SerializeField] TMP_InputField roomNameField;
     [SerializeField] Toggle isVisible;
     [SerializeField] Toggle isSecret;
     [SerializeField] Button createRoomBtn; // 방만들기 팝업 열기
     [SerializeField] Button roomJoinBtn; // 방들어가기
     [SerializeField] Button createBtn; // 방만들기
     [SerializeField] Button cancelBtn; // 방만들기 취소
+    public RegularGamePop regularGamePop;
     public override void Open()
     {
         base.Open();
@@ -39,7 +41,7 @@ public class GameSelectPop : PopBase
     }
     public void CreateRoom()
     {
-
+        ServerManager.Instance.roomManager.CreateRoom(roomNameField.text, isVisible.isOn, passWordField.text);
     }
     public void ButtonSwitch(bool on)
     {
