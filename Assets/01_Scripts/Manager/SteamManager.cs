@@ -74,7 +74,6 @@ public class SteamManager : MonoBehaviour
     {
         if (!Initialized)
         {
-            Debug.LogError("Steam is not initialized. Cannot get Steam name.");
             return "Unknown";
         }
 
@@ -86,7 +85,6 @@ public class SteamManager : MonoBehaviour
     {
         if (!Initialized)
         {
-            Debug.LogError("Steam is not initialized. Cannot get Steam avatar.");
             return null;
         }
 

@@ -33,6 +33,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         base.OnCreatedRoom();
         UIManager.instance.ChangeRoomUI();
+        PopManager.instance.gameSelectPop.ButtonSwitch(true);
         Debug.Log($"Room Created: {PhotonNetwork.CurrentRoom.Name}");
     }
 
@@ -62,10 +63,26 @@ public class RoomManager : MonoBehaviourPunCallbacks
         Debug.LogWarning($"Join Room Failed: {message}");
     }
     #endregion
+    #region 방나가기
+    public void LeaveRoom()
+    {
+        if (PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.LeaveRoom(); // 현재 방 나가기
+        }
+    }
+
+    public override void OnLeftRoom()
+    {
+        Debug.Log("방에서 나감");
+        PhotonNetwork.LoadLevel("MainScene"); // 로비 씬으로 이동
+        UIManager.instance.ChangeLobbyUI();
+    }
+    #endregion
     // 방 목록이 갱신될 때마다 Photon이 이 콜백을 호출해줌
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        PopManager.instance.
+        PopManager.instance.gameSelectPop.regularGamePop.SetRoomListSlot(roomList);
         // 여기서 roomList를 순회하며 RoomInfo를 얻을 수 있음
         foreach (RoomInfo info in roomList)
         {

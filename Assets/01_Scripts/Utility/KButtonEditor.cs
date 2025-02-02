@@ -1,8 +1,6 @@
-using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEditor.UI;        // ButtonEditor를 상속받기 위해 필요
-using DG.Tweening;
-using PlayerCharacterControl.State;
+using UnityEditor.UI;
 
 [CustomEditor(typeof(KButton), true)]
 [CanEditMultipleObjects]
@@ -44,3 +42,4 @@ public class KButtonEditor : ButtonEditor
         serializedObject.ApplyModifiedProperties();
     }
 }
+#endif

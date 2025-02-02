@@ -1,11 +1,13 @@
 using PlayerCharacterControl.State;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PopManager : ManagerBase<PopManager>
 {
     public List<PopBase> pops = new List<PopBase>();
+    public GameSelectPop gameSelectPop;
     #region Pop Active
     private List<PopBase> openPops = new List<PopBase>();
     private List<GameObject> DetailOpenPops = new List<GameObject>();
@@ -65,12 +67,9 @@ public class PopManager : ManagerBase<PopManager>
     }
     public void AllPopClose()
     {
-        if(pops.Count > 0)
+        if(openPops.Count > 0)
         {
-            foreach(PopBase p in pops)
-            {
-                p.Close();
-            }
+            openPops.RemoveAll(p => { p.Close(); return true; }) ;
         }
     }
 }

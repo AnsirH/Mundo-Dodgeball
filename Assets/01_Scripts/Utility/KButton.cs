@@ -1,8 +1,5 @@
 using DG.Tweening;
 using PlayerCharacterControl.State;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

@@ -17,7 +17,7 @@ public class RegularGamePop : MonoBehaviour
         for(int i = 0; i < roomList.Count; i++) 
         {
             roomList[i].gameObject.SetActive(false);
-            if(_roomList.Count < i)
+            if(_roomList.Count > i)
             {
                 roomList[i].gameObject.SetActive(true);
                 RoomInfo info = _roomList[i];

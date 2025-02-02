@@ -4,15 +4,8 @@ using UnityEngine;
 
 public class RoomUI : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public void RoomExit()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        ServerManager.Instance.roomManager.LeaveRoom();
     }
 }

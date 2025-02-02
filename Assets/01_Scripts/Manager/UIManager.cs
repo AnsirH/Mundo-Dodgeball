@@ -16,4 +16,10 @@ public class UIManager : ManagerBase<UIManager>
         lobbyUI.SetActive(false);
         PopManager.instance.AllPopClose();
     }
+    public void ChangeLobbyUI()
+    {
+        roomUI.gameObject.SetActive(false);
+        lobbyUI.SetActive(true);
+        PopManager.instance.AllPopClose();
+    }
 }
