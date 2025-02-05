@@ -57,6 +57,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         UIManager.instance.ChangeRoomUI();
+        UpdatePlayerUI();
         Debug.Log($"Joined Room: {PhotonNetwork.CurrentRoom.Name}");
         // 여기서부터는 룸 내부 상태(플레이어 목록, 채팅 등)를 관리 가능
     }

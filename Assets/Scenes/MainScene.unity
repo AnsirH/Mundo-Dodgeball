@@ -6393,6 +6393,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5286749209937773325, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: b5329b7c16401054792f21de8285eeed, type: 2}
+    - target: {fileID: 5286749209937773325, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5467987194831980326, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
       propertyPath: m_Name
       value: PlayerInfo (1)
@@ -10257,6 +10265,14 @@ PrefabInstance:
     - target: {fileID: 5286749209937773325, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
       propertyPath: m_text
       value: "\uB300\uAE30\uC911.."
+      objectReference: {fileID: 0}
+    - target: {fileID: 5286749209937773325, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: b5329b7c16401054792f21de8285eeed, type: 2}
+    - target: {fileID: 5286749209937773325, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5467987194831980326, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
       propertyPath: m_Name
