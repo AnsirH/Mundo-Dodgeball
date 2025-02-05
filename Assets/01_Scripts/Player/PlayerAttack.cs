@@ -16,9 +16,26 @@ namespace PlayerCharacterControl
             }
             else
             {
-                axeShooter.DisplayRange(GetMouseWorldPoint - transform.position);
+                axeShooter.DisplayRange(GetMousePosition - transform.position);
             }
         }
+
+        Vector3 GetMousePosition
+        {
+            get
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(CameraManager.Instance.firstPlayerCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
+                {
+                    Vector3 result = hit.point;
+                    result.y = transform.position.y;
+                    return result;
+                }
+                else
+                    return Vector3.zero;
+            }
+        }
+
         private void Cooldown()
         {
             if (currentCoolTime > 0.0f)
@@ -40,10 +57,13 @@ namespace PlayerCharacterControl
             }
         }
 
-        public void OnMove()
+        public void CancelAttack()
         {
-            if (canAttackable)
-                CancelAttack();
+            if (CanAttackable)
+            {
+                axeShooter.ShowRange(false);
+                transform.DOKill();
+            }
         }
 
         public void OnSelect()
@@ -55,22 +75,7 @@ namespace PlayerCharacterControl
 
                 axeShooter.ShowRange(false);
 
-                axeShooter.targetPoint = GetMouseWorldPoint;
-            }
-        }
-
-        private Vector3 GetMouseWorldPoint
-        {
-            get
-            {
-                if (Physics.Raycast(CameraManager.Instance.firstPlayerCamera.ScreenPointToRay(Mouse.current.position.ReadValue()), out RaycastHit hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
-                {
-                    Vector3 result = hit.point;
-                    result.y = transform.position.y;
-                    return result;
-                }
-                else
-                    return Vector3.zero;
+                axeShooter.targetPoint = GetMousePosition;
             }
         }
 
@@ -85,11 +90,6 @@ namespace PlayerCharacterControl
             currentCoolTime = maxCoolTime;
         }
 
-        public void CancelAttack()
-        {
-            axeShooter.ShowRange(false);
-        }
-
         public void SpawnAxe()
         {
             axeShooter.SpawnAxe();
@@ -102,7 +102,6 @@ namespace PlayerCharacterControl
         }
 
         [Header("References")]
-        //[SerializeField] UnityEngine.Camera playerCamera;
         [SerializeField] AxeShooter axeShooter;
         [SerializeField] GameObject axeObj;
 

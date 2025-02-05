@@ -28,14 +28,15 @@ namespace PlayerCharacterControl
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Time.deltaTime);
         }
 
-        public void OnMove()
+        public void StartMove(Vector3 targetPoint)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(CameraManager.Instance.firstPlayerCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
-            {
-                targetPoint = hit.point;
-                isMove = true;
-            }
+            this.targetPoint = targetPoint;
+            isMove = true;
+        }
+
+        public void StopMove()
+        {
+            isMove = false;
         }
 
         private bool isMove = false;
@@ -45,7 +46,5 @@ namespace PlayerCharacterControl
 
         public float moveSpeed = 1.0f;
         public float rotateSpeed = 180.0f;
-
-        //public UnityEngine.Camera playerCamera;
     }
 }
