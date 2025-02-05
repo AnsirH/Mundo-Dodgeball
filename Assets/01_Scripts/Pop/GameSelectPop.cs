@@ -24,6 +24,7 @@ public class GameSelectPop : PopBase
     }
     public override void Close()
     {
+        ServerManager.Instance.roomManager.joinRoomId = null;
         base.Close();
     }
     public override void DetailOpen(GameObject g)
@@ -42,6 +43,15 @@ public class GameSelectPop : PopBase
     public void CreateRoom()
     {
         ServerManager.Instance.roomManager.CreateRoom(roomNameField.text, isVisible.isOn, passWordField.text);
+    }
+    public void JoinRoom()
+    {
+        if(ServerManager.Instance.roomManager.joinRoomId == null)
+        {
+            Debug.Log("no selected room!");
+            return;
+        }
+        ServerManager.Instance.roomManager.JoinRoom(ServerManager.Instance.roomManager.joinRoomId);
     }
     public void ButtonSwitch(bool on)
     {

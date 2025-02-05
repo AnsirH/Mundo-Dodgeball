@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
+    public string joinRoomId;
     #region 방생성 로직
     public void CreateRoom(string roomName, bool isVisible, string password)
     {
@@ -19,6 +20,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 2;
         roomOptions.IsVisible = isVisible;
+        roomOptions.EmptyRoomTtl = 5000;
+        roomOptions.PublishUserId = true;
         var customProps = new Hashtable();
         if(!string.IsNullOrEmpty(password))
         {
@@ -33,6 +36,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         base.OnCreatedRoom();
         UIManager.instance.ChangeRoomUI();
+        UpdatePlayerUI();
         Debug.Log($"Room Created: {PhotonNetwork.CurrentRoom.Name}");
     }
 
@@ -52,6 +56,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     // 방 참가 성공 시
     public override void OnJoinedRoom()
     {
+        UIManager.instance.ChangeRoomUI();
         Debug.Log($"Joined Room: {PhotonNetwork.CurrentRoom.Name}");
         // 여기서부터는 룸 내부 상태(플레이어 목록, 채팅 등)를 관리 가능
     }
@@ -76,6 +81,37 @@ public class RoomManager : MonoBehaviourPunCallbacks
         Debug.Log("방에서 나감");
         PhotonNetwork.LoadLevel("MainScene"); // 로비 씬으로 이동
         UIManager.instance.ChangeLobbyUI();
+    }
+    #endregion
+    #region 방들어오거나 나감
+    void UpdatePlayerUI()
+    {
+        Player master = PhotonNetwork.MasterClient; // 방장 정보 가져오기
+        Player otherPlayer = null; // 참여자 정보
+
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            if (player != master)
+            {
+                otherPlayer = player;
+                break;
+            }
+        }
+
+        // 방장 왼쪽, 참여자 오른쪽에 표시
+        UIManager.instance.roomUI.leftPlayerText.text = master.NickName;
+        UIManager.instance.roomUI.rightPlayerText.text = otherPlayer != null ? otherPlayer.NickName : "대기 중...";
+    }
+    // 새로운 플레이어가 들어왔을 때 실행
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        UpdatePlayerUI();
+    }
+
+    // 플레이어가 나갔을 때 실행
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        UpdatePlayerUI();
     }
     #endregion
     // 방 목록이 갱신될 때마다 Photon이 이 콜백을 호출해줌

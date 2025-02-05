@@ -5,7 +5,7 @@ using UnityEngine;
 public class UIManager : ManagerBase<UIManager>
 {
     [SerializeField] GameObject lobbyUI;
-    [SerializeField] RoomUI roomUI;
+    public RoomUI roomUI;
     void Start()
     {
         
