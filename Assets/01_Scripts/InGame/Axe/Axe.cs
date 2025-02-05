@@ -20,7 +20,7 @@ public class Axe : MonoBehaviour
     {
         if (other.TryGetComponent<IDamageable>(out IDamageable damageable))
         {
-            damageable.Damage(10.0f);
+            damageable.Damage(80.0f);
             DOTween.Clear();
             ObjectPooler.Release("Axe", gameObject);
         }

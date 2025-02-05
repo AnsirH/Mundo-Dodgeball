@@ -4,6 +4,23 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
+    private void Awake()
+    {
+        health = maxHealth;
+    }
+
+    private void Update()
+    {
+        HealthRegen();   
+    }
+
+    private void HealthRegen()
+    {
+        health += healthRegenPerSec * Time.deltaTime;
+
+        health = Mathf.Clamp(health, 0, maxHealth);
+    }
+
     public void Damage(float damage)
     {
         health -= damage;
@@ -14,5 +31,8 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         }
     }
 
-    public float health = 100.0f;
+    public float maxHealth = 613.0f;
+    public float health = 0.0f;
+
+    public float healthRegenPerSec = 7.0f;
 }
