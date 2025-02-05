@@ -31,7 +31,7 @@ namespace PlayerCharacterControl
         public void OnMove()
         {
             RaycastHit hit;
-            if (Physics.Raycast(playerCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
+            if (Physics.Raycast(CameraManager.Instance.firstPlayerCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
             {
                 targetPoint = hit.point;
                 isMove = true;
@@ -46,6 +46,6 @@ namespace PlayerCharacterControl
         public float moveSpeed = 1.0f;
         public float rotateSpeed = 180.0f;
 
-        public UnityEngine.Camera playerCamera;
+        //public UnityEngine.Camera playerCamera;
     }
 }

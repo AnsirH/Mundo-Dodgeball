@@ -63,7 +63,7 @@ namespace PlayerCharacterControl
         {
             get
             {
-                if (Physics.Raycast(playerCamera.ScreenPointToRay(Mouse.current.position.ReadValue()), out RaycastHit hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
+                if (Physics.Raycast(CameraManager.Instance.firstPlayerCamera.ScreenPointToRay(Mouse.current.position.ReadValue()), out RaycastHit hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
                 {
                     Vector3 result = hit.point;
                     result.y = transform.position.y;
@@ -102,13 +102,12 @@ namespace PlayerCharacterControl
         }
 
         [Header("References")]
-        [SerializeField] UnityEngine.Camera playerCamera;
+        //[SerializeField] UnityEngine.Camera playerCamera;
         [SerializeField] AxeShooter axeShooter;
         [SerializeField] GameObject axeObj;
 
         private bool canAttackable = true;
         private bool attackTrigger = false;
-        private bool isShowRangeDisplay = false;
 
         public bool CanAttackable => canAttackable;
         public bool AttackTrigger => attackTrigger;

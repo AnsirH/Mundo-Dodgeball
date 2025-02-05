@@ -53,6 +53,24 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpellD"",
+                    ""type"": ""Button"",
+                    ""id"": ""8513fae3-dfe6-4864-ab11-f011282a7e2a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpellF"",
+                    ""type"": ""Button"",
+                    ""id"": ""6ec8dc39-f7f1-4467-8fc1-36bc27dc927c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -88,6 +106,28 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""action"": ""Select"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d988ae83-67d1-446a-99f1-d39a5dc74b96"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpellD"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5e40895b-20a3-4192-8af8-ea00c6d5837f"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpellF"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -99,6 +139,8 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_PlayerInput_Move = m_PlayerInput.FindAction("Move", throwIfNotFound: true);
         m_PlayerInput_Attack = m_PlayerInput.FindAction("Attack", throwIfNotFound: true);
         m_PlayerInput_Select = m_PlayerInput.FindAction("Select", throwIfNotFound: true);
+        m_PlayerInput_SpellD = m_PlayerInput.FindAction("SpellD", throwIfNotFound: true);
+        m_PlayerInput_SpellF = m_PlayerInput.FindAction("SpellF", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -163,6 +205,8 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_Move;
     private readonly InputAction m_PlayerInput_Attack;
     private readonly InputAction m_PlayerInput_Select;
+    private readonly InputAction m_PlayerInput_SpellD;
+    private readonly InputAction m_PlayerInput_SpellF;
     public struct PlayerInputActions
     {
         private @PlayerInputAction m_Wrapper;
@@ -170,6 +214,8 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_PlayerInput_Move;
         public InputAction @Attack => m_Wrapper.m_PlayerInput_Attack;
         public InputAction @Select => m_Wrapper.m_PlayerInput_Select;
+        public InputAction @SpellD => m_Wrapper.m_PlayerInput_SpellD;
+        public InputAction @SpellF => m_Wrapper.m_PlayerInput_SpellF;
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -188,6 +234,12 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Select.started += instance.OnSelect;
             @Select.performed += instance.OnSelect;
             @Select.canceled += instance.OnSelect;
+            @SpellD.started += instance.OnSpellD;
+            @SpellD.performed += instance.OnSpellD;
+            @SpellD.canceled += instance.OnSpellD;
+            @SpellF.started += instance.OnSpellF;
+            @SpellF.performed += instance.OnSpellF;
+            @SpellF.canceled += instance.OnSpellF;
         }
 
         private void UnregisterCallbacks(IPlayerInputActions instance)
@@ -201,6 +253,12 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Select.started -= instance.OnSelect;
             @Select.performed -= instance.OnSelect;
             @Select.canceled -= instance.OnSelect;
+            @SpellD.started -= instance.OnSpellD;
+            @SpellD.performed -= instance.OnSpellD;
+            @SpellD.canceled -= instance.OnSpellD;
+            @SpellF.started -= instance.OnSpellF;
+            @SpellF.performed -= instance.OnSpellF;
+            @SpellF.canceled -= instance.OnSpellF;
         }
 
         public void RemoveCallbacks(IPlayerInputActions instance)
@@ -223,5 +281,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnSelect(InputAction.CallbackContext context);
+        void OnSpellD(InputAction.CallbackContext context);
+        void OnSpellF(InputAction.CallbackContext context);
     }
 }
