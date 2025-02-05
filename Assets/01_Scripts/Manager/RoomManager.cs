@@ -33,7 +33,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         base.OnCreatedRoom();
         UIManager.instance.ChangeRoomUI();
-        PopManager.instance.gameSelectPop.ButtonSwitch(true);
         Debug.Log($"Room Created: {PhotonNetwork.CurrentRoom.Name}");
     }
 
