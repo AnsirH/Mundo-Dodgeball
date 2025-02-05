@@ -12,21 +12,16 @@ public class RegularGamePop : MonoBehaviour
     [SerializeField] Button createBtn;
     [SerializeField] Button joinBtn;
     [SerializeField] List<RoomSlot> roomList = new List<RoomSlot>();
+
     public void SetRoomListSlot(List<RoomInfo> _roomList)
     {
-        for(int i = 0; i < roomList.Count; i++) 
+        for(int i = 0; i < roomList.Count; i++)
         {
             roomList[i].gameObject.SetActive(false);
-            if(_roomList.Count > i)
+            if(_roomList.Count > i && _roomList[i].PlayerCount > 0)
             {
                 roomList[i].gameObject.SetActive(true);
-                RoomInfo info = _roomList[i];
-                bool isSc = false;
-                if (info.CustomProperties.ContainsKey("password"))
-                {
-                    isSc = true;
-                }
-                roomList[i].init(info.Name, info.PlayerCount, info.MaxPlayers, isSc);
+                roomList[i].init(_roomList[i]);
             }
         }
     }

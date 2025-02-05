@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
-    public string joinRoomId;
+    public RoomInfo joinRoom;
     #region 规积己 肺流
     public void CreateRoom(string roomName, bool isVisible, string password)
     {
@@ -20,12 +20,13 @@ public class RoomManager : MonoBehaviourPunCallbacks
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 2;
         roomOptions.IsVisible = isVisible;
-        roomOptions.EmptyRoomTtl = 5000;
+        roomOptions.EmptyRoomTtl = 0;
         roomOptions.PublishUserId = true;
-        var customProps = new Hashtable();
+        roomOptions.PlayerTtl = 5000;
         if(!string.IsNullOrEmpty(password))
         {
-            customProps["Password"] = password;
+            roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "Password", password } };
+            roomOptions.CustomRoomPropertiesForLobby = new string[]{"Password"};
         }
         // 规 积己 矫档
         PhotonNetwork.CreateRoom(roomName, roomOptions, TypedLobby.Default);
@@ -50,9 +51,24 @@ public class RoomManager : MonoBehaviourPunCallbacks
     #region 规 曼啊 肺流
     public void JoinRoom(string roomName)
     {
+        if(joinRoom.CustomProperties.ContainsKey("Password"))
+        {
+            PopManager.instance.gameSelectPop.SetPasswordWindow();
+            return;
+        }
         PhotonNetwork.JoinRoom(roomName);
     }
-
+    public void PasswordJoinRoom(string password)
+    {
+        if((string)joinRoom.CustomProperties["Password"] == password)
+        {
+            PhotonNetwork.JoinRoom(joinRoom.Name);
+        }
+        else
+        {
+            Debug.Log("The password is incorrect.");
+        }
+    }
     // 规 曼啊 己傍 矫
     public override void OnJoinedRoom()
     {
