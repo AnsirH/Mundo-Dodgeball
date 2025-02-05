@@ -5,7 +5,9 @@ using UnityEngine;
 public class UIManager : ManagerBase<UIManager>
 {
     [SerializeField] GameObject lobbyUI;
+    [SerializeField] GameObject LoadingUI;
     public RoomUI roomUI;
+
     void Start()
     {
         
@@ -21,5 +23,9 @@ public class UIManager : ManagerBase<UIManager>
         roomUI.gameObject.SetActive(false);
         lobbyUI.SetActive(true);
         PopManager.instance.AllPopClose();
+    }
+    public void SetLoadingUI(bool on)
+    {
+        LoadingUI.SetActive(on);
     }
 }

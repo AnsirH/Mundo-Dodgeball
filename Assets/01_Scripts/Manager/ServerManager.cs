@@ -48,6 +48,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
     #endregion
     public RoomManager roomManager;
     [SerializeField] private string gameVersion = "1.0";
+
     void Start()
     {
         //  자동 동기화
@@ -58,7 +59,34 @@ public class ServerManager : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings(); 
         Debug.Log("Connecting to Photon...");
     }
+    private const float checkConstTime = 5f;
+    private float checkInterval = 5f; // 상태 확인 주기 (초)
+    private float nextCheckTime = 0f;
 
+    void Update()
+    {
+        if (Time.time >= nextCheckTime)
+        {
+            nextCheckTime = Time.time + checkInterval;
+            CheckConnectionStatus();
+        }
+    }
+
+    void CheckConnectionStatus()
+    {
+        if (PhotonNetwork.IsConnectedAndReady)
+        {
+            // 정상 연결됨!
+            checkInterval = checkConstTime;
+            UIManager.instance.SetLoadingUI(false);
+        }
+        else
+        {
+            checkInterval = 0.2f;
+            UIManager.instance.SetLoadingUI(true);
+            PhotonNetwork.Reconnect(); // 자동 재연결 시도
+        }
+    }
     // 포톤 마스터 서버 연결완료
     public override void OnConnectedToMaster()
     {
