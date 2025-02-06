@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -17,12 +18,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
         }
 
         // 방 옵션 지정 (예시: 최대 4명)
-        RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 2;
-        roomOptions.IsVisible = isVisible;
-        roomOptions.EmptyRoomTtl = 0;
-        roomOptions.PublishUserId = true;
-        roomOptions.PlayerTtl = 5000;
+        RoomOptions roomOptions = new RoomOptions()
+        {
+            MaxPlayers = 2,
+            IsVisible = isVisible,
+            EmptyRoomTtl = 0,
+            PublishUserId = true,
+            PlayerTtl = 5000
+        };
         if(!string.IsNullOrEmpty(password))
         {
             roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "Password", password } };
@@ -47,7 +50,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
         Debug.LogWarning($"Create Room Failed: {message}");
     }
     #endregion
-
     #region 방 참가 로직
     public void JoinRoom(string roomName)
     {
@@ -131,6 +133,48 @@ public class RoomManager : MonoBehaviourPunCallbacks
         UpdatePlayerUI();
     }
     #endregion
+    // Ready 버튼이 눌렸을 때 호출되는 함수 (버튼 OnClick에 연결)
+    public void OnClickReady(bool isReady)
+    {
+        if (!PhotonNetwork.InRoom) return;
+
+        // Player Custom Properties에 "Ready" = true 설정
+        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable();
+        props["Ready"] = isReady;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+        UIManager.instance.roomUI.SetImReady(PhotonNetwork.IsMasterClient, isReady);
+    }
+
+    // 어떤 플레이어의 CustomProperties가 변경될 때마다 호출되는 콜백
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        // 모든 플레이어가 레디인지 마스터 클라이언트가 확인
+        CheckAllPlayersReady();
+    }
+
+    private void CheckAllPlayersReady()
+    {
+        // 마스터 클라이언트가 아니면 처리하지 않음
+        if (!PhotonNetwork.IsMasterClient || PhotonNetwork.PlayerList.Length < 2) return;
+
+        // 모든 플레이어의 "Ready" 상태가 true인지 확인
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            // Ready 프로퍼티가 없거나 false라면 아직 준비 안 된 것으로 간주
+            if (!p.CustomProperties.ContainsKey("Ready") || !(bool)p.CustomProperties["Ready"])
+            {
+                return;
+            }
+        }
+
+        // 여기까지 왔다면, 모든 인원이 Ready 상태
+        Debug.Log("모든 플레이어가 Ready! GameScene으로 이동합니다.");
+
+        // 마스터 클라이언트가 씬 로드를 트리거하면
+        // AutomaticallySyncScene이 true면 다른 클라이언트도 자동 이동
+        PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.LoadLevel("PlayerCharacterTest");
+    }
     // 방 목록이 갱신될 때마다 Photon이 이 콜백을 호출해줌
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
