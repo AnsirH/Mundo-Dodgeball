@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -64,3 +65,4 @@ public class FontChangerTool : EditorWindow
         EditorUtility.DisplayDialog("Font Changer", $"폰트 변경 완료!\nText: {textCount}개\nTMP_Text: {tmpCount}개", "확인");
     }
 }
+#endif

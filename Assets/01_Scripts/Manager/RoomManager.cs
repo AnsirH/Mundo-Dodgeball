@@ -110,6 +110,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         foreach (Player player in PhotonNetwork.PlayerList)
         {
+            if (player.CustomProperties.ContainsKey("Ready"))
+            {
+                UIManager.instance.roomUI.SetImReady(player.IsMasterClient, (bool)player.CustomProperties["Ready"]);
+            }
             if (player != master)
             {
                 otherPlayer = player;
@@ -125,12 +129,20 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         UpdatePlayerUI();
+        if (newPlayer.CustomProperties.ContainsKey("Ready"))
+        {
+            UIManager.instance.roomUI.SetImReady(newPlayer.IsMasterClient, (bool)newPlayer.CustomProperties["Ready"]);
+        }
     }
 
     // 플레이어가 나갔을 때 실행
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         UpdatePlayerUI();
+        if (otherPlayer.CustomProperties.ContainsKey("Ready"))
+        {
+            UIManager.instance.roomUI.SetImReady(otherPlayer.IsMasterClient, (bool)otherPlayer.CustomProperties["Ready"]);
+        }
     }
     #endregion
     // Ready 버튼이 눌렸을 때 호출되는 함수 (버튼 OnClick에 연결)
@@ -148,6 +160,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
     // 어떤 플레이어의 CustomProperties가 변경될 때마다 호출되는 콜백
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
+        if (targetPlayer.CustomProperties.ContainsKey("Ready"))
+        {
+            UIManager.instance.roomUI.SetImReady(targetPlayer.IsMasterClient, (bool)targetPlayer.CustomProperties["Ready"]);
+        }
         // 모든 플레이어가 레디인지 마스터 클라이언트가 확인
         CheckAllPlayersReady();
     }
