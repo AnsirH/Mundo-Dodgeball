@@ -49,29 +49,47 @@ public class ServerManager : MonoBehaviourPunCallbacks
     public RoomManager roomManager;
     [SerializeField] private string gameVersion = "1.0";
 
-    void Start()
-    {
-        //  자동 동기화
-        PhotonNetwork.AutomaticallySyncScene = true;
-
-        // 게임 버전 셋팅
-        PhotonNetwork.GameVersion = gameVersion;
-        PhotonNetwork.ConnectUsingSettings(); 
-        Debug.Log("Connecting to Photon...");
-    }
+    
     private const float checkConstTime = 5f;
     private float checkInterval = 5f; // 상태 확인 주기 (초)
     private float nextCheckTime = 0f;
 
+    private bool isStartGame = false;
+    void Start()
+    {
+        string savedRegion = PlayerPrefs.GetString("LocalKey");
+        if (savedRegion == null || savedRegion == "")
+        {
+            
+        }
+        else
+        {
+            ApplyRegionSetting(savedRegion);
+        }
+    }
+
     void Update()
     {
-        if (Time.time >= nextCheckTime)
+        if (Time.time >= nextCheckTime && isStartGame)
         {
             nextCheckTime = Time.time + checkInterval;
             CheckConnectionStatus();
         }
     }
+    void ApplyRegionSetting(string regionCode)
+    {
+        //  자동 동기화
+        PhotonNetwork.AutomaticallySyncScene = true;
+        // 지역 설정
+        PhotonNetwork.PhotonServerSettings.AppSettings.UseNameServer = true;
+        PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = regionCode;
 
+        // 게임 버전 셋팅
+        PhotonNetwork.GameVersion = gameVersion;
+        PhotonNetwork.ConnectUsingSettings();
+        isStartGame = true;
+        Debug.Log("Connecting to Photon...");
+    }
     void CheckConnectionStatus()
     {
         if (PhotonNetwork.IsConnectedAndReady)
