@@ -693,7 +693,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       propertyPath: m_Name
-      value: Prefab_BullTank Viking
+      value: PlayerNew
       objectReference: {fileID: 0}
     - target: {fileID: 1772443926088868188, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1241,9 +1241,9 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
-        m_MethodName: OnMove
+      - m_Target: {fileID: 1089014353931383088}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: GetPlayerInputEvent
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1257,9 +1257,9 @@ MonoBehaviour:
     m_ActionName: Player Input/Move[/Mouse/rightButton]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
-        m_MethodName: OnMove
+      - m_Target: {fileID: 1089014353931383088}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: GetPlayerInputEvent
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1273,9 +1273,9 @@ MonoBehaviour:
     m_ActionName: Player Input/Attack[/Keyboard/q]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
-        m_MethodName: OnMove
+      - m_Target: {fileID: 1089014353931383088}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: GetPlayerInputEvent
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1289,9 +1289,9 @@ MonoBehaviour:
     m_ActionName: Player Input/Select[/Mouse/rightButton]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
-        m_MethodName: OnMove
+      - m_Target: {fileID: 1089014353931383088}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: GetPlayerInputEvent
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1305,9 +1305,9 @@ MonoBehaviour:
     m_ActionName: Player Input/SpellD[/Keyboard/d]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
-        m_MethodName: OnMove
+      - m_Target: {fileID: 1089014353931383088}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: GetPlayerInputEvent
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
