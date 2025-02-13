@@ -1,10 +1,11 @@
 using DG.Tweening;
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAttack : MonoBehaviour
+public class PlayerAttack : MonoBehaviourPunCallbacks
 {
     private void Update()
     {
@@ -36,6 +37,7 @@ public class PlayerAttack : MonoBehaviour
 
     public void StartAttack()
     {
+        if (!photonView.IsMine) return;
         if (canAttackable)
         {
             Vector3 direction = axeShooter.targetPoint - transform.position;
