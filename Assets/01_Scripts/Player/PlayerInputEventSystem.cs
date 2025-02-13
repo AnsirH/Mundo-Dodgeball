@@ -20,7 +20,14 @@ public class PlayerInputEventSystem : MonoBehaviourPunCallbacks, IPlayerInputAct
     public void OnClick(InputAction.CallbackContext context)
     {
         if (photonView.IsMine)
+        {
             PlayerInputEvent?.Invoke(context);
+            Debug.Log("photonView.IsMine is true");
+        }
+        else
+        {
+            Debug.Log("photonView.IsMine is false");
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
