@@ -17,7 +17,6 @@ namespace PlayerCharacterControl.State
 
         public override void ExitState()
         {
-            Debug.Log($"{GetType().Name} 상태 종료");
             playerController.Anim.SetBool("IsMove", false);
         }
 

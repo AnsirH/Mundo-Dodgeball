@@ -22,9 +22,7 @@ namespace PlayerCharacterControl.State
 
             playerController.Attack.StartAttack();
 
-            playerController.Anim.SetTrigger("Attack"); // 상수로 변경할 것.
-
-            //playerController.AxeShooter.targetDirection = 
+            playerController.Anim.SetTrigger("Attack"); // 상수로 변경할 것
         }
 
         public override void ExitState()

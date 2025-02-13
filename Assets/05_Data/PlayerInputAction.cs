@@ -46,7 +46,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Select"",
+                    ""name"": ""Click"",
                     ""type"": ""Button"",
                     ""id"": ""a5b1f991-1d93-4015-a2c9-4f49d4e25c1c"",
                     ""expectedControlType"": ""Button"",
@@ -103,7 +103,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Select"",
+                    ""action"": ""Click"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -138,7 +138,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_PlayerInput = asset.FindActionMap("Player Input", throwIfNotFound: true);
         m_PlayerInput_Move = m_PlayerInput.FindAction("Move", throwIfNotFound: true);
         m_PlayerInput_Attack = m_PlayerInput.FindAction("Attack", throwIfNotFound: true);
-        m_PlayerInput_Select = m_PlayerInput.FindAction("Select", throwIfNotFound: true);
+        m_PlayerInput_Click = m_PlayerInput.FindAction("Click", throwIfNotFound: true);
         m_PlayerInput_SpellD = m_PlayerInput.FindAction("SpellD", throwIfNotFound: true);
         m_PlayerInput_SpellF = m_PlayerInput.FindAction("SpellF", throwIfNotFound: true);
     }
@@ -204,7 +204,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private List<IPlayerInputActions> m_PlayerInputActionsCallbackInterfaces = new List<IPlayerInputActions>();
     private readonly InputAction m_PlayerInput_Move;
     private readonly InputAction m_PlayerInput_Attack;
-    private readonly InputAction m_PlayerInput_Select;
+    private readonly InputAction m_PlayerInput_Click;
     private readonly InputAction m_PlayerInput_SpellD;
     private readonly InputAction m_PlayerInput_SpellF;
     public struct PlayerInputActions
@@ -213,7 +213,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         public PlayerInputActions(@PlayerInputAction wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_PlayerInput_Move;
         public InputAction @Attack => m_Wrapper.m_PlayerInput_Attack;
-        public InputAction @Select => m_Wrapper.m_PlayerInput_Select;
+        public InputAction @Click => m_Wrapper.m_PlayerInput_Click;
         public InputAction @SpellD => m_Wrapper.m_PlayerInput_SpellD;
         public InputAction @SpellF => m_Wrapper.m_PlayerInput_SpellF;
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
@@ -231,9 +231,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Attack.started += instance.OnAttack;
             @Attack.performed += instance.OnAttack;
             @Attack.canceled += instance.OnAttack;
-            @Select.started += instance.OnSelect;
-            @Select.performed += instance.OnSelect;
-            @Select.canceled += instance.OnSelect;
+            @Click.started += instance.OnClick;
+            @Click.performed += instance.OnClick;
+            @Click.canceled += instance.OnClick;
             @SpellD.started += instance.OnSpellD;
             @SpellD.performed += instance.OnSpellD;
             @SpellD.canceled += instance.OnSpellD;
@@ -250,9 +250,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Attack.started -= instance.OnAttack;
             @Attack.performed -= instance.OnAttack;
             @Attack.canceled -= instance.OnAttack;
-            @Select.started -= instance.OnSelect;
-            @Select.performed -= instance.OnSelect;
-            @Select.canceled -= instance.OnSelect;
+            @Click.started -= instance.OnClick;
+            @Click.performed -= instance.OnClick;
+            @Click.canceled -= instance.OnClick;
             @SpellD.started -= instance.OnSpellD;
             @SpellD.performed -= instance.OnSpellD;
             @SpellD.canceled -= instance.OnSpellD;
@@ -280,7 +280,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
-        void OnSelect(InputAction.CallbackContext context);
+        void OnClick(InputAction.CallbackContext context);
         void OnSpellD(InputAction.CallbackContext context);
         void OnSpellF(InputAction.CallbackContext context);
     }

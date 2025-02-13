@@ -201,6 +201,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rangeDisplayer: {fileID: 1792318916}
+  currentCoolTime: 0
+  maxCoolTime: 2.5
   targetPoint: {x: 0, y: 0, z: 0}
   flyTime: 0.5
   flyDistance: 7.5
@@ -576,6 +578,7 @@ GameObject:
   - component: {fileID: 1118867331}
   - component: {fileID: 1118867330}
   - component: {fileID: 1118867332}
+  - component: {fileID: 1118867333}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -595,6 +598,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a81442b606c73e647abb041030fd7359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInputEventSystem: {fileID: 1118867333}
+  playerMovement: {fileID: 1118867328}
   playerAttack: {fileID: 1118867331}
   playerAnim: {fileID: 7716498986825857070}
   playerAnimEventHandler: {fileID: 7716498986825857071}
@@ -628,7 +633,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 3
-  rotateSpeed: 1080
+  rotateSpeed: 1140
 --- !u!114 &1118867330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -656,8 +661,8 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1118867326}
-        m_TargetAssemblyTypeName: PlayerCharacterControl.PlayerController, Assembly-CSharp
+      - m_Target: {fileID: 1118867333}
+        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
         m_MethodName: OnMove
         m_Mode: 0
         m_Arguments:
@@ -672,9 +677,9 @@ MonoBehaviour:
     m_ActionName: Player Input/Move[/Mouse/rightButton]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1118867326}
-        m_TargetAssemblyTypeName: PlayerCharacterControl.PlayerController, Assembly-CSharp
-        m_MethodName: OnAttack
+      - m_Target: {fileID: 1118867333}
+        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
+        m_MethodName: OnMove
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -688,9 +693,9 @@ MonoBehaviour:
     m_ActionName: Player Input/Attack[/Keyboard/q]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1118867326}
-        m_TargetAssemblyTypeName: PlayerCharacterControl.PlayerController, Assembly-CSharp
-        m_MethodName: OnSelect
+      - m_Target: {fileID: 1118867333}
+        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
+        m_MethodName: OnMove
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -703,11 +708,35 @@ MonoBehaviour:
     m_ActionId: a5b1f991-1d93-4015-a2c9-4f49d4e25c1c
     m_ActionName: Player Input/Select[/Mouse/rightButton]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1118867333}
+        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 8513fae3-dfe6-4864-ab11-f011282a7e2a
     m_ActionName: Player Input/SpellD[/Keyboard/d]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1118867333}
+        m_TargetAssemblyTypeName: PlayerInputEventSystem, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 6ec8dc39-f7f1-4467-8fc1-36bc27dc927c
     m_ActionName: Player Input/SpellF[/Keyboard/f]
   m_NeverAutoSwitchControlSchemes: 0
@@ -744,6 +773,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flashDistance: 1.5
   canUseSpellD: 1
+--- !u!114 &1118867333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118867325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2740abd91cc61b489426022f1a59cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerInputEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1641783610
 GameObject:
   m_ObjectHideFlags: 0

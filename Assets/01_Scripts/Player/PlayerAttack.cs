@@ -1,8 +1,8 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace PlayerCharacterControl
 {
@@ -10,50 +10,42 @@ namespace PlayerCharacterControl
     {
         private void Update()
         {
-            if (!canAttackable)
+            if (canAttackable)
             {
-                Cooldown();
-            }
-            else
-            {
-                axeShooter.DisplayRange(GetMousePosition - transform.position);
+                axeShooter.DisplayRange(PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform));
             }
         }
 
-        Vector3 GetMousePosition
+        public void ReadyToAttack()
         {
-            get
+            if (!canAttackable && axeShooter.CanShoot)
             {
-                RaycastHit hit;
-                if (Physics.Raycast(CameraManager.Instance.firstPlayerCamera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
-                {
-                    Vector3 result = hit.point;
-                    result.y = transform.position.y;
-                    return result;
-                }
-                else
-                    return Vector3.zero;
-            }
-        }
-
-        private void Cooldown()
-        {
-            if (currentCoolTime > 0.0f)
-            {
-                currentCoolTime -= Time.deltaTime;
-            }
-            else
-            {
-                currentCoolTime = 0.0f;
+                axeShooter.ShowRange(true);
                 canAttackable = true;
             }
+
+            else if (canAttackable)
+            {
+                CancelReady();
+            }
         }
 
-        public void OnAttack()
+        public void CancelReady()
+        {
+            canAttackable = false;
+            axeShooter.ShowRange(false);
+        }
+
+        public void StartAttack()
         {
             if (canAttackable)
             {
-                axeShooter.ShowRange(true);
+                Vector3 direction = axeShooter.targetPoint - transform.position;
+                direction.y = 0.0f;
+                transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f);
+
+                CancelReady();
+                attackTrigger = false;
             }
         }
 
@@ -66,33 +58,10 @@ namespace PlayerCharacterControl
             }
         }
 
-        public void OnSelect()
-        {
-            if (canAttackable)
-            {
-                CancelAttack();
-                attackTrigger = true;
-
-                axeShooter.ShowRange(false);
-
-                axeShooter.targetPoint = GetMousePosition;
-            }
-        }
-
-        public void StartAttack()
-        {
-            Vector3 direction = axeShooter.targetPoint - transform.position;
-            direction.y = 0.0f;
-            transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f);
-
-            canAttackable = false;
-            attackTrigger = false;
-            currentCoolTime = maxCoolTime;
-        }
-
+        #region Animation Event Func
         public void SpawnAxe()
         {
-            axeShooter.SpawnAxe();
+            axeShooter.ShootAxe();
             axeObj.SetActive(false);
         }
 
@@ -100,6 +69,17 @@ namespace PlayerCharacterControl
         {
             axeObj.SetActive(true);
         }
+
+        public void SetAttack(bool value)
+        {
+            if (canAttackable)
+            {
+                attackTrigger = value;
+                if (value)
+                    axeShooter.targetPoint = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform);
+            }
+        }
+        #endregion
 
         [Header("References")]
         [SerializeField] AxeShooter axeShooter;
@@ -110,17 +90,5 @@ namespace PlayerCharacterControl
 
         public bool CanAttackable => canAttackable;
         public bool AttackTrigger => attackTrigger;
-
-        float currentCoolTime = 0.0f;
-        public float maxCoolTime = 2.5f;
-
-#if UNITY_EDITOR
-
-        public void OnGUI()
-        {
-            GUILayout.TextField($"Current Cool Time : {currentCoolTime}");
-        }
-
-#endif
     }
 }

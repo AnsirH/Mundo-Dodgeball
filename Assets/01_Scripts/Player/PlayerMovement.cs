@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEngine;
 
 namespace PlayerCharacterControl
@@ -28,19 +29,49 @@ namespace PlayerCharacterControl
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Time.deltaTime);
         }
 
-        public void StartMove(Vector3 targetPoint)
+        public void StartMove()
         {
-            this.targetPoint = targetPoint;
+            targetPoint = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform);
             isMove = true;
+            isHold = true;
+
+            if (holdingMoveCoroutine != null) StopCoroutine(holdingMoveCoroutine);
+            holdingMoveCoroutine = StartCoroutine(HoldingMove());
+        }
+
+        public void CancelHold()
+        {
+            isHold = false;
+
+            StopCoroutine(holdingMoveCoroutine);
+            holdingMoveCoroutine = null;
         }
 
         public void StopMove()
         {
             isMove = false;
+            isHold = true;
+
+            StopCoroutine(holdingMoveCoroutine);
+            holdingMoveCoroutine = null;
         }
 
-        private bool isMove = false;
+        private IEnumerator HoldingMove()
+        {
+            WaitForSeconds targetSetDelay = new(0.2f);
+
+            while (isHold)
+            {
+                yield return targetSetDelay;
+
+                targetPoint = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform);
+            }
+        }
+
+        private bool isMove = false; // 이동 체크
+        private bool isHold = false; // 마우스 홀드 체크
         private Vector3 targetPoint;
+        private Coroutine holdingMoveCoroutine;
 
         public bool IsMove => isMove;
 
