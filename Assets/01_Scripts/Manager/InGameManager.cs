@@ -25,6 +25,6 @@ public class InGameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PhotonNetwork.Instantiate("Cube", Vector3.zero, Quaternion.identity);
+        PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
     }
 }
