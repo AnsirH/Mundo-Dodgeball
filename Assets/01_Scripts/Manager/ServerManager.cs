@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
 public class ServerManager : MonoBehaviourPunCallbacks
@@ -100,7 +101,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
             checkInterval = checkConstTime;
             UIManager.instance.SetLoadingUI(false);
         }
-        else
+        else if(PhotonNetwork.NetworkClientState == ClientState.Disconnected)
         {
             checkInterval = 0.2f;
             UIManager.instance.SetLoadingUI(true);
