@@ -1,10 +1,9 @@
+using Photon.Pun;
 using PlayerCharacterControl;
 using PlayerCharacterControl.State;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -15,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerAttack playerAttack;
     [SerializeField] private Animator playerAnim;
     [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
+    private PhotonView playerPhotonView;
 
     public PlayerStateMachine StateMachine => playerStateMachine;
     public PlayerMovement Movement => playerMovement;
@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour
         playerStateMachine.ChangeState(EPlayerState.Idle);
 
         playerInputEventSystem.PlayerInputEvent.AddListener(GetPlayerInputEvent);
+
+        playerPhotonView = GetComponent<PhotonView>();
     }
 
     void Update()
@@ -71,6 +73,7 @@ public class PlayerController : MonoBehaviour
 
     public void GetPlayerInputEvent(InputAction.CallbackContext context)
     {
+        if (!playerPhotonView.IsMine) return;
         switch (context.action.name)
         {
             case "Move":
