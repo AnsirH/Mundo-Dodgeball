@@ -190,6 +190,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         // AutomaticallySyncScene이 true면 다른 클라이언트도 자동 이동
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.LoadLevel("PlayerCharacterTest");
+        UIManager.instance.ChangeGame(false);
     }
     // 방 목록이 갱신될 때마다 Photon이 이 콜백을 호출해줌
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
