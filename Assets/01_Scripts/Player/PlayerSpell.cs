@@ -43,3 +43,19 @@ public class PlayerSpell : MonoBehaviour
     public float flashDistance = 1.5f;
     public bool canUseSpellD = true;
 }
+
+public class Spell
+{
+    public virtual void Execute()
+    {
+
+    }
+}
+
+public class Flash : Spell
+{
+    public override void Execute()
+    {
+
+    }
+}
