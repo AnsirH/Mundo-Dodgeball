@@ -1412,7 +1412,7 @@ MonoBehaviour:
     SynchronizeType: 2
     Name: IsMove
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: Attack
   m_SynchronizeLayers:
   - SynchronizeType: 0
