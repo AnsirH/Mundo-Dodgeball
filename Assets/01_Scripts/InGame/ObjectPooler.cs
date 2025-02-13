@@ -1,3 +1,4 @@
+using Photon.Pun;
 using Steamworks;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,7 +63,8 @@ public class ObjectPooler : MonoBehaviour
 
     private GameObject OnNewObjCreate(GameObject newObj)
     {
-        GameObject obj = Instantiate(newObj, transform);
+        GameObject obj = PhotonNetwork.Instantiate(newObj.name, Vector3.zero, Quaternion.identity);
+        obj.transform.parent = transform;
         obj.SetActive(false);
         return obj;
     }

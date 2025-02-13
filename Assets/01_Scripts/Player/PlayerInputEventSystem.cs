@@ -11,15 +11,22 @@ public class PlayerInputEventSystem : MonoBehaviourPunCallbacks, IPlayerInputAct
 {
     public UnityEvent<InputAction.CallbackContext> PlayerInputEvent = new();
 
+    private PhotonView playerPhotonView;
+
+    private void Awake()
+    {
+        playerPhotonView = GetComponent<PhotonView>();
+    }
+
     public void OnAttack(InputAction.CallbackContext context)
     {
-        if (photonView.IsMine)
+        if (playerPhotonView.IsMine)
             PlayerInputEvent?.Invoke(context);
     }
 
     public void OnClick(InputAction.CallbackContext context)
     {
-        if (photonView.IsMine)
+        if (playerPhotonView.IsMine)
         {
             PlayerInputEvent?.Invoke(context);
             Debug.Log("photonView.IsMine is true");
@@ -32,19 +39,26 @@ public class PlayerInputEventSystem : MonoBehaviourPunCallbacks, IPlayerInputAct
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (photonView.IsMine)
+        if (playerPhotonView.IsMine)
+        {
             PlayerInputEvent?.Invoke(context);
+            Debug.Log("photonView.IsMine is true");
+        }
+        else
+        {
+            Debug.Log("photonView.IsMine is false");
+        }
     }
 
     public void OnSpellD(InputAction.CallbackContext context)
     {
-        if (photonView.IsMine)
+        if (playerPhotonView.IsMine)
             PlayerInputEvent?.Invoke(context);
     }
 
     public void OnSpellF(InputAction.CallbackContext context)
     {
-        if (photonView.IsMine)
+        if (playerPhotonView.IsMine)
             PlayerInputEvent?.Invoke(context);
     }
 }
