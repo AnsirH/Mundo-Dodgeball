@@ -1270,6 +1270,9 @@ PrefabInstance:
       addedObject: {fileID: 1032545230076460764}
     - targetCorrespondingSourceObject: {fileID: 8031292165292444941, guid: 607f48622e4d33e489d7d09ffe485607, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6943913840014149571}
+    - targetCorrespondingSourceObject: {fileID: 8031292165292444941, guid: 607f48622e4d33e489d7d09ffe485607, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 3152286405756443568}
   m_SourcePrefab: {fileID: 100100000, guid: 607f48622e4d33e489d7d09ffe485607, type: 3}
 --- !u!4 &1329167703698248021 stripped
@@ -1310,6 +1313,30 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &6943913840014149571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1817754779811269615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 0
+    Name: IsMove
+  - Type: 9
+    SynchronizeType: 0
+    Name: Attack
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!114 &3152286405756443568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1330,6 +1357,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 1032545230076460764}
+  - {fileID: 6943913840014149571}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
