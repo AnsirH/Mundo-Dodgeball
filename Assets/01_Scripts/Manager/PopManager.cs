@@ -8,6 +8,9 @@ public class PopManager : ManagerBase<PopManager>
 {
     public List<PopBase> pops = new List<PopBase>();
     public GameSelectPop gameSelectPop;
+    public LocalSelectPop localSelectPop;
+
+
     #region Pop Active
     private List<PopBase> openPops = new List<PopBase>();
     private List<GameObject> DetailOpenPops = new List<GameObject>();

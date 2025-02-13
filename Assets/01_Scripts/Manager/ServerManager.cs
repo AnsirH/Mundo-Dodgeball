@@ -60,7 +60,8 @@ public class ServerManager : MonoBehaviourPunCallbacks
         string savedRegion = PlayerPrefs.GetString("LocalKey");
         if (savedRegion == null || savedRegion == "")
         {
-            
+            PopManager.instance.localSelectPop.Open();
+            return;
         }
         else
         {
@@ -76,14 +77,15 @@ public class ServerManager : MonoBehaviourPunCallbacks
             CheckConnectionStatus();
         }
     }
-    void ApplyRegionSetting(string regionCode)
+    public void ApplyRegionSetting(string regionCode)
     {
         //  자동 동기화
         PhotonNetwork.AutomaticallySyncScene = true;
         // 지역 설정
         PhotonNetwork.PhotonServerSettings.AppSettings.UseNameServer = true;
         PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = regionCode;
-
+        PlayerPrefs.SetString("LocalKey", regionCode);
+        PlayerPrefs.Save();
         // 게임 버전 셋팅
         PhotonNetwork.GameVersion = gameVersion;
         PhotonNetwork.ConnectUsingSettings();
