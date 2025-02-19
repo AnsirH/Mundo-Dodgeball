@@ -12,7 +12,7 @@ public class Axe : MonoBehaviour
 
     public void FlyToTarget(Vector3 targetPoint, float flyTime)
     {
-        transform.DOMove(targetPoint, flyTime).SetEase(Ease.Linear).onComplete += () => ObjectPooler.Instance.Destroy(gameObject);
+        transform.DOMove(targetPoint, flyTime).SetEase(Ease.Linear).onComplete += () => ObjectPooler.Release("Axe", gameObject);
         modelTrf.DOLocalRotate(new Vector3(0.0f, 810.0f, 0.0f), flyTime, RotateMode.LocalAxisAdd).SetEase(Ease.Linear);
     }
 

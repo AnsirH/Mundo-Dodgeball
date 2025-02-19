@@ -45,7 +45,8 @@ public class AxeShooter : MonoBehaviour
         targetPoint.y = transform.position.y;
         Vector3 direction = (targetPoint - transform.position).normalized;
 
-        GameObject axeObj = ObjectPooler.Instance.Instantiate("Axe", transform.position, Quaternion.LookRotation(direction));
+        //GameObject axeObj = ObjectPooler.Instance.Instantiate("Axe", transform.position, Quaternion.LookRotation(direction));
+        GameObject axeObj = ObjectPooler.Get("Axe");
 
         Vector3 destination = transform.position + direction * flyDistance;
         axeObj.GetComponent<Axe>().FlyToTarget(destination, flyTime);
