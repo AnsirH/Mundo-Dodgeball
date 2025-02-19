@@ -1372,6 +1372,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 8439029551291699871}
   - {fileID: 7402131800847745899}
   - {fileID: 7087272152704519845}
   sceneViewId: 0
@@ -1409,10 +1410,10 @@ MonoBehaviour:
   ShowParameterInspector: 1
   m_SynchronizeParameters:
   - Type: 4
-    SynchronizeType: 2
+    SynchronizeType: 1
     Name: IsMove
   - Type: 9
-    SynchronizeType: 2
+    SynchronizeType: 1
     Name: Attack
   m_SynchronizeLayers:
   - SynchronizeType: 0

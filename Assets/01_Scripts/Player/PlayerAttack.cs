@@ -1,12 +1,11 @@
 using DG.Tweening;
-using MoreMountains.Feedbacks;
 using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAttack : MonoBehaviourPunCallbacks
+public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
 {
     private void Update()
     {
@@ -75,6 +74,14 @@ public class PlayerAttack : MonoBehaviourPunCallbacks
             attackTrigger = false;
             canAttackable = false;
         }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+            stream.SendNext(axeShooter.targetPoint);
+        else
+            axeShooter.targetPoint = (Vector3)stream.ReceiveNext();
     }
 
     #region Animation Event Func
