@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class ObjectPooler : MonoBehaviour, IPunPrefabPool
+public class ObjectPooler : MonoBehaviour
 {
     public static ObjectPooler Instance { get; private set; }
 
@@ -23,7 +23,6 @@ public class ObjectPooler : MonoBehaviour, IPunPrefabPool
         if (Instance == null)
         {
             Instance = this;
-            PhotonNetwork.PrefabPool = this; // IPunPrefabPool ¼³Á¤
             InitializePools();
         }
         else
@@ -53,10 +52,9 @@ public class ObjectPooler : MonoBehaviour, IPunPrefabPool
 
     private GameObject CreatePooledObject(GameObject prefab)
     {
-        var obj = Instantiate(prefab);
-        obj.name = prefab.name;
+        var obj = Instantiate(prefab, transform);
+        obj.GetComponent<PhotonView>().ViewID = PhotonNetwork.AllocateViewID(true);
         obj.SetActive(false);
-        obj.transform.SetParent(transform);
         return obj;
     }
 
@@ -68,36 +66,6 @@ public class ObjectPooler : MonoBehaviour, IPunPrefabPool
     private void OnReleaseObject(GameObject obj)
     {
         obj.SetActive(false);
-    }
-
-    public GameObject Instantiate(string prefabId, Vector3 position, Quaternion rotation)
-    {
-        if (poolDictionary.TryGetValue(prefabId, out var pool))
-        {
-            var obj = pool.Get();
-            obj.transform.position = position;
-            obj.transform.rotation = rotation;
-            return obj;
-        }
-        else
-        {
-            Debug.LogWarning($"Pool with tag {prefabId} doesn't exist.");
-            return null;
-        }
-    }
-
-    public void Destroy(GameObject gameObject)
-    {
-        var tag = gameObject.name;
-        if (poolDictionary.TryGetValue(tag, out var pool))
-        {
-            pool.Release(gameObject);
-        }
-        else
-        {
-            Debug.LogWarning($"Pool with tag {tag} doesn't exist.");
-            Object.Destroy(gameObject);
-        }
     }
 
     public static GameObject Get(string tag)
