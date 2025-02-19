@@ -1,4 +1,5 @@
 using DG.Tweening;
+using MoreMountains.Feedbacks;
 using Photon.Pun;
 using System;
 using System.Collections;
@@ -35,16 +36,16 @@ public class PlayerAttack : MonoBehaviourPunCallbacks
         axeShooter.ShowRange(false);
     }
 
+    [PunRPC]
     public void StartAttack()
     {
         if (!photonView.IsMine) return;
-        if (canAttackable)
+        if (attackTrigger)
         {
             Vector3 direction = axeShooter.targetPoint - transform.position;
             direction.y = 0.0f;
             transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f);
 
-            CancelReady();
             attackTrigger = false;
         }
     }
@@ -58,6 +59,24 @@ public class PlayerAttack : MonoBehaviourPunCallbacks
         }
     }
 
+    public void SetAttack(bool value)
+    {
+        if (value == true)
+        {
+            if (canAttackable)
+            {
+                attackTrigger = true;
+                CancelReady();
+                axeShooter.targetPoint = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform);
+            }
+        }
+        else
+        {
+            attackTrigger = false;
+            canAttackable = false;
+        }
+    }
+
     #region Animation Event Func
     public void SpawnAxe()
     {
@@ -68,16 +87,6 @@ public class PlayerAttack : MonoBehaviourPunCallbacks
     public void ResetAxe()
     {
         axeObj.SetActive(true);
-    }
-
-    public void SetAttack(bool value)
-    {
-        if (canAttackable)
-        {
-            attackTrigger = value;
-            if (value)
-                axeShooter.targetPoint = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform);
-        }
     }
     #endregion
 

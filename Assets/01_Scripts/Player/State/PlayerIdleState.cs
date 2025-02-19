@@ -22,7 +22,7 @@ namespace PlayerCharacterControl.State
 
         public override void UpdateState()
         {
-            if (playerController.Attack.CanAttackable && playerController.Attack.AttackTrigger)
+            if (playerController.Attack.AttackTrigger)
                 playerController.StateMachine.ChangeState(EPlayerState.Attack);
 
             if (playerController.Movement.IsMove)

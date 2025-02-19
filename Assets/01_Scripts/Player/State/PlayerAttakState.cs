@@ -12,15 +12,13 @@ namespace PlayerCharacterControl.State
 
         public override void EnterState()
         {
-            Debug.Log($"{GetType().Name} 상태 진입");
-
             if (playerController.StateMachine.PrevState is PlayerMoveState)
             {
                 playerController.Movement.enabled = false;
                 isMoving = true;
             }
 
-            playerController.Attack.StartAttack();
+            playerController.Attack.photonView.RPC("StartAttack", Photon.Pun.RpcTarget.All);
 
             playerController.Anim.SetTrigger("Attack"); // 상수로 변경할 것
         }

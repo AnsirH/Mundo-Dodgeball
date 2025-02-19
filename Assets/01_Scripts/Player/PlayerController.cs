@@ -26,8 +26,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
         playerStateMachine = new(this);
         playerStateMachine.ChangeState(EPlayerState.Idle);
-
-        playerInputEventSystem.PlayerInputEvent.AddListener(GetPlayerInputEvent);
     }
 
     void Update()

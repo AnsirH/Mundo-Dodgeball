@@ -53,8 +53,9 @@ public class ObjectPooler : MonoBehaviour
     private GameObject CreatePooledObject(GameObject prefab)
     {
         var obj = Instantiate(prefab, transform);
+        Debug.Log("¿À »÷Áî");
         obj.GetComponent<PhotonView>().ViewID = PhotonNetwork.AllocateViewID(true);
-        //obj.SetActive(false);
+        obj.SetActive(false);
         return obj;
     }
 

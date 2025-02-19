@@ -14,6 +14,12 @@ namespace PlayerCharacterControl
         public void SendEventTag(string tag)
         {
             if (!photonView.IsMine) return;
+            photonView.RPC("SendEventTagRPC", RpcTarget.All, tag);
+        }
+
+        [PunRPC]
+        private void SendEventTagRPC(string tag)
+        {
             onAnimationEventActions.Invoke(tag);
         }
     }
