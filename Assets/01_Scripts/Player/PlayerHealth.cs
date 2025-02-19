@@ -1,8 +1,10 @@
+using Photon.Pun;
+using PlayerCharacterControl.State;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour, IDamageable
+public class PlayerHealth : MonoBehaviourPunCallbacks, IDamageable, IPunObservable
 {
     private void Awake()
     {
@@ -27,8 +29,22 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         if (health <= 0)
         {
-            Destroy(gameObject);
+            PhotonNetwork.Destroy(gameObject);
         }
+    }
+
+    [PunRPC]
+    private void DieRPC()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+            stream.SendNext(health);
+        else
+            health = (float)stream.ReceiveNext();
     }
 
     public float maxHealth = 613.0f;

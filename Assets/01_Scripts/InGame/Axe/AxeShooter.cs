@@ -35,7 +35,7 @@ public class AxeShooter : MonoBehaviour
         }
     }
 
-    public void ShootAxe()
+    public void ShootAxe(PlayerAttack sender)
     {
         if (!CanShoot)
         {
@@ -51,7 +51,7 @@ public class AxeShooter : MonoBehaviour
         axeObj.transform.rotation = Quaternion.LookRotation(direction);
 
         Vector3 destination = transform.position + direction * flyDistance;
-        axeObj.GetComponent<Axe>().FlyToTarget(destination, flyTime);
+        axeObj.GetComponent<Axe>().Init(destination, flyTime, sender);
 
         currentCoolTime = maxCoolTime;
     }

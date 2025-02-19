@@ -26,6 +26,6 @@ public class InGameManager : MonoBehaviour
     void Start()
     {
         UIManager.instance.ChangeGame(false);
-        PhotonNetwork.Instantiate("PlayerNew", Vector3.zero, Quaternion.identity);
+        PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
     }
 }

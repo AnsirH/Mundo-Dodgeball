@@ -87,7 +87,7 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
     #region Animation Event Func
     public void SpawnAxe()
     {
-        axeShooter.ShootAxe();
+        axeShooter.ShootAxe(this);
         axeObj.SetActive(false);
     }
 
@@ -106,4 +106,6 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
 
     public bool CanAttackable => canAttackable;
     public bool AttackTrigger => attackTrigger;
+
+    public float attackPower = 80.0f;
 }

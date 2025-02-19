@@ -10,8 +10,9 @@ public class Axe : MonoBehaviour
         modelTrf.localRotation = Quaternion.Euler(startRotation);
     }
 
-    public void FlyToTarget(Vector3 targetPoint, float flyTime)
+    public void Init(Vector3 targetPoint, float flyTime, PlayerAttack sender)
     {
+        owner = sender;
         transform.DOMove(targetPoint, flyTime).SetEase(Ease.Linear).onComplete += () => ObjectPooler.Release("Axe", gameObject);
         modelTrf.DOLocalRotate(new Vector3(0.0f, 810.0f, 0.0f), flyTime, RotateMode.LocalAxisAdd).SetEase(Ease.Linear);
     }
@@ -20,7 +21,7 @@ public class Axe : MonoBehaviour
     {
         if (other.TryGetComponent<IDamageable>(out IDamageable damageable))
         {
-            damageable.Damage(80.0f);
+            damageable.Damage(owner.attackPower);
             DOTween.Clear();
             ObjectPooler.Release("Axe", gameObject);
         }
@@ -28,6 +29,6 @@ public class Axe : MonoBehaviour
 
     [Header("References")]
     public Transform modelTrf;
-    
+    PlayerAttack owner;
     private Vector3 startRotation = new Vector3(-30.0f, 0.0f, -90.0f);
 }
