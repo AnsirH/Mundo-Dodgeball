@@ -35,9 +35,9 @@ public class ObjectPooler : MonoBehaviour
     {
         poolDictionary = new Dictionary<string, ObjectPool<GameObject>>();
 
-        foreach (var pool in pools)
+        foreach (Pool pool in pools)
         {
-            var objectPool = new ObjectPool<GameObject>(
+            ObjectPool<GameObject> objectPool = new ObjectPool<GameObject>(
                 createFunc: () => CreatePooledObject(pool.prefab),
                 actionOnGet: obj => OnGetObject(obj),
                 actionOnRelease: obj => OnReleaseObject(obj),
@@ -54,7 +54,7 @@ public class ObjectPooler : MonoBehaviour
     {
         var obj = Instantiate(prefab, transform);
         obj.GetComponent<PhotonView>().ViewID = PhotonNetwork.AllocateViewID(true);
-        obj.SetActive(false);
+        //obj.SetActive(false);
         return obj;
     }
 
