@@ -19,7 +19,7 @@ public class Axe : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent<IDamageable>(out IDamageable damageable))
+        if (other.TryGetComponent<IDamageable>(out IDamageable damageable) && other.gameObject != owner.gameObject)
         {
             damageable.Damage(owner.attackPower);
             DOTween.Clear();
