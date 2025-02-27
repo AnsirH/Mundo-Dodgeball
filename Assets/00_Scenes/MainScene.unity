@@ -11788,7 +11788,7 @@ MonoBehaviour:
   bgmSource: {fileID: 1182801044}
   lobbyBGM: {fileID: 8300000, guid: c9a2cfb4c107c754588bbaa4ff6e5a46, type: 3}
   uiSfxSource: {fileID: 985292473}
-  buttonClickClip: {fileID: 0}
+  buttonClickClip: {fileID: 8300000, guid: 6df8ab6c51059e7478d3edefd02dd7b9, type: 3}
 --- !u!1 &1431099019
 GameObject:
   m_ObjectHideFlags: 0
