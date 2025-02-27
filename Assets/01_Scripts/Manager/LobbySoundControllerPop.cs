@@ -11,16 +11,8 @@ public class LobbySoundControllerPop : PopBase
     // Start is called before the first frame update
     void Start()
     {
-        // 로비 BGM 재생
-        if (SoundManager.instance.bgmSource != null && SoundManager.instance.lobbyBGM != null)
-        {
-            SoundManager.instance.bgmSource.clip = SoundManager.instance.lobbyBGM;
-            SoundManager.instance.bgmSource.loop = true;
-            SoundManager.instance.bgmSource.Play();
-        }
-
         // 로비 볼륨 슬라이더 설정
-        if(outGameVolumeSlider != null)
+        if (outGameVolumeSlider != null)
         {
             // 슬라이더 값 변경 시 AudioManager로 전달
             outGameVolumeSlider.onValueChanged.AddListener(OnOutGameVolumeChanged);

@@ -48,6 +48,7 @@ public class KButton : Button
     public override void OnPointerClick(PointerEventData eventData)
     {
         base.OnPointerClick(eventData);
+        SoundManager.instance.OnClickButton();
         // popup 열기 전용
         if(EPopupType.None != PopupType)
         {
