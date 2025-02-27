@@ -78,7 +78,7 @@ public class Flash : Spell
     public override void Execute()
     {
         base.Execute();
-        Vector3 targetVector = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, owner.transform) - owner.transform.position;
+        Vector3 targetVector = PlayerController.GetMousePosition(owner.transform) - owner.transform.position;
         if (targetVector.magnitude > distance)
         {
             owner.transform.position += targetVector.normalized * distance;
