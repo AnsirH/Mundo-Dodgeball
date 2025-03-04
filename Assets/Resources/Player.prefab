@@ -1220,7 +1220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   axeShooter: {fileID: 5097637738017206974}
   axeObj: {fileID: 9042082356628863269}
-  attackPower: 80
+  attackPower: 200
 --- !u!114 &970527021875988243
 MonoBehaviour:
   m_ObjectHideFlags: 0
