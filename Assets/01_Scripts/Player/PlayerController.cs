@@ -33,10 +33,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
         playerStateMachine.UpdateCurrentState();
     }
 
-    public static Vector3 GetMousePosition(Camera cam, Transform entity)
+    public static Vector3 GetMousePosition(Transform entity)
     {
         RaycastHit hit;
-        if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
         {
             Vector3 result = hit.point;
             result.y = entity.position.y;

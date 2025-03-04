@@ -11,7 +11,7 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (canAttackable)
         {
-            axeShooter.DisplayRange(PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform));
+            axeShooter.DisplayRange(PlayerController.GetMousePosition(transform));
         }
     }
 
@@ -66,7 +66,7 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
             {
                 attackTrigger = true;
                 CancelReady();
-                axeShooter.targetPoint = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform);
+                axeShooter.targetPoint = PlayerController.GetMousePosition(transform);
             }
         }
         else

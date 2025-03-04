@@ -30,7 +30,7 @@ namespace PlayerCharacterControl
 
         public void StartMove()
         {
-            targetPoint = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform);
+            targetPoint = PlayerController.GetMousePosition(transform);
             isMove = true;
             isHold = true;
 
@@ -63,7 +63,7 @@ namespace PlayerCharacterControl
             {
                 yield return targetSetDelay;
 
-                targetPoint = PlayerController.GetMousePosition(CameraManager.Instance.firstPlayerCamera, transform);
+                targetPoint = PlayerController.GetMousePosition(transform);
             }
         }
 

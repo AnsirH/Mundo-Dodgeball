@@ -75,7 +75,7 @@ public class ObjectPooler : MonoBehaviour
         obj.SetActive(false);
     }
 
-    /// <summary> 오브젝트 Get /// </summary>
+    /// <summary> 오브젝트 풀에서 가져오기 /// </summary>
     public static GameObject Get(string tag)
     {
         if (Instance.poolDictionary.TryGetValue(tag, out var pool))
@@ -89,7 +89,7 @@ public class ObjectPooler : MonoBehaviour
         }
     }
 
-    /// <summary> 오브젝트 Get /// </summary>
+    /// <summary> 오브젝트 풀로 반환 /// </summary>
     public static void Release(string tag, GameObject obj)
     {
         if (Instance.poolDictionary.TryGetValue(tag, out var pool))
