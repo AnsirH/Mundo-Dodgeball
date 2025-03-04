@@ -9,16 +9,17 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviourPunCallbacks
 {
     private PlayerStateMachine playerStateMachine;
-    [SerializeField] private PlayerInputEventSystem playerInputEventSystem;
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private PlayerAttack playerAttack;
     [SerializeField] private Animator playerAnim;
     [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
+    [SerializeField] private PlayerHealth playerHealth;
 
     public PlayerStateMachine StateMachine => playerStateMachine;
     public PlayerMovement Movement => playerMovement;
     public PlayerAttack Attack => playerAttack;
     public Animator Anim => playerAnim;
+    public PlayerHealth Health => playerHealth;
 
     void Awake()
     {
@@ -86,6 +87,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
             case "Click":
                 if (context.started) playerAttack.SetAttack(true);
+                break;
+            case "StopMove":
+                if (context.started) playerMovement.StopMove();
                 break;
         }
     }

@@ -42,16 +42,16 @@ namespace PlayerCharacterControl
         {
             isHold = false;
 
-            StopCoroutine(holdingMoveCoroutine);
+            if (holdingMoveCoroutine != null) StopCoroutine(holdingMoveCoroutine);
             holdingMoveCoroutine = null;
         }
 
         public void StopMove()
         {
             isMove = false;
-            isHold = true;
+            isHold = false;
 
-            StopCoroutine(holdingMoveCoroutine);
+            if (holdingMoveCoroutine != null) StopCoroutine(holdingMoveCoroutine);
             holdingMoveCoroutine = null;
         }
 

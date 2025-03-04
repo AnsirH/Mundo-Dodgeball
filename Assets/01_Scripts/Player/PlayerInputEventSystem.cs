@@ -61,4 +61,10 @@ public class PlayerInputEventSystem : MonoBehaviourPunCallbacks, IPlayerInputAct
         if (playerPhotonView.IsMine)
             PlayerInputEvent?.Invoke(context);
     }
+
+    public void OnStopMove(InputAction.CallbackContext context)
+    {
+        if (playerPhotonView.IsMine)
+            PlayerInputEvent?.Invoke(context);
+    }
 }

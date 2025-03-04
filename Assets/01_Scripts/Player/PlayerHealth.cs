@@ -9,6 +9,8 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IDamageable, IPunObservab
     private void Awake()
     {
         health = maxHealth;
+        if (HpBarTrf == null)
+            Debug.LogError($"{gameObject.name} doesn't match Hp Bar Transform");
     }
 
     private void Update()
@@ -51,4 +53,5 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IDamageable, IPunObservab
     public float health = 0.0f;
 
     public float healthRegenPerSec = 7.0f;
+    public Transform HpBarTrf;
 }

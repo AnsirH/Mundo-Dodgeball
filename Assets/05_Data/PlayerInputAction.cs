@@ -71,6 +71,15 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""StopMove"",
+                    ""type"": ""Button"",
+                    ""id"": ""639de995-19a3-4811-b11c-3c7004ef59d7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -128,6 +137,17 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""action"": ""SpellF"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""aea7ecae-003a-43a8-b2ec-cdc8452a7e8e"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""StopMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -141,6 +161,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_PlayerInput_Click = m_PlayerInput.FindAction("Click", throwIfNotFound: true);
         m_PlayerInput_SpellD = m_PlayerInput.FindAction("SpellD", throwIfNotFound: true);
         m_PlayerInput_SpellF = m_PlayerInput.FindAction("SpellF", throwIfNotFound: true);
+        m_PlayerInput_StopMove = m_PlayerInput.FindAction("StopMove", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -207,6 +228,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_Click;
     private readonly InputAction m_PlayerInput_SpellD;
     private readonly InputAction m_PlayerInput_SpellF;
+    private readonly InputAction m_PlayerInput_StopMove;
     public struct PlayerInputActions
     {
         private @PlayerInputAction m_Wrapper;
@@ -216,6 +238,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         public InputAction @Click => m_Wrapper.m_PlayerInput_Click;
         public InputAction @SpellD => m_Wrapper.m_PlayerInput_SpellD;
         public InputAction @SpellF => m_Wrapper.m_PlayerInput_SpellF;
+        public InputAction @StopMove => m_Wrapper.m_PlayerInput_StopMove;
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -240,6 +263,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @SpellF.started += instance.OnSpellF;
             @SpellF.performed += instance.OnSpellF;
             @SpellF.canceled += instance.OnSpellF;
+            @StopMove.started += instance.OnStopMove;
+            @StopMove.performed += instance.OnStopMove;
+            @StopMove.canceled += instance.OnStopMove;
         }
 
         private void UnregisterCallbacks(IPlayerInputActions instance)
@@ -259,6 +285,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @SpellF.started -= instance.OnSpellF;
             @SpellF.performed -= instance.OnSpellF;
             @SpellF.canceled -= instance.OnSpellF;
+            @StopMove.started -= instance.OnStopMove;
+            @StopMove.performed -= instance.OnStopMove;
+            @StopMove.canceled -= instance.OnStopMove;
         }
 
         public void RemoveCallbacks(IPlayerInputActions instance)
@@ -283,5 +312,6 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         void OnClick(InputAction.CallbackContext context);
         void OnSpellD(InputAction.CallbackContext context);
         void OnSpellF(InputAction.CallbackContext context);
+        void OnStopMove(InputAction.CallbackContext context);
     }
 }
