@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RoomUI : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class RoomUI : MonoBehaviour
     public RectTransform hostRect;
     public TMP_Text leftPlayerText;
     public TMP_Text rightPlayerText;
+    public Image leftPlayerImage;
+    public Image rightPlayerImage;
 
     private bool isReady = false;
     public void RoomExit()

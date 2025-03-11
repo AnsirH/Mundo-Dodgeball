@@ -4,7 +4,11 @@ using System.Linq;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using MyGame.Utils;
 using UnityEngine.SceneManagement;
+using UnityEngine.Diagnostics;
+using UnityEngine.UI;
+using UnityEngine.Timeline;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
@@ -40,6 +44,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnCreatedRoom()
     {
         base.OnCreatedRoom();
+        OnConnectedToServer();
         UIManager.instance.ChangeRoomUI();
         UpdatePlayerUI();
         Debug.Log($"Room Created: {PhotonNetwork.CurrentRoom.Name}");
@@ -77,6 +82,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         UIManager.instance.ChangeRoomUI();
         UpdatePlayerUI();
+        OnConnectedToServer();
         Debug.Log($"Joined Room: {PhotonNetwork.CurrentRoom.Name}");
         // 여기서부터는 룸 내부 상태(플레이어 목록, 채팅 등)를 관리 가능
     }
@@ -123,6 +129,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         }
 
         // 방장 왼쪽, 참여자 오른쪽에 표시
+
         UIManager.instance.roomUI.leftPlayerText.text = master.NickName;
         UIManager.instance.roomUI.rightPlayerText.text = otherPlayer != null ? otherPlayer.NickName : "대기 중...";
     }
@@ -165,6 +172,16 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             UIManager.instance.roomUI.SetImReady(targetPlayer.IsMasterClient, (bool)targetPlayer.CustomProperties["Ready"]);
         }
+        string playerIconURL = (string)targetPlayer.CustomProperties["PlayerIconURL"];
+        
+        //if (!targetPlayer.IsMasterClient)
+        //{
+        //    StartCoroutine(Utility.DownloadImage(playerIconURL, UIManager.instance.roomUI.rightPlayerImage));
+        //}
+        //else
+        //{
+        //    StartCoroutine(Utility.DownloadImage(playerIconURL, UIManager.instance.roomUI.leftPlayerImage));
+        //}
         // 모든 플레이어가 레디인지 마스터 클라이언트가 확인
         CheckAllPlayersReady();
     }
@@ -202,5 +219,19 @@ public class RoomManager : MonoBehaviourPunCallbacks
             Debug.Log($"Room Name: {info.Name}, PlayerCount: {info.PlayerCount}/{info.MaxPlayers}");
             // 원하는 UI 표시나 추가 로직 작성
         }
+    }
+
+    // 스팀에서 유저 아이콘 URL받아오는 코드
+    //25.03.04 스팀 출시 안할거 같아서 뺌.슈발
+    public void OnConnectedToServer()
+    {
+        //string iconURL = SteamManager.GetPlayerAvatarURL();
+        //Debug.Log(iconURL);
+        //ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable()
+        //{
+        //    { "PlayerIconURL", iconURL}
+        //};
+
+        //PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
     }
 }

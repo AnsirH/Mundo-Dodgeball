@@ -11,6 +11,9 @@ public class ProfileUI : MonoBehaviour
     void Start()
     {
         userId.text = SteamManager.GetSteamName();
-        userIcon.sprite = SteamManager.GetSteamAvatar();
+    }
+    public void SetIcon(int i)
+    {
+        userIcon.sprite = GameManager.Instance.resourceManager.GetPlayerIcon(i);
     }
 }

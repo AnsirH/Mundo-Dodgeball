@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     #endregion
     // Start is called before the first frame update
+    public ReSourceManager resourceManager;
     void Start()
     {
         
