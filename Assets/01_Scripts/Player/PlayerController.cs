@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 {
     private PlayerStateMachine playerStateMachine;
     [SerializeField] private PlayerMovement playerMovement;
+    //[SerializeField] private PlayableMovement playableMovement;
     [SerializeField] private PlayerAttack playerAttack;
     [SerializeField] private Animator playerAnim;
     [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
@@ -17,6 +18,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     public PlayerStateMachine StateMachine => playerStateMachine;
     public PlayerMovement Movement => playerMovement;
+
+    /// <summary> PlayableMovement property </summary>
+    //public PlayableMovement PM => playableMovement;
     public PlayerAttack Attack => playerAttack;
     public Animator Anim => playerAnim;
     public PlayerHealth Health => playerHealth;

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace PlayerCharacterControl
-{
-    public class PlayerMovement : MonoBehaviour
+{    public class PlayerMovement : MonoBehaviour
     {
         private void LateUpdate()
         {
