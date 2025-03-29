@@ -7,6 +7,7 @@ public class IngameUIController : MonoBehaviour
 {
     private void Update()
     {
+        // 초기화를 해줬을 때만 체력바 활성화
         if (isInitialized)
         {
             foreach (HpBar hpBar in HpBars)
@@ -17,17 +18,28 @@ public class IngameUIController : MonoBehaviour
         }
     }
 
+    /// <summary> UI 매니저 초기화. </summary>
     public void Init()
     {
+        // 플레이어 수 가져오기 from IngameController
         int playerCount = IngameController.Instance.playerControllers.Length;
-        HpBars = new HpBar[playerCount];
-        for (int i = 0; i < playerCount; ++i)
-        {
-            HpBars[i] = Instantiate(hpBarPrefab, transform).GetComponent<HpBar>();
-            HpBars[i].Init(IngameController.Instance.playerControllers[i].Health);
-        }
 
-        isInitialized = true;
+        if (playerCount > 0)
+        {
+            // HpBar 배열 생성
+            HpBars = new HpBar[playerCount];
+
+            // HpBar 생성 및 할당
+            // HpBar에 플레이어를 지정하여 초기화
+            for (int i = 0; i < playerCount; ++i)
+            {
+                HpBars[i] = Instantiate(hpBarPrefab, transform).GetComponent<HpBar>();
+                HpBars[i].Init(IngameController.Instance.playerControllers[i].Health);
+            }
+
+            // 초기화 된 상태로 설정
+            isInitialized = true;
+        }
     }
 
     public HpBar[] HpBars { get; private set; }
