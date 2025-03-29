@@ -17,7 +17,6 @@ namespace PlayerCharacterControl.State
 
         public override void ExitState()
         {
-            Debug.Log($"{GetType().Name} 상태 종료");
         }
 
         public override void UpdateState()
@@ -25,7 +24,7 @@ namespace PlayerCharacterControl.State
             if (playerController.Attack.AttackTrigger)
                 playerController.StateMachine.ChangeState(EPlayerState.Attack);
 
-            if (playerController.Movement.IsMove)
+            if (playerController.PM.IsMoving)
                 playerController.StateMachine.ChangeState(EPlayerState.Move);
         }
     }

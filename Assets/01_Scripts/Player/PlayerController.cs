@@ -9,18 +9,17 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviourPunCallbacks
 {
     private PlayerStateMachine playerStateMachine;
-    [SerializeField] private PlayerMovement playerMovement;
-    //[SerializeField] private PlayableMovement playableMovement;
+    // 플레이어 이동 컴포넌트
+    [SerializeField] private PlayableMovement playableMovement;
     [SerializeField] private PlayerAttack playerAttack;
     [SerializeField] private Animator playerAnim;
     [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
     [SerializeField] private PlayerHealth playerHealth;
 
     public PlayerStateMachine StateMachine => playerStateMachine;
-    public PlayerMovement Movement => playerMovement;
 
     /// <summary> PlayableMovement property </summary>
-    //public PlayableMovement PM => playableMovement;
+    public PlayableMovement PM => playableMovement;
     public PlayerAttack Attack => playerAttack;
     public Animator Anim => playerAnim;
     public PlayerHealth Health => playerHealth;
@@ -53,7 +52,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void QuitAllAction()
     {
-        playerMovement.StopMove();
+        PM.StopMove();
         playerAttack.CancelAttack();
     }
 
@@ -76,24 +75,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (!photonView.IsMine) return;
         switch (context.action.name)
         {
-            case "Move":
-                if (context.started)
-                {
-                    playerMovement.StartMove();
-                    playerAttack.CancelReady();
-                }
-                else if (context.canceled) playerMovement.CancelHold();
-                break;
-
             case "Attack":
                 if (context.started) playerAttack.ReadyToAttack();
                 break;
 
             case "Click":
                 if (context.started) playerAttack.SetAttack(true);
-                break;
-            case "StopMove":
-                if (context.started) playerMovement.StopMove();
                 break;
         }
     }

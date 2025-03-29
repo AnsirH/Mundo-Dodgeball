@@ -25,7 +25,7 @@ namespace PlayerCharacterControl.State
             if (playerController.Attack.AttackTrigger)
                 playerController.StateMachine.ChangeState(EPlayerState.Attack);
 
-            else if (PlayerController.Movement.IsMove == false)
+            else if (PlayerController.PM.IsMoving == false)
                 PlayerController.StateMachine.ChangeState(EPlayerState.Idle);
 
         }

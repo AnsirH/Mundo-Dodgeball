@@ -68,5 +68,14 @@ namespace MyGame.Utils
                 }
             }
         }
+
+        public static Vector3? GetMousePosition(Camera camera, string layerName)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask(layerName)))
+                return hit.point;
+            else
+                return null;
+        }
     }
 }

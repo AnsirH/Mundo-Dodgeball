@@ -22,7 +22,6 @@ namespace PlayerCharacterControl.State
 
         public override void UpdateState()
         {
-            //Debug.Log($"{GetType().Name} 상태 실행 중");
         }
     }
 }
