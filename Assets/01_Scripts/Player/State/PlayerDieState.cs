@@ -6,7 +6,7 @@ namespace PlayerCharacterControl.State
 {
     public class PlayerDieState : PlayerStateBase
     {
-        public PlayerDieState(PlayerController playerController) : base(playerController)
+        public PlayerDieState(IPlayerContext playerContext) : base(playerContext)
         {
         }
 

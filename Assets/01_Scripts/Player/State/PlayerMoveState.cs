@@ -6,28 +6,31 @@ namespace PlayerCharacterControl.State
 {
     public class PlayerMoveState : PlayerStateBase
     {
-        public PlayerMoveState(PlayerController playerController) : base(playerController)
+        public PlayerMoveState(IPlayerContext playerContext, IPlayerComponent movement) : base(playerContext)
         {
+            this.movement = movement;
         }
 
         public override void EnterState()
         {
-            playerController.Anim.SetBool("IsMove", true);
+            context.Anim.SetBool("IsMove", true);
         }
 
         public override void ExitState()
         {
-            playerController.Anim.SetBool("IsMove", false);
+            context.Anim.SetBool("IsMove", false);
         }
 
         public override void UpdateState()
         {
-            if (playerController.Attack.AttackTrigger)
-                playerController.StateMachine.ChangeState(EPlayerState.Attack);
+            //if (playerController.Attack.AttackTrigger)
+            //    playerController.StateMachine.ChangeState(EPlayerState.Attack);
 
-            else if (PlayerController.PM.IsMoving == false)
-                PlayerController.StateMachine.ChangeState(EPlayerState.Idle);
+            //else if (PlayerController.PM.IsMoving == false)
+            //    PlayerController.StateMachine.ChangeState(EPlayerState.Idle);
 
         }
+
+        private IPlayerComponent movement;
     }
 }

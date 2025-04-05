@@ -1,22 +1,15 @@
-using Photon.Pun.Demo.Cockpit;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using MyGame.Utils;
+using UnityEngine.Diagnostics;
 
-public class PlayerSpell : MonoBehaviour
+public class PlayerSpell : MonoBehaviour, IPlayerComponent
 {
     private void Awake()
     {
         spellD = new Flash(this);
-    }
-
-    private void Update()
-    {
-        if (!spellD.CanUsable)
-        {
-            spellD.CoolDown(Time.deltaTime);
-        }
     }
 
     public void OnSpellD()
@@ -30,6 +23,34 @@ public class PlayerSpell : MonoBehaviour
     private void SetSpellable()
     {
         canUseSpellD = true;
+    }
+
+    public void Initialize(IPlayerContext context)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void Updated()
+    {
+        if (!spellD.CanUsable)
+        {
+            spellD.CoolDown(Time.deltaTime);
+        }
+    }
+
+    public void OnEnabled()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnDisabled()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void HandleInput(InputAction.CallbackContext context)
+    {
+        throw new System.NotImplementedException();
     }
 
     private Spell spellD;
@@ -78,7 +99,7 @@ public class Flash : Spell
     public override void Execute()
     {
         base.Execute();
-        Vector3 targetVector = PlayerController.GetMousePosition(owner.transform) - owner.transform.position;
+        Vector3 targetVector = Utility.GetMousePosition(Camera.main).Value - owner.transform.position;
         if (targetVector.magnitude > distance)
         {
             owner.transform.position += targetVector.normalized * distance;

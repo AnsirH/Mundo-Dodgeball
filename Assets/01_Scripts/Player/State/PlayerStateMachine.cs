@@ -1,30 +1,47 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace PlayerCharacterControl.State
 {
     public class PlayerStateMachine
     {
-        public PlayerStateMachine(PlayerController playerController)
+        public PlayerStateMachine(IPlayerContext playerContext, IPlayerComponent attack, IPlayerComponent movement)
         {
-            states[(int)EPlayerState.Idle] = new PlayerIdleState(playerController);
-            states[(int)EPlayerState.Move] = new PlayerMoveState(playerController);
-            states[(int)EPlayerState.Attack] = new PlayerAttakState(playerController);
-            states[(int)EPlayerState.Die] = new PlayerDieState(playerController);
+            states[(int)EPlayerState.Idle] = new PlayerIdleState(playerContext);
+            states[(int)EPlayerState.Move] = new PlayerMoveState(playerContext, movement);
+            states[(int)EPlayerState.Attack] = new PlayerAttackState(playerContext, attack);
+            states[(int)EPlayerState.Die] = new PlayerDieState(playerContext);
+
+            ChangeState(EPlayerState.Idle);
         }
 
         private PlayerStateBase[] states = new PlayerStateBase[4];
 
-        // 상태 전환
-        public void ChangeState(EPlayerState newState)
+        public void HandleInput(string stateName)
+        {
+            switch (stateName)
+            {
+                case "Attack":
+                    ChangeState(EPlayerState.Attack);
+                    break;
+
+                case "Move":
+                    ChangeState(EPlayerState.Move);
+                    break;
+            }
+        }
+
+            // 상태 전환
+        private void ChangeState(EPlayerState newState)
         {
             if (newState == EPlayerState.None) return;
 
-            _ChangeState(states[(int)newState]);
+            ChangeState(states[(int)newState]);
         }
 
-        private void _ChangeState(PlayerStateBase newState)
+        private void ChangeState(PlayerStateBase newState)
         {
             if (currentState != null)
             {
@@ -36,12 +53,13 @@ namespace PlayerCharacterControl.State
             currentState.EnterState();
         }
 
+
         // 이전 상태로 전환
         public void UndoState()
         {
             if (prevState != null)
             {
-                _ChangeState(prevState);
+                ChangeState(prevState);
             }
         }
 

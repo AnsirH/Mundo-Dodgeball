@@ -69,7 +69,7 @@ namespace MyGame.Utils
             }
         }
 
-        public static Vector3? GetMousePosition(Camera camera, string layerName)
+        public static Vector3? GetMousePosition(Camera camera, string layerName = "Ground")
         {
             RaycastHit hit;
             if (Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask(layerName)))

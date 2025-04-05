@@ -1,57 +1,67 @@
 using Photon.Pun;
-using PlayerCharacterControl.State;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class PlayerHealth : MonoBehaviourPunCallbacks, IDamageable, IPunObservable
+public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageable, IPlayerComponent
 {
-    private void Awake()
-    {
-        health = maxHealth;
-        if (HpBarTrf == null)
-            Debug.LogError($"{gameObject.name} doesn't match Hp Bar Transform");
-    }
+    private IPlayerContext context;
+    private float currentHealth;
+    [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private float healthRegenPerSec = 7.0f;
 
-    private void Update()
+    public void Initialize(IPlayerContext context)
     {
-        HealthRegen();   
+        this.context = context;
+        currentHealth = maxHealth;
     }
 
     private void HealthRegen()
     {
-        health += healthRegenPerSec * Time.deltaTime;
-
-        health = Mathf.Clamp(health, 0, maxHealth);
+        currentHealth += healthRegenPerSec * Time.deltaTime;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
     }
 
     public void Damage(float damage)
     {
-        health -= damage;
-
-        if (health <= 0)
+        if (!context.IsLocalPlayer()) return;
+        
+        currentHealth = Mathf.Max(0, currentHealth - damage);
+        if (currentHealth <= 0)
         {
-            PhotonNetwork.Destroy(gameObject);
+            context.OnPlayerDeath();
         }
-    }
-
-    [PunRPC]
-    private void DieRPC()
-    {
-        gameObject.SetActive(false);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
-            stream.SendNext(health);
+            stream.SendNext(currentHealth);
         else
-            health = (float)stream.ReceiveNext();
+            currentHealth = (float)stream.ReceiveNext();
     }
 
-    public float maxHealth = 613.0f;
-    public float health = 0.0f;
+    public float GetHealthPercentage()
+    {
+        return currentHealth / maxHealth;
+    }
 
-    public float healthRegenPerSec = 7.0f;
-    public Transform HpBarTrf;
+    public void Updated()
+    {
+        HealthRegen();
+    }
+
+    public void OnEnabled()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnDisabled()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void HandleInput(InputAction.CallbackContext context)
+    {
+        throw new System.NotImplementedException();
+    }
 }
