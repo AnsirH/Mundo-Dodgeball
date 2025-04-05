@@ -52,16 +52,11 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
 
     public void OnEnabled()
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 
     public void OnDisabled()
     {
-        throw new System.NotImplementedException();
-    }
-
-    public void HandleInput(InputAction.CallbackContext context)
-    {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 }

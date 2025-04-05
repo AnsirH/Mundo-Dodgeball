@@ -6,7 +6,7 @@ namespace PlayerCharacterControl.State
 {
     public class PlayerMoveState : PlayerStateBase
     {
-        public PlayerMoveState(IPlayerContext playerContext, IPlayerComponent movement) : base(playerContext)
+        public PlayerMoveState(IPlayerContext playerContext, IPlayerAction movement) : base(playerContext)
         {
             this.movement = movement;
         }
@@ -14,6 +14,7 @@ namespace PlayerCharacterControl.State
         public override void EnterState()
         {
             context.Anim.SetBool("IsMove", true);
+            movement.ExecuteAction();
         }
 
         public override void ExitState()
@@ -31,6 +32,6 @@ namespace PlayerCharacterControl.State
 
         }
 
-        private IPlayerComponent movement;
+        private IPlayerAction movement;
     }
 }

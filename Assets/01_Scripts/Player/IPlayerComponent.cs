@@ -1,4 +1,5 @@
 using PlayerCharacterControl.State;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -83,9 +84,12 @@ public interface IPlayerComponent
     /// 컴포넌트가 비활성화될 때 호출
     /// </summary>
     void OnDisabled();
+}
 
-    /// <summary>
-    /// 플레이어 입력 이벤트 처리
-    /// </summary>
-    void HandleInput(InputAction.CallbackContext context);
+// 행동 완료를 알리는 인터페이스
+public interface IPlayerAction
+{
+    event Action OnActionCompleted;
+    void ExecuteAction();
+    bool IsActionInProgress { get; }
 }

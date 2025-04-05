@@ -1,12 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using MyGame.Utils;
 using UnityEngine;
 
 public class AxeShooter : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] RangeDisplayer rangeDisplayer;
+
+    private bool rangeToggle = false;
 
     public float currentCoolTime = 0.0f;
     public float maxCoolTime = 2.5f;
@@ -21,6 +21,9 @@ public class AxeShooter : MonoBehaviour
     {
         if (!CanShoot)
             Cooldown();
+
+        if (rangeToggle)
+            DisplayRange();
     }
 
     private void Cooldown()
@@ -41,7 +44,6 @@ public class AxeShooter : MonoBehaviour
         {
             return;
         }
-
         targetPoint.y = transform.position.y;
         Vector3 direction = (targetPoint - transform.position).normalized;
 
@@ -56,15 +58,21 @@ public class AxeShooter : MonoBehaviour
         currentCoolTime = maxCoolTime;
     }
 
-    public void DisplayRange(Vector3 targetPoint)
+    public void DisplayRange()
     {
-        Vector3 direction = targetPoint - transform.position;
-        direction.y = 0.0f;
-        rangeDisplayer.UpdateRange(direction, flyDistance);
+        Vector3? mousePoint = Utility.GetMousePosition(Camera.main);
+        if (mousePoint.HasValue)
+        {
+            targetPoint = mousePoint.Value;
+            Vector3 direction = (mousePoint.Value - transform.position).normalized;
+            direction.y = 0.0f;
+            rangeDisplayer.UpdateRange(direction, flyDistance);
+        }
     }
 
     public void ShowRange(bool active)
     {
+        rangeToggle = active;
         rangeDisplayer.gameObject.SetActive(active);
     }
 

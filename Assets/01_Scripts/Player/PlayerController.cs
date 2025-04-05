@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using MyGame.Utils;
-using System;
-using UnityEngine.UIElements;
 
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
@@ -90,17 +88,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
             //playerSpell      // 스킬은 마지막
         };
 
-        try
+        components = initializationOrder;
+
+
+        foreach (var component in components)
         {
-            foreach (var component in components)
-            {
-                component.Initialize(this);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"[PlayerController] Component initialization failed: {ex.Message}");
-            // 필요한 경우 복구 로직
+            component.Initialize(this);
         }
     }
 
@@ -146,17 +139,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
             case "Throw Axe":
                 playerAttack.SpawnAxe();
                 break;
-
-            case "Reset Axe":
-                playerAttack.ResetAxe();
-                break;
         }
     }
 
     public void HandleInput(InputAction.CallbackContext context)
     {
-        if (!photonView.IsMine) return;
+        //if (!photonView.IsMine) return;
+        if (context.performed)
+        {
+            switch (context.action.name)
+            {
+                case "Attack":
+                    playerAttack.ActivateRange(true);
+                    Debug.Log("Q");
+                    break;
+                default:
+                    playerStateMachine.HandleInput(context.action.name);
+                    Debug.Log(context.action.name);
+                    break;
 
-        playerStateMachine.HandleInput(context.action.name);
+            }
+        }
     }
 }

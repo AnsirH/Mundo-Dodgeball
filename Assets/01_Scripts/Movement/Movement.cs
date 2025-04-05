@@ -40,6 +40,9 @@ public class Movement : MonoBehaviourPun, IMovable
     {
         // 이동 초기화
         StopMove();
+
+        targetPosition.y = transform.position.y;
+
         // 현재 목표 위치 설정
         currentTargetPosition = targetPosition;
         // 이동 시작( MovingToTargt )
@@ -81,18 +84,13 @@ public class Movement : MonoBehaviourPun, IMovable
     private IEnumerator MovingToTarget(Vector3 targetPosition, bool rotateTowardTarget)
     {
         // 목표 위치에 도달할 때까지 이동
-        while (!CheckArrive(targetPosition))
+        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
         {
             MoveForDeltaTime(targetPosition, moveSpeed);
             if (rotateTowardTarget) RotateForDeltaTime(targetPosition);
             yield return null;
         }
-    }
-
-    /// <summary> targetPosition에 도달했는지 확인 </summary>
-    private bool CheckArrive(Vector3 targetPosition)
-    {
-        return Vector3.Distance(transform.position, targetPosition) < 0.01f;
+        movingCoroutine = null;
     }
     #endregion
 

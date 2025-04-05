@@ -1,85 +1,107 @@
 using DG.Tweening;
 using Photon.Pun;
+using System;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerComponent
+public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerComponent, IPlayerAction
 {
     private IPlayerContext context;
-    private bool canAttackable = true;
-    private bool attackTrigger = false;
 
-    public bool CanAttackable => canAttackable;
-    public bool AttackTrigger => attackTrigger;
     public float attackPower = 80.0f;
+    private float attackDuration = 0.75f;
+    private bool axeRangeToggle = false;
+
+    private Coroutine currentAttackRoutine;
 
     [Header("References")]
+    // 도끼 발사체
     [SerializeField] private AxeShooter axeShooter;
+
+    // 캐릭터 도끼 모델링
     [SerializeField] private GameObject axeObj;
 
+    #region IPlayerAction Implementation
+    public event Action OnActionCompleted;
+
+    public bool IsActionInProgress { get; private set; } = false;
+
+    public void ExecuteAction()
+    {
+        if (IsActionInProgress || !axeRangeToggle) return;
+
+        ActivateRange(false);
+        Vector3? targetPoint = context.GetMousePosition();
+        if (targetPoint.Value == null) return;
+        Vector3 direction = (targetPoint.Value - context.Pos).normalized;
+        direction.y = 0.0f;
+        transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => { SpawnAxe(); };
+
+        IsActionInProgress = true;
+        currentAttackRoutine = StartCoroutine(AttackRoutine());
+
+    }
+    #endregion
+
+    #region IPlayerComponent Implementation
     public void Initialize(IPlayerContext context)
     {
         this.context = context;
     }
 
-    public void ReadyToAttack()
+    public void Updated()
     {
-        if (!canAttackable && axeShooter.CanShoot)
-        {
-            axeShooter.ShowRange(true);
-            canAttackable = true;
-        }
-        else if (canAttackable)
-        {
-            CancelReady();
-        }
     }
 
-    public void CancelReady()
+    public void OnEnabled()
     {
-        canAttackable = false;
-        axeShooter.ShowRange(false);
+        //throw new System.NotImplementedException();
     }
 
-    [PunRPC]
-    public void StartAttack()
+    public void OnDisabled()
     {
-        if (!context.IsLocalPlayer()) return;
-        
-        if (attackTrigger)
+        CancelAttack();
+
+        if (currentAttackRoutine != null)
         {
-            Vector3 direction = axeShooter.targetPoint - context.Pos;
-            direction.y = 0.0f;
-            transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f);
-            attackTrigger = false;
+            StopCoroutine(currentAttackRoutine);
+            IsActionInProgress = false;
         }
+    }
+    #endregion
+
+    #region Animation Event Functions
+    public void SpawnAxe()
+    {
+        axeShooter.ShootAxe(this);
+        axeObj.SetActive(false);
+    }
+    #endregion
+
+    // 공격 코루틴. 시간 지나면 완료 이벤트 발행
+    private IEnumerator AttackRoutine()
+    {
+        // 공격 애니메이션 및 로직
+        yield return new WaitForSeconds(attackDuration);
+
+        IsActionInProgress = false;
+        axeObj.SetActive(true);
+        OnActionCompleted?.Invoke();
+    }
+
+    // 도끼 궤적 활성화 메서드
+    public void ActivateRange(bool active)
+    {
+        axeRangeToggle = active;
+        axeShooter.ShowRange(active);
     }
 
     public void CancelAttack()
     {
-        if (CanAttackable)
-        {
-            axeShooter.ShowRange(false);
-            transform.DOKill();
-        }
-    }
+        ActivateRange(false);
 
-    public void SetAttack(bool value)
-    {
-        if (value)
-        {
-            if (canAttackable)
-            {
-                attackTrigger = true;
-                CancelReady();
-                axeShooter.targetPoint = context.GetMousePosition().Value;
-            }
-        }
-        else
-        {
-            attackTrigger = false;
-            canAttackable = false;
-        }
+        // 회전 종료
+        transform.DOKill();
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -89,43 +111,5 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerCo
         else
             axeShooter.targetPoint = (Vector3)stream.ReceiveNext();
     }
-
-    #region Animation Event Functions
-    public void SpawnAxe()
-    {
-        axeShooter.ShootAxe(this);
-        axeObj.SetActive(false);
-    }
-
-    public void ResetAxe()
-    {
-        axeObj.SetActive(true);
-    }
-
-    public void Updated()
-    {
-        if (canAttackable)
-        {
-            Vector3? mousePosition = context.GetMousePosition();
-            if (mousePosition != null)
-                axeShooter.DisplayRange(mousePosition.Value);
-        }
-    }
-
-    public void OnEnabled()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnDisabled()
-    {
-        CancelAttack();
-    }
-
-    public void HandleInput(InputAction.CallbackContext context)
-    {
-        throw new System.NotImplementedException();
-    }
-    #endregion
 
 }

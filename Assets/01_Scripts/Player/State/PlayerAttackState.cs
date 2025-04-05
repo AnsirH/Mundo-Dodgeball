@@ -6,13 +6,15 @@ namespace PlayerCharacterControl.State
 {
     public class PlayerAttackState : PlayerStateBase
     {
-        public PlayerAttackState(IPlayerContext playerContext, IPlayerComponent attack) : base(playerContext)
+        public PlayerAttackState(IPlayerContext playerContext, IPlayerAction attack) : base(playerContext)
         {
             this.attack = attack;
         }
 
         public override void EnterState()
         {
+            attack.ExecuteAction();
+            context.Anim.SetTrigger("Attack");
             // 이전 상태가 이동 상태인지 확인 및 저장
             //isPrevStateIsMove = context.StateMachine.PrevState is PlayerMoveState;
 
@@ -53,7 +55,7 @@ namespace PlayerCharacterControl.State
         bool isPrevStateIsMove = false;
         private readonly string AttackAnimationName = "Attack03_End";
 
-        private IPlayerComponent attack;
+        private IPlayerAction attack;
 
     }
 }
