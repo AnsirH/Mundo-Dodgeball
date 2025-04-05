@@ -370,7 +370,7 @@ MonoBehaviour:
           ChildIndex: 0
         RandomizeOutput: 0
         RandomMultiplier: {x: 0.8, y: 1}
-        RandomizeDuration: 1
+        RandomizeDuration: 0
         RandomDurationMultiplier: {x: 1, y: 2}
         UseRange: 0
         RangeDistance: 5
