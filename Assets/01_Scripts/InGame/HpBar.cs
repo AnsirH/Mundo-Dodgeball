@@ -1,7 +1,5 @@
-using Photon.Pun.Demo.Cockpit;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class HpBar : MonoBehaviour
@@ -11,7 +9,7 @@ public class HpBar : MonoBehaviour
     public void Init(PlayerHealth targetPlayerHealth)
     {
         playerHealth = targetPlayerHealth;
-        targetTrf = targetPlayerHealth.HpBarTrf;
+        targetTrf = targetPlayerHealth.transform;
     }
     /// <summary> 체력값 반영 </summary>
     public void UpdateDisplay()
@@ -24,8 +22,8 @@ public class HpBar : MonoBehaviour
 
         float resultHp = 0;
 
-        if (playerHealth.health >= 0 && playerHealth.maxHealth > 0) 
-            resultHp = playerHealth.health / playerHealth.maxHealth;
+        if (playerHealth.GetHealthPercentage() >= 0) 
+            resultHp = playerHealth.GetHealthPercentage();
 
         valueBarRtrf.localScale = new Vector3(resultHp, 1.0f, 1.0f);
     }

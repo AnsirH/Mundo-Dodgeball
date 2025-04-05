@@ -1,18 +1,25 @@
 using DG.Tweening;
 using Photon.Pun;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerComponent
 {
-    private void Update()
+    private IPlayerContext context;
+    private bool canAttackable = true;
+    private bool attackTrigger = false;
+
+    public bool CanAttackable => canAttackable;
+    public bool AttackTrigger => attackTrigger;
+    public float attackPower = 80.0f;
+
+    [Header("References")]
+    [SerializeField] private AxeShooter axeShooter;
+    [SerializeField] private GameObject axeObj;
+
+    public void Initialize(IPlayerContext context)
     {
-        if (canAttackable)
-        {
-            axeShooter.DisplayRange(PlayerController.GetMousePosition(transform));
-        }
+        this.context = context;
     }
 
     public void ReadyToAttack()
@@ -22,7 +29,6 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
             axeShooter.ShowRange(true);
             canAttackable = true;
         }
-
         else if (canAttackable)
         {
             CancelReady();
@@ -38,13 +44,13 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void StartAttack()
     {
-        if (!photonView.IsMine) return;
+        if (!context.IsLocalPlayer()) return;
+        
         if (attackTrigger)
         {
-            Vector3 direction = axeShooter.targetPoint - transform.position;
+            Vector3 direction = axeShooter.targetPoint - context.Pos;
             direction.y = 0.0f;
             transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f);
-
             attackTrigger = false;
         }
     }
@@ -60,13 +66,13 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
 
     public void SetAttack(bool value)
     {
-        if (value == true)
+        if (value)
         {
             if (canAttackable)
             {
                 attackTrigger = true;
                 CancelReady();
-                axeShooter.targetPoint = PlayerController.GetMousePosition(transform);
+                axeShooter.targetPoint = context.GetMousePosition().Value;
             }
         }
         else
@@ -84,7 +90,7 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
             axeShooter.targetPoint = (Vector3)stream.ReceiveNext();
     }
 
-    #region Animation Event Func
+    #region Animation Event Functions
     public void SpawnAxe()
     {
         axeShooter.ShootAxe(this);
@@ -95,17 +101,31 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable
     {
         axeObj.SetActive(true);
     }
+
+    public void Updated()
+    {
+        if (canAttackable)
+        {
+            Vector3? mousePosition = context.GetMousePosition();
+            if (mousePosition != null)
+                axeShooter.DisplayRange(mousePosition.Value);
+        }
+    }
+
+    public void OnEnabled()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnDisabled()
+    {
+        CancelAttack();
+    }
+
+    public void HandleInput(InputAction.CallbackContext context)
+    {
+        throw new System.NotImplementedException();
+    }
     #endregion
 
-    [Header("References")]
-    [SerializeField] AxeShooter axeShooter;
-    [SerializeField] GameObject axeObj;
-
-    private bool canAttackable = true;
-    private bool attackTrigger = false;
-
-    public bool CanAttackable => canAttackable;
-    public bool AttackTrigger => attackTrigger;
-
-    public float attackPower = 80.0f;
 }

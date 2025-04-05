@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using MyGame.Utils;
 
-public class PlayableMovement : Movement, IPlayable
+public class PlayableMovement : Movement, IPlayerComponent
 {
     /// <summary>
     /// Input System Move 액션이 발생하면 호출. context값에 따라 행동
@@ -11,7 +11,7 @@ public class PlayableMovement : Movement, IPlayable
     /// StopMove: 이동 정지
     /// </summary>
     /// <param name="context"></param>
-    public void GetPlayerInputEvent(InputAction.CallbackContext context)
+    public void HandleInput(InputAction.CallbackContext context)
     {
         if (!photonView.IsMine) return;
 
@@ -31,5 +31,25 @@ public class PlayableMovement : Movement, IPlayable
                 StopMove();
                 break;
         }        
+    }
+
+    public void Initialize(IPlayerContext context)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnDisabled()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnEnabled()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void Updated()
+    {
+        throw new System.NotImplementedException();
     }
 }

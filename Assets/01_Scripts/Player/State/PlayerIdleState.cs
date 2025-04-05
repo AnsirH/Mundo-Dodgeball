@@ -6,7 +6,7 @@ namespace PlayerCharacterControl.State
 {
     public class PlayerIdleState : PlayerStateBase
     {
-        public PlayerIdleState(PlayerController playerController) : base(playerController)
+        public PlayerIdleState(IPlayerContext playerContext) : base(playerContext)
         {
         }
 
@@ -21,11 +21,11 @@ namespace PlayerCharacterControl.State
 
         public override void UpdateState()
         {
-            if (playerController.Attack.AttackTrigger)
-                playerController.StateMachine.ChangeState(EPlayerState.Attack);
+            //if (playerController.Attack.AttackTrigger)
+            //    playerController.StateMachine.ChangeState(EPlayerState.Attack);
 
-            if (playerController.PM.IsMoving)
-                playerController.StateMachine.ChangeState(EPlayerState.Move);
+            //if (playerController.PM.IsMoving)
+            //    playerController.StateMachine.ChangeState(EPlayerState.Move);
         }
     }
 }

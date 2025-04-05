@@ -1,58 +1,141 @@
 using Photon.Pun;
 using PlayerCharacterControl;
 using PlayerCharacterControl.State;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using MyGame.Utils;
+using System;
+using UnityEngine.UIElements;
 
-public class PlayerController : MonoBehaviourPunCallbacks
+
+public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 {
+    // 플레이어 상태 머신
     private PlayerStateMachine playerStateMachine;
-    // �÷��̾� �̵� ������Ʈ
-    [SerializeField] private PlayableMovement playableMovement;
-    [SerializeField] private PlayerAttack playerAttack;
-    [SerializeField] private Animator playerAnim;
-    [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
-    [SerializeField] private PlayerHealth playerHealth;
+    // 플레이어 스크립트 리스트
+    private List<IPlayerComponent> components = new List<IPlayerComponent>();
 
+    #region IPlayerComponents
+    // 이동
+    [SerializeField] private PlayableMovement playableMovement;
+    // 공격
+    [SerializeField] private PlayerAttack playerAttack;
+    // 체력
+    [SerializeField] private PlayerHealth playerHealth;
+    // 스킬
+
+    #endregion
+
+    [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
+
+    [SerializeField] private Animator playerAnim;
+
+
+    #region properties
     public PlayerStateMachine StateMachine => playerStateMachine;
 
-    /// <summary> PlayableMovement property </summary>
     public PlayableMovement PM => playableMovement;
     public PlayerAttack Attack => playerAttack;
-    public Animator Anim => playerAnim;
     public PlayerHealth Health => playerHealth;
+
+    public PlayerStateBase PlayerState => playerStateMachine.CurrentState;
+    #endregion
+
+    #region IPlayerContext Implementation
+
+    public Animator Anim => playerAnim;
+
+    public Transform Trf => transform;
+
+    public Vector3 Pos => transform.position;
+
+    public Quaternion Rot => transform.rotation;
+
+    public bool IsLocalPlayer() { return photonView.IsMine; }
+
+    public void OnPlayerDeath()
+    {
+        // 플레이어 사망 처리
+        QuitAllAction();
+        gameObject.SetActive(false);
+    }
+
+    public PlayerStateBase GetCurrentState() { return playerStateMachine.CurrentState; }
+
+    public Vector3? GetMousePosition(string layer = "Ground") { return Utility.GetMousePosition(Camera.main, layer); }
+    #endregion
 
     void Awake()
     {
+        // 컴포넌트 초기화
+        InitializeComponents();
+        
+        // 애니메이션 이벤트 설정
         playerAnimEventHandler.OnAnimationEventActions.AddListener(GetAnimationEvent);
 
-        playerStateMachine = new(this);
-        playerStateMachine.ChangeState(EPlayerState.Idle);
+        // 상태 머신 초기화
+        playerStateMachine = new(this, playerAttack, playableMovement);
+    }
+
+    // IPlayerComponent 컴포넌트들 초기화
+    private void InitializeComponents()
+    {
+        // 초기화 순서가 중요한 경우 순서 지정
+        var initializationOrder = new List<IPlayerComponent>
+        {
+            playerHealth,      // 체력은 가장 먼저 초기화
+            playableMovement,  // 이동은 그 다음
+            playerAttack,      // 공격은 이동 이후
+            //playerSpell      // 스킬은 마지막
+        };
+
+        try
+        {
+            foreach (var component in components)
+            {
+                component.Initialize(this);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[PlayerController] Component initialization failed: {ex.Message}");
+            // 필요한 경우 복구 로직
+        }
     }
 
     void Update()
     {
         playerStateMachine.UpdateCurrentState();
+
+        // 모든 IPlayable 컴포넌트 업데이트
+        foreach (var component in components)
+        {
+            component.Updated();
+        }
     }
 
-    public static Vector3 GetMousePosition(Transform entity)
+    public override void OnEnable()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Ground")))
+        base.OnEnable();
+        foreach (var component in components)
         {
-            Vector3 result = hit.point;
-            result.y = entity.position.y;
-            return result;
+            component.OnEnabled();
         }
-        else
-            return Vector3.zero;
+    }
+
+    public override void OnDisable()
+    {
+        base.OnDisable();
+        foreach (var component in components)
+        {
+            component.OnDisabled();
+        }
     }
 
     private void QuitAllAction()
     {
-        PM.StopMove();
+        playableMovement.StopMove();
         playerAttack.CancelAttack();
     }
 
@@ -70,18 +153,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
         }
     }
 
-    public void GetPlayerInputEvent(InputAction.CallbackContext context)
+    public void HandleInput(InputAction.CallbackContext context)
     {
         if (!photonView.IsMine) return;
-        switch (context.action.name)
-        {
-            case "Attack":
-                if (context.started) playerAttack.ReadyToAttack();
-                break;
 
-            case "Click":
-                if (context.started) playerAttack.SetAttack(true);
-                break;
-        }
+        playerStateMachine.HandleInput(context.action.name);
     }
 }
