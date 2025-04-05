@@ -376,6 +376,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1148139314 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3942705704205918731, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
+  m_PrefabInstance: {fileID: 2142139265}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1148139316 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2111329040807826123, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
+  m_PrefabInstance: {fileID: 2142139265}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1148139314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da43522623d4704e979466dc7650b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2103238305
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,9 +520,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   AlignmentMode: 0
   FixedAlignment: {x: 0, y: 1, z: 0}
-  AlwaysFaceCamera: 0
+  AlwaysFaceCamera: 1
   AutoGrabMainCameraOnStart: 1
-  TargetCamera: {fileID: 0}
+  TargetCamera: {fileID: 272010858}
   AnimateScale: 1
   RemapScaleZero: {x: 0, y: 0}
   RemapScaleOne: {x: 1, y: 1}
@@ -705,10 +721,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1822853794646474301, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
+      propertyPath: damageControllObj
+      value: 
+      objectReference: {fileID: 1148139314}
+    - target: {fileID: 1822853794646474301, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
+      propertyPath: damageTestController
+      value: 
+      objectReference: {fileID: 1148139316}
     - target: {fileID: 2111329040807826123, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
       propertyPath: managedReferences[5131703460027170874].PositionMode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2111329040807826123, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
+      propertyPath: managedReferences[5131703460027170874].TargetTransform
+      value: 
+      objectReference: {fileID: 272010859}
     - target: {fileID: 5424137487824949208, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
       propertyPath: sceneViewId
       value: 1
