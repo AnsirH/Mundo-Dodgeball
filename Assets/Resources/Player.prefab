@@ -1332,9 +1332,6 @@ PrefabInstance:
       addedObject: {fileID: 6215085181777121791}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6110425989472344968}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 8439029551291699871}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
@@ -1471,11 +1468,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a81442b606c73e647abb041030fd7359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMovement: {fileID: 6110425989472344968}
+  playableMovement: {fileID: 0}
   playerAttack: {fileID: 8439029551291699871}
-  playerAnim: {fileID: 6646368711127324858}
-  playerAnimEventHandler: {fileID: 6215085181777121791}
   playerHealth: {fileID: 1822853794646474301}
+  playerAnimEventHandler: {fileID: 6215085181777121791}
+  playerAnim: {fileID: 6646368711127324858}
 --- !u!114 &6215085181777121791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1488,20 +1485,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b1d8e567cf96a42a6a995f8efaf9d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6110425989472344968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 114658553885513850}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81fd2b8ce1cbe154fb5117e003571cb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 3
-  rotateSpeed: 1140
 --- !u!114 &8439029551291699871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1514,9 +1497,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7a8ed01d0d9e3744b48ad710940ae6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackPower: 200
   axeShooter: {fileID: 5097637738017206974}
   axeObj: {fileID: 9042082356628863269}
-  attackPower: 200
 --- !u!114 &970527021875988243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1680,7 +1663,7 @@ MonoBehaviour:
   - {fileID: 7402131800847745899}
   - {fileID: 7087272152704519845}
   - {fileID: 1822853794646474301}
-  sceneViewId: 1
+  sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &7402131800847745899
@@ -1736,9 +1719,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 613
-  health: 0
   healthRegenPerSec: 7
-  HpBarTrf: {fileID: 5969769793669387349}
 --- !u!136 &809524163573960308
 CapsuleCollider:
   m_ObjectHideFlags: 0
