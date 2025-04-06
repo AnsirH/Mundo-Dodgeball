@@ -2,116 +2,107 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
+
 public interface IMovable
 {
-    /// <summary> targetPosition·Î deltaTimeµ¿¾È ÀÌµ¿ </summary>
-    public void MoveForDeltaTime(Vector3 targetPosition, float moveSped);
+    /// <summary> targetPositionï¿½ï¿½ deltaTimeï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ </summary>
+    public void MoveForDeltaTime(Vector3 targetPosition, float deltaTime);
 
-    /// <summary> targetPosition·Î deltaTimeµ¿¾È È¸Àü </summary>
-    public void RotateForDeltaTime(Vector3 targetPosition);
+    /// <summary> targetPosition deltaTime È¸ </summary>
+    public void RotateForDeltaTime(Vector3 targetPosition, float deltaTime);
+
+    /// <summary> targetPosition   Ìµ </summary>
+    public void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true);
+
+    /// <summary> Ìµ Ê±È­ </summary>
+    public void StopMove();
+
+    /// <summary> Ìµ  È® </summary>
+    public bool IsMoving { get; }
 }
 
 public class Movement : MonoBehaviourPun, IMovable
 {
-    #region interface method
-    // µ¨Å¸ Å¸ÀÓ ±âÁØ ÀÌµ¿
-    public void MoveForDeltaTime(Vector3 targetPosition, float moveSped)
+    [SerializeField] protected float moveSpeed = 5f;
+    [SerializeField] protected float rotateSpeed = 10f;
+    [SerializeField] protected float arrivalThreshold = 0.1f;
+
+    protected Vector3? currentTargetPosition;
+    protected Coroutine moveCoroutine;
+    protected Tweener moveTween;
+    protected Tweener rotateTween;
+
+    public virtual void MoveForDeltaTime(Vector3 targetPosition, float deltaTime)
     {
         Vector3 dir = (targetPosition - transform.position).normalized;
 
-        transform.position += dir * moveSped * Time.deltaTime;
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        transform.position += direction * moveSpeed * deltaTime;
     }
 
-    // µ¨Å¸ Å¸ÀÓ ±âÁØ È¸Àü
-    public void RotateForDeltaTime(Vector3 targetPosition)
+    public virtual void RotateForDeltaTime(Vector3 targetPosition, float deltaTime)
     {
-        // ¸ñÇ¥ È¸Àü°ª ±¸ÇÏ±â
+        // ï¿½ï¿½Ç¥ È¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï±ï¿½
         targetPosition.y = transform.position.y;
-        Quaternion targetRotation = Quaternion.LookRotation((targetPosition - transform.position).normalized);
 
-        // È¸Àü
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotateSpeed * Time.deltaTime);
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        if (direction != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotateSpeed * deltaTime);
+        }
     }
-    #endregion
 
-    #region public method
-    /// <summary> targetPosition±îÁö µµ´ÞÇÒ ¶§±îÁö ÀÌµ¿ </summary>
-    public void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget=true)
+    public virtual void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
     {
-        // ÀÌµ¿ ÃÊ±âÈ­
+        // ï¿½Ìµï¿½ ï¿½Ê±ï¿½È­
         StopMove();
-
         targetPosition.y = transform.position.y;
-
-        // ÇöÀç ¸ñÇ¥ À§Ä¡ ¼³Á¤
         currentTargetPosition = targetPosition;
-        // ÀÌµ¿ ½ÃÀÛ( MovingToTargt )
-        movingCoroutine = StartCoroutine(MovingToTarget(targetPosition, rotateTowardTarget));
+
+        // ì´ë™ ê±°ë¦¬ ê³„ì‚°
+        float distance = Vector3.Distance(transform.position, targetPosition);
+        // ì´ë™ ì‹œê°„ ê³„ì‚° (ê±°ë¦¬ì— ë¹„ë¡€)
+        float duration = distance / moveSpeed;
+
+        // ì´ë™
+        moveTween = transform.DOMove(targetPosition, duration)
+            .SetEase(Ease.Linear)
+            .OnComplete(() => OnMoveComplete());
+
+        // íšŒì „
+        if (rotateTowardTarget)
+        {
+            Vector3 direction = (targetPosition - transform.position).normalized;
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                rotateTween = transform.DORotateQuaternion(targetRotation, 0.2f)
+                    .SetEase(Ease.OutQuad);
+            }
+        }
     }
 
-    /// <summary> ÇöÀç ÀúÀåµÈ ¸ñÇ¥ À§Ä¡¿¡ µµ´ÞÇÒ ¶§±îÁö ÀÌµ¿ </summary>
-    public void ContinueMoveToTarget(bool rotateTowardTarget = true)
+    protected virtual void OnMoveComplete()
     {
-        // ÀúÀåµÈ À§Ä¡°¡ ¾ø´Ù¸é
-        if (!currentTargetPosition.HasValue)
-        {
-            Debug.LogError("Playable Movement has no current target position");
-            return;
-        }
+        moveTween = null;
+        rotateTween = null;
+        currentTargetPosition = null;
+    }
 
-        // ÀÌµ¿ ÃÊ±âÈ­
+    public virtual void StopMove()
+    {
+        moveTween?.Kill();
+        rotateTween?.Kill();
+        moveTween = null;
+        rotateTween = null;
+    }
+
+    public bool IsMoving => moveTween != null;
+
+    protected virtual void OnDestroy()
+    {
         StopMove();
-
-        // ÇöÀç Å¸°Ù À§Ä¡·Î ÀÌµ¿ ½ÃÀÛ
-        movingCoroutine = StartCoroutine(MovingToTarget(currentTargetPosition.Value, rotateTowardTarget));
     }
-
-    /// <summary> ÀÌµ¿ ÃÊ±âÈ­ </summary>
-    public void StopMove()
-    {
-        // ÀÌµ¿ À¯¹« È®ÀÎ
-        // - ÀÌµ¿ ÁßÀÌ¸é ÀÌµ¿ ¸ØÃß°í »õ·Î¿î ÀÌµ¿ ½ÃÀÛ
-        if (movingCoroutine != null)
-        {
-            StopCoroutine(movingCoroutine);
-            movingCoroutine = null;
-        }
-    }
-    #endregion
-
-    #region private method
-    /// <summary> ¸ñÇ¥ À§Ä¡·Î ÀÌµ¿ </summary>
-    private IEnumerator MovingToTarget(Vector3 targetPosition, bool rotateTowardTarget)
-    {
-        // ¸ñÇ¥ À§Ä¡¿¡ µµ´ÞÇÒ ¶§±îÁö ÀÌµ¿
-        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
-        {
-            MoveForDeltaTime(targetPosition, moveSpeed);
-            if (rotateTowardTarget) RotateForDeltaTime(targetPosition);
-            yield return null;
-        }
-        movingCoroutine = null;
-    }
-    #endregion
-
-    #region public variables 
-
-    // ÀÌµ¿ ¼Óµµ
-    public float moveSpeed = 1.0f;
-    // È¸Àü ¼Óµµ
-    public float rotateSpeed = 1080.0f;
-
-    #endregion 
-
-    #region private variables    
-    // ÀÌµ¿ ÄÚ·çÆ¾ ÀúÀå¿ë
-    private Coroutine movingCoroutine;
-    // ¸ñÇ¥ À§Ä¡ ÀúÀå¿ë
-    private Vector3? currentTargetPosition;
-    #endregion
-
-    #region properties
-    // ÀÌµ¿ ÁßÀÎÁö È®ÀÎ
-    public bool IsMoving { get { return movingCoroutine != null; } }
-    #endregion
 }

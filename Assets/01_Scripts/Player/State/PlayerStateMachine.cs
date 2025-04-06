@@ -50,7 +50,7 @@ namespace PlayerCharacterControl.State
 
         private void ChangeState(PlayerStateBase newState)
         {
-            if (currentState != null)
+            if (currentState != null && currentState != newState)
             {
                 prevState = currentState;
                 prevState.ExitState();
