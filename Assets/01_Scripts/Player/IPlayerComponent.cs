@@ -84,6 +84,8 @@ public interface IPlayerComponent
     /// 컴포넌트가 비활성화될 때 호출
     /// </summary>
     void OnDisabled();
+
+    public bool Controllable { get; set; }
 }
 
 // 행동 완료를 알리는 인터페이스
@@ -92,4 +94,5 @@ public interface IPlayerAction
     event Action OnActionCompleted;
     void ExecuteAction();
     bool IsActionInProgress { get; }
+    bool CanExecuteAction { get; }
 }

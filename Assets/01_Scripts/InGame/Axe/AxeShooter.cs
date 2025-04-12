@@ -1,87 +1,103 @@
 using MyGame.Utils;
+using Photon.Pun;
 using UnityEngine;
 
-public class AxeShooter : MonoBehaviour
+public interface IShooter
 {
-    [Header("References")]
-    [SerializeField] RangeDisplayer rangeDisplayer;
+    void Initialize(IPlayerContext context);
+    void ActivateRange(bool isActive);
+    void SpawnProjectile();
+    bool IsRangeActive { get; }
+    bool CanShoot { get; }
+}
 
-    private bool rangeToggle = false;
+// IRangeIndicator.cs
+public interface IRangeIndicator
+{
+    void Show();
+    void Hide();
+    void UpdatePosition(Vector3 position);
+    bool IsActive { get; }
+}
 
-    public float currentCoolTime = 0.0f;
-    public float maxCoolTime = 2.5f;
+// IProjectile.cs
+public interface IProjectile
+{
+    void Initialize(IPlayerContext context, float damage);
+    void Launch(Vector3 direction);
+    void OnHit(Collider other);
+}
 
-    public Vector3 targetPoint;
-    public float flyTime = 0.5f;
-    public float flyDistance = 5.0f;
+public class AxeShooter : MonoBehaviourPun, IShooter
+{
+    [SerializeField] private float attackPower = 80.0f;
+    [SerializeField] private float cooldownTime = 2.0f;
+    [SerializeField] private GameObject axePrefab;
 
-    public bool CanShoot { get { return currentCoolTime <= 0.0f; } }
+    private IPlayerContext context;
+    private IRangeIndicator rangeIndicator;
+    private bool isRangeActive;
+    private float currentCooldown;
+
+    public bool IsRangeActive => isRangeActive;
+    public bool CanShoot => !IsOnCooldown;  // 쿨타임 중이 아닐 때만 공격 가능
+    private bool IsOnCooldown => currentCooldown > 0f;
+
+    private void Awake()
+    {
+        rangeIndicator = GetComponent<IRangeIndicator>();
+    }
 
     private void Update()
     {
-        if (!CanShoot)
-            Cooldown();
-
-        if (rangeToggle)
-            DisplayRange();
+        if (currentCooldown > 0f)
+        {
+            currentCooldown -= Time.deltaTime;
+        }
     }
 
-    private void Cooldown()
+    public void Initialize(IPlayerContext context)
     {
-        if (currentCoolTime > 0.0f)
-        {
-            currentCoolTime -= Time.deltaTime;
-        }
+        this.context = context;
+    }
+
+    public void ActivateRange(bool isActive)
+    {
+        isRangeActive = isActive;
+        if (isActive)
+            rangeIndicator.Show();
         else
-        {
-            currentCoolTime = 0.0f;
-        }
+            rangeIndicator.Hide();
     }
 
-    public void ShootAxe(PlayerAttack sender)
+    public void SpawnProjectile()
     {
-        if (!CanShoot)
-        {
-            return;
-        }
-        targetPoint.y = transform.position.y;
-        Vector3 direction = (targetPoint - transform.position).normalized;
+        if (!photonView.IsMine) return;
 
-        //GameObject axeObj = ObjectPooler.Instance.Instantiate("Axe", transform.position, Quaternion.LookRotation(direction));
-        GameObject axeObj = ObjectPooler.Get("Axe");
-        axeObj.transform.position = transform.position;
-        axeObj.transform.rotation = Quaternion.LookRotation(direction);
+        Vector3? targetPoint = context.GetMousePosition();
+        if (!targetPoint.HasValue) return;
 
-        Vector3 destination = transform.position + direction * flyDistance;
-        axeObj.GetComponent<Axe>().Init(destination, flyTime, sender);
+        Vector3 direction = (targetPoint.Value - context.Pos).normalized;
+        direction.y = 0.0f;
 
-        currentCoolTime = maxCoolTime;
+        // 도끼 생성 및 발사
+        GameObject axeObj = PhotonNetwork.Instantiate(axePrefab.name, transform.position, Quaternion.identity);
+        IProjectile axe = axeObj.GetComponent<IProjectile>();
+        axe.Initialize(context, attackPower);
+        axe.Launch(direction);
+
+        // 쿨타임 시작
+        currentCooldown = cooldownTime;
     }
 
-    public void DisplayRange()
+    // 쿨타임 관련 추가 기능들 (AxeShooter 고유 기능)
+    public void ReduceCooldown(float amount)
     {
-        Vector3? mousePoint = Utility.GetMousePosition(Camera.main);
-        if (mousePoint.HasValue)
-        {
-            targetPoint = mousePoint.Value;
-            Vector3 direction = (mousePoint.Value - transform.position).normalized;
-            direction.y = 0.0f;
-            rangeDisplayer.UpdateRange(direction, flyDistance);
-        }
+        currentCooldown = Mathf.Max(0f, currentCooldown - amount);
     }
 
-    public void ShowRange(bool active)
+    public float GetCooldownProgress()
     {
-        rangeToggle = active;
-        rangeDisplayer.gameObject.SetActive(active);
+        return currentCooldown / cooldownTime;
     }
-
-#if UNITY_EDITOR
-
-    public void OnGUI()
-    {
-        GUILayout.TextField($"Current Cool Time : {currentCoolTime}");
-    }
-
-#endif
 }

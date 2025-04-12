@@ -335,12 +335,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a80fd69fb1501b4fa794e9ddb72f72b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rangeDisplayer: {fileID: 1772391199544503423}
-  currentCoolTime: 0
-  maxCoolTime: 2.5
-  targetPoint: {x: 0, y: 0, z: 0}
-  flyTime: 0.5
-  flyDistance: 7.5
+  attackPower: 80
+  cooldownTime: 2
+  axePrefab: {fileID: 0}
 --- !u!1 &6287148386201354997
 GameObject:
   m_ObjectHideFlags: 0
@@ -1329,6 +1326,9 @@ PrefabInstance:
       addedObject: {fileID: 1089014353931383088}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 7700144322300401899}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 6215085181777121791}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
@@ -1463,16 +1463,30 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 114658553885513850}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a81442b606c73e647abb041030fd7359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playableMovement: {fileID: 0}
-  playerAttack: {fileID: 8439029551291699871}
-  playerHealth: {fileID: 1822853794646474301}
-  playerAnimEventHandler: {fileID: 6215085181777121791}
   playerAnim: {fileID: 6646368711127324858}
+  movement: {fileID: 0}
+  attack: {fileID: 0}
+  playerHealth: {fileID: 1822853794646474301}
+--- !u!114 &7700144322300401899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114658553885513850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 733a4ac905a373745984578e139fdafc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 3
+  rotateSpeed: 1080
+  arrivalThreshold: 0.1
 --- !u!114 &6215085181777121791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1529,7 +1543,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1089014353931383088}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: GetPlayerInputEvent
+        m_MethodName: HandleInput
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1545,7 +1559,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1089014353931383088}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: GetPlayerInputEvent
+        m_MethodName: HandleInput
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1561,7 +1575,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1089014353931383088}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: GetPlayerInputEvent
+        m_MethodName: HandleInput
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1659,7 +1673,6 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 8439029551291699871}
   - {fileID: 7402131800847745899}
   - {fileID: 7087272152704519845}
   - {fileID: 1822853794646474301}
@@ -1720,6 +1733,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 613
   healthRegenPerSec: 7
+  damageTestController: {fileID: 2111329040807826123}
 --- !u!136 &809524163573960308
 CapsuleCollider:
   m_ObjectHideFlags: 0

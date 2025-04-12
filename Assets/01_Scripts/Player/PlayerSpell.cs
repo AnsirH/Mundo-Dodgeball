@@ -57,6 +57,8 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
 
     public float flashDistance = 1.5f;
     public bool canUseSpellD = true;
+
+    public bool Controllable { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 }
 
 public class Spell

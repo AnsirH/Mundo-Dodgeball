@@ -4,13 +4,12 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerComponent, IPlayerAction
+public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayerAction
 {
     private IPlayerContext context;
 
     public float attackPower = 80.0f;
     private float attackDuration = 0.75f;
-    private bool axeRangeToggle = false;
 
     private Coroutine currentAttackRoutine;
 
@@ -26,16 +25,20 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerCo
 
     public bool IsActionInProgress { get; private set; } = false;
 
+    public bool CanExecuteAction => axeShooter.CanShoot && axeShooter.IsRangeActive;
+
+    public bool Controllable { get; set; } = true;
+
     public void ExecuteAction()
     {
-        if (IsActionInProgress || !axeRangeToggle) return;
+        if (IsActionInProgress || !axeShooter.IsRangeActive) return;
 
         ActivateRange(false);
         Vector3? targetPoint = context.GetMousePosition();
         if (targetPoint.Value == null) return;
         Vector3 direction = (targetPoint.Value - context.Pos).normalized;
         direction.y = 0.0f;
-        transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => { SpawnAxe(); };
+        transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => { axeShooter.SpawnProjectile(); };
 
         IsActionInProgress = true;
         currentAttackRoutine = StartCoroutine(AttackRoutine());
@@ -70,13 +73,6 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerCo
     }
     #endregion
 
-    #region Animation Event Functions
-    public void SpawnAxe()
-    {
-        axeShooter.ShootAxe(this);
-        axeObj.SetActive(false);
-    }
-    #endregion
 
     // 공격 코루틴. 시간 지나면 완료 이벤트 발행
     private IEnumerator AttackRoutine()
@@ -92,8 +88,7 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerCo
     // 도끼 궤적 활성화 메서드
     public void ActivateRange(bool active)
     {
-        axeRangeToggle = active;
-        axeShooter.ShowRange(active);
+        axeShooter.ActivateRange(active);
     }
 
     public void CancelAttack()
@@ -103,13 +98,4 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPunObservable, IPlayerCo
         // 회전 종료
         transform.DOKill();
     }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-            stream.SendNext(axeShooter.targetPoint);
-        else
-            axeShooter.targetPoint = (Vector3)stream.ReceiveNext();
-    }
-
 }

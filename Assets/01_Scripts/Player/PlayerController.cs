@@ -14,13 +14,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     // 플레이어 스크립트 리스트
     private List<IPlayerComponent> components = new List<IPlayerComponent>();
 
-    [SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
+    //[SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
 
     [SerializeField] private Animator playerAnim;
 
     #region IPlayerComponents
     // 이동
-    [SerializeField] private PlayableMovement movement;
+    [SerializeField] private PlayerMovement movement;
     // 공격
     [SerializeField] private PlayerAttack attack;
     // 체력
@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     #region properties
     public PlayerStateMachine StateMachine => stateMachine;
 
-    public PlayableMovement PM => movement;
+    public PlayerMovement PM => movement;
     public PlayerAttack Attack => attack;
     public PlayerHealth Health => playerHealth;
 
@@ -67,9 +67,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     {
         // 플레이어 컴포넌트들 초기화
         InitializeComponents();
-        
-        // 애니메이션 이벤트 설정
-        playerAnimEventHandler.OnAnimationEventActions.AddListener(GetAnimationEvent);
 
         // 상태 머신 초기화
         stateMachine = new(this, attack, movement);
@@ -131,16 +128,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
         attack.CancelAttack();
     }
 
-    private void GetAnimationEvent(string tag)
-    {
-        switch (tag)
-        {
-            case "Throw Axe":
-                attack.SpawnAxe();
-                break;
-        }
-    }
-
     public void HandleInput(InputAction.CallbackContext context)
     {
         if (!photonView.IsMine) return;
@@ -161,7 +148,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
                     break;
 
                 case "Click":
-                    if (!attack.IsActionInProgress)
+                    if (!attack.IsActionInProgress && attack.CanExecuteAction)
                         stateMachine.ChangeState(EPlayerState.Attack);
                     break;
 

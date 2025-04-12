@@ -15,6 +15,8 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     [SerializeField] MMF_Player damageTestController;
     private MMF_FloatingText mMF_FloatingText;
 
+    public bool Controllable { get; set; } = true;
+
     private void Start()
     {
         foreach (var feedback in damageTestController.FeedbacksList)
