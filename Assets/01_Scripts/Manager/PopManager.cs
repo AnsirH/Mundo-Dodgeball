@@ -10,7 +10,7 @@ public class PopManager : ManagerBase<PopManager>
     public GameSelectPop gameSelectPop;
     public LocalSelectPop localSelectPop;
     public LobbySoundControllerPop lobbySoundControllerPop;
-
+    public InGameSettingPop inGameSettingPop;
 
     #region Pop Active
     private List<PopBase> openPops = new List<PopBase>();

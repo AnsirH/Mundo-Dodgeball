@@ -118,6 +118,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("방에서 나감");
         PhotonNetwork.LoadLevel("MainScene"); // 로비 씬으로 이동
+        UIManager.instance.ChangeGame(true);
         UIManager.instance.ChangeLobbyUI();
     }
     #endregion
@@ -196,7 +197,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
             UIManager.instance.ChangeGame(false);
         }
     }
+
     #endregion
+    #region 
+    
+    #endregion
+
     // Ready 버튼이 눌렸을 때 호출되는 함수 (버튼 OnClick에 연결)
     public void OnClickReady(bool isReady)
     {
