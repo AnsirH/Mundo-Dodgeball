@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -49,6 +50,16 @@ public class GameManager : MonoBehaviourPunCallbacks
     #endregion
     // Start is called before the first frame update
     public ReSourceManager resourceManager;
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (SceneManager.GetActiveScene().name != "MainScene" && !PopManager.instance.inGameSettingPop.gameObject.activeSelf)
+            {
+                PopManager.instance.inGameSettingPop.Open();
+            }
+        }
+    }
     void Start()
     {
         
