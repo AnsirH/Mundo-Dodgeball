@@ -9,7 +9,7 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayer
     private IPlayerContext context;
 
     public float attackPower = 80.0f;
-    private float attackDuration = 0.75f;
+    private float attackDuration = 0.25f;
 
     private Coroutine currentAttackRoutine;
 
@@ -35,10 +35,10 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayer
 
         ActivateRange(false);
         Vector3? targetPoint = context.GetMousePosition();
-        if (targetPoint.Value == null) return;
+        if (!targetPoint.HasValue) return;
         Vector3 direction = (targetPoint.Value - context.Pos).normalized;
         direction.y = 0.0f;
-        transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => { axeShooter.SpawnProjectile(); };
+        transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => { axeShooter.SpawnProjectile(targetPoint.Value); };
 
         IsActionInProgress = true;
         currentAttackRoutine = StartCoroutine(AttackRoutine());
@@ -47,9 +47,10 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayer
     #endregion
 
     #region IPlayerComponent Implementation
-    public void Initialize(IPlayerContext context)
+    public void Initialize(IPlayerContext context, bool isOfflineMode)
     {
         this.context = context;
+        axeShooter.Initialize(context, isOfflineMode);
     }
 
     public void Updated()

@@ -9,6 +9,7 @@ using static UnityEngine.GraphicsBuffer;
 public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageable, IPlayerComponent
 {
     private IPlayerContext context;
+    private bool isOfflineMode;
     private float currentHealth;
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float healthRegenPerSec = 7.0f;
@@ -28,9 +29,10 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
             }
         }
     }
-    public void Initialize(IPlayerContext context)
+    public void Initialize(IPlayerContext context, bool isOfflineMode = false)
     {
         this.context = context;
+        this.isOfflineMode = isOfflineMode;
         currentHealth = maxHealth;
     }
 

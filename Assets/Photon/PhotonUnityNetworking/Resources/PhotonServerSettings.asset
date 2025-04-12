@@ -46,6 +46,9 @@ MonoBehaviour:
   - DieRPC
   - CreatePlayerCharacter
   - CreatePlayerCharacter_RPC
+  - RPC_HandleInput
+  - RPC_SpawnProjectil
+  - RPC_StartMove
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

@@ -15,28 +15,10 @@ namespace PlayerCharacterControl.State
         {
             attack.ExecuteAction();
             context.Anim.SetTrigger("Attack");
-            // 이전 상태가 이동 상태인지 확인 및 저장
-            //isPrevStateIsMove = context.StateMachine.PrevState is PlayerMoveState;
-
-            // 이전 상태가 이동이라면 이동 중지
-            //if (isPrevStateIsMove)
-            //    playerController.PM.StopMove();
-
-            //// [RPC] 공격 실행
-            //attack.photonView.RPC("StartAttack", Photon.Pun.RpcTarget.All);
-
-            //// 공격 애니메이션 실행
-            //playerController.Anim.SetTrigger("Attack"); // 상수로 변경할 것
         }
 
         public override void ExitState()
         {
-            //// 이전 상태가 이동 상태였을 때 마저 이동
-            //if (isPrevStateIsMove)
-            //{
-            //    playerController.PM.ContinueMoveToTarget();
-            //    isPrevStateIsMove = false;
-            //}
         }
 
         public override void UpdateState()

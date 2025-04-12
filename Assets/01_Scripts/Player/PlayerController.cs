@@ -25,6 +25,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     [SerializeField] private PlayerAttack attack;
     // 체력
     [SerializeField] private PlayerHealth playerHealth;
+
+    public bool isOfflineMode;
+
     // 스킬
 
     #endregion
@@ -118,7 +121,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
         foreach (var component in components)
         {
-            component.Initialize(this);
+            component.Initialize(this, isOfflineMode);
         }
     }
 
@@ -137,24 +140,44 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
             switch (context.action.name)
             {
                 case "Move":
-                    if (!attack.IsActionInProgress)
-                    {
-                        stateMachine.ChangeState(EPlayerState.Move);
-                        attack.ActivateRange(false);
-                    }
+                    HandleMoveInput();
                     break;
 
                 case "Attack":
+                    HandleAttackInput();
                     break;
 
                 case "Click":
-                    if (!attack.IsActionInProgress && attack.CanExecuteAction)
-                        stateMachine.ChangeState(EPlayerState.Attack);
+                    HandleClickInput();
                     break;
 
                 default:
                     break;
             }
+        }
+    }
+
+    public void HandleMoveInput()
+    {
+        if (!attack.IsActionInProgress)
+        {
+            stateMachine.ChangeState(EPlayerState.Move);
+            attack.ActivateRange(false);
+        }
+    }
+
+    public void HandleAttackInput()
+    {
+        if (!attack.IsActionInProgress)
+            attack.ActivateRange(true);
+    }
+
+    public void HandleClickInput()
+    {
+        if (!attack.IsActionInProgress && attack.CanExecuteAction)
+        {
+            stateMachine.ChangeState(EPlayerState.Attack);
+            movement.StopMove();
         }
     }
 }

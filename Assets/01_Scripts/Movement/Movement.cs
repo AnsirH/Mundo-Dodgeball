@@ -21,21 +21,11 @@ public interface IMovable
 
     /// <summary> ̵  Ȯ </summary>
     public bool IsMoving { get; }
-
-    MovementState CurrentState { get; }
-    event Action<MovementState> OnStateChanged;
-}
-
-public enum MovementState
-{
-    Idle,
-    Moving,
-    Rotating,
-    Stopping
 }
 
 public class Movement : MonoBehaviourPun, IMovable
 {
+    [SerializeField] protected bool isOfflineMode = false;
     [SerializeField] protected float moveSpeed = 5f;
     [SerializeField] protected float rotateSpeed = 10f;
     [SerializeField] protected float arrivalThreshold = 0.1f;
@@ -44,17 +34,7 @@ public class Movement : MonoBehaviourPun, IMovable
     protected Coroutine moveCoroutine;
     protected Tweener moveTween;
     protected Tweener rotateTween;
-    protected MovementState currentState = MovementState.Idle;
 
-    public MovementState CurrentState => currentState;
-    public event Action<MovementState> OnStateChanged;
-
-    protected void SetState(MovementState newState)
-    {
-        if (currentState == newState) return;
-        currentState = newState;
-        OnStateChanged?.Invoke(newState);
-    }
 
     public virtual void MoveForDeltaTime(Vector3 targetPosition, float deltaTime)
     {
@@ -81,11 +61,14 @@ public class Movement : MonoBehaviourPun, IMovable
         }
     }
 
-    public virtual void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
+    [PunRPC]
+    public void RPC_StartMove(Vector3 targetPosition)
     {
-        if (!photonView.IsMine) return;
+        StartMoveToNewTargetInternal(targetPosition);
+    }
 
-        // ̵ ʱȭ
+    private void StartMoveToNewTargetInternal(Vector3 targetPosition, bool rotateTowardTarget = true)
+    {
         StopMove();
         targetPosition.y = transform.position.y;
         currentTargetPosition = targetPosition;
@@ -95,7 +78,6 @@ public class Movement : MonoBehaviourPun, IMovable
         // 이동 시간 계산 (거리에 비례)
         float duration = distance / moveSpeed;
 
-        SetState(MovementState.Moving);
 
         // 이동
         moveTween = transform.DOMove(targetPosition, duration)
@@ -108,39 +90,42 @@ public class Movement : MonoBehaviourPun, IMovable
             Vector3 direction = (targetPosition - transform.position).normalized;
             if (direction != Vector3.zero)
             {
-                SetState(MovementState.Rotating);
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
                 rotateTween = transform.DORotateQuaternion(targetRotation, 0.2f)
-                    .SetEase(Ease.OutQuad)
-                    .OnComplete(() => {
-                        if (currentState == MovementState.Rotating)
-                            SetState(MovementState.Moving);
-                    });
+                    .SetEase(Ease.OutQuad).OnComplete(() => rotateTween = null);
             }
+        }
+    }
+
+    public virtual void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
+    {
+        if (isOfflineMode)
+        {
+            // 오프라인 모드: 직접 이동
+            StartMoveToNewTargetInternal(targetPosition);
+        }
+        else if (photonView.IsMine)
+        {
+            // 온라인 모드: RPC로 이동 요청
+            photonView.RPC("RPC_StartMove", RpcTarget.All, targetPosition);
         }
     }
 
     protected virtual void OnMoveComplete()
     {
         moveTween = null;
-        rotateTween = null;
         currentTargetPosition = null;
-        SetState(MovementState.Idle);
     }
 
     public virtual void StopMove()
     {
-        if (currentState == MovementState.Idle) return;
-        
-        SetState(MovementState.Stopping);
         moveTween?.Kill();
         rotateTween?.Kill();
         moveTween = null;
         rotateTween = null;
-        OnMoveComplete();
     }
 
-    public bool IsMoving => currentState == MovementState.Moving || currentState == MovementState.Rotating;
+    public bool IsMoving => moveTween != null;
 
     protected virtual void OnDestroy()
     {

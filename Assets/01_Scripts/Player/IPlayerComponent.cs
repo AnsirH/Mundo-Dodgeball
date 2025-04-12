@@ -68,7 +68,7 @@ public interface IPlayerComponent
     /// <summary>
     /// 컴포넌트 초기화
     /// </summary>
-    void Initialize(IPlayerContext context);
+    void Initialize(IPlayerContext context, bool isOfflineMode);
 
     /// <summary>
     /// 매 프레임 호출되는 업데이트

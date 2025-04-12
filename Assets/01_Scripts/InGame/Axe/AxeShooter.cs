@@ -4,9 +4,9 @@ using UnityEngine;
 
 public interface IShooter
 {
-    void Initialize(IPlayerContext context);
+    void Initialize(IPlayerContext context, bool isOfflineMode = false);
     void ActivateRange(bool isActive);
-    void SpawnProjectile();
+    void SpawnProjectile(Vector3 targetPoint);
     bool IsRangeActive { get; }
     bool CanShoot { get; }
 }
@@ -16,23 +16,28 @@ public interface IRangeIndicator
 {
     void Show();
     void Hide();
-    void UpdatePosition(Vector3 position);
+    void UpdatePosition(Vector3 position, float distance);
     bool IsActive { get; }
 }
 
 // IProjectile.cs
 public interface IProjectile
 {
-    void Initialize(IPlayerContext context, float damage);
+    void Initialize(IPlayerContext context, float damage, Vector3 spawnPos);
     void Launch(Vector3 direction);
     void OnHit(Collider other);
 }
 
 public class AxeShooter : MonoBehaviourPun, IShooter
 {
+    private bool isOfflineMode = false;
+    [Header("임시 변수")]
     [SerializeField] private float attackPower = 80.0f;
     [SerializeField] private float cooldownTime = 2.0f;
+
+    [Header("References")]
     [SerializeField] private GameObject axePrefab;
+    [SerializeField] private GameObject rangeIndicatorObj;
 
     private IPlayerContext context;
     private IRangeIndicator rangeIndicator;
@@ -45,7 +50,7 @@ public class AxeShooter : MonoBehaviourPun, IShooter
 
     private void Awake()
     {
-        rangeIndicator = GetComponent<IRangeIndicator>();
+        rangeIndicator = rangeIndicatorObj.GetComponent<IRangeIndicator>();
     }
 
     private void Update()
@@ -54,11 +59,19 @@ public class AxeShooter : MonoBehaviourPun, IShooter
         {
             currentCooldown -= Time.deltaTime;
         }
+
+        if (IsRangeActive)
+        {
+            Vector3? mousePosition = context.GetMousePosition();
+            if (mousePosition.HasValue)
+                rangeIndicator.UpdatePosition(mousePosition.Value, 10.0f);
+        }
     }
 
-    public void Initialize(IPlayerContext context)
+    public void Initialize(IPlayerContext context, bool isOfflineMode=false)
     {
         this.context = context;
+        this.isOfflineMode = isOfflineMode;
     }
 
     public void ActivateRange(bool isActive)
@@ -70,21 +83,50 @@ public class AxeShooter : MonoBehaviourPun, IShooter
             rangeIndicator.Hide();
     }
 
-    public void SpawnProjectile()
+    [PunRPC]
+    public void RPC_SpawnProjectil(Vector3 position, Vector3 direction)
     {
-        if (!photonView.IsMine) return;
+        SpawnProjectileInternal(position, direction);
+    }
 
-        Vector3? targetPoint = context.GetMousePosition();
-        if (!targetPoint.HasValue) return;
+    private void SpawnProjectileInternal(Vector3 position, Vector3 direction)
+    {
+        GameObject axeObj;
+        if (isOfflineMode)
+        {
+            // 오프라인 모드: 직접 Instantiate
+            axeObj = Instantiate(axePrefab, position, Quaternion.identity);
+        }
+        else
+        {
+            // 온라인 모드: PhotonNetwork.Instantiate
+            axeObj = PhotonNetwork.Instantiate(axePrefab.name, position, Quaternion.identity);
+        }
 
-        Vector3 direction = (targetPoint.Value - context.Pos).normalized;
+        IProjectile axe = axeObj.GetComponent<IProjectile>();
+        axe.Initialize(context, attackPower, transform.position);
+        axe.Launch(direction);
+    }
+
+    public void SpawnProjectile(Vector3 targetPoint)
+    {
+        if (!CanShoot) return;
+
+        Vector3 direction = (targetPoint - context.Pos).normalized * 10.0f;
         direction.y = 0.0f;
 
-        // 도끼 생성 및 발사
-        GameObject axeObj = PhotonNetwork.Instantiate(axePrefab.name, transform.position, Quaternion.identity);
-        IProjectile axe = axeObj.GetComponent<IProjectile>();
-        axe.Initialize(context, attackPower);
-        axe.Launch(direction);
+        if (isOfflineMode)
+        {
+            // 오프라인 모드: 직접 생성
+            SpawnProjectileInternal(transform.position, direction);
+        }
+        else if(context.IsLocalPlayer())
+        {
+            // 온라인 모드: RPC로 생성 요청
+            photonView.RPC("RPC_SpawnProjectile", RpcTarget.All,
+                transform.position,
+                direction);
+        }
 
         // 쿨타임 시작
         currentCooldown = cooldownTime;

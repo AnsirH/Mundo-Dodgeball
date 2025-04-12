@@ -25,9 +25,10 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
         canUseSpellD = true;
     }
 
-    public void Initialize(IPlayerContext context)
+    public void Initialize(IPlayerContext context, bool isOfflineMode = false)
     {
-        throw new System.NotImplementedException();
+        this.context = context;
+        this.isOfflineMode = isOfflineMode;
     }
 
     public void Updated()
@@ -52,6 +53,9 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
     {
         throw new System.NotImplementedException();
     }
+
+    private IPlayerContext context;
+    private bool isOfflineMode;
 
     private Spell spellD;
 
