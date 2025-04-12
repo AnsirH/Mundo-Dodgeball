@@ -1120,13 +1120,13 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 2367554691260015081}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1089014353931383088}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7700144322300401899}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6215085181777121791}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8439029551291699871}
@@ -1151,6 +1151,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 809524163573960308}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9105942959282052119}
     - targetCorrespondingSourceObject: {fileID: -780769333758982494, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3490007475169857344}
@@ -1253,6 +1256,20 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
   m_PrefabInstance: {fileID: 961008935505192235}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2367554691260015081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114658553885513850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b25895b7cc13b0c41a18a6d2c74a4369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isOfflineMode: 0
+  isDebugMode: 1
 --- !u!114 &1089014353931383088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1266,9 +1283,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerAnim: {fileID: 6646368711127324858}
-  movement: {fileID: 0}
-  attack: {fileID: 0}
+  movement: {fileID: 7700144322300401899}
+  attack: {fileID: 8439029551291699871}
   playerHealth: {fileID: 1822853794646474301}
+  isOfflineMode: 0
 --- !u!114 &7700144322300401899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1281,21 +1299,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733a4ac905a373745984578e139fdafc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isOfflineMode: 0
   moveSpeed: 3
   rotateSpeed: 1080
   arrivalThreshold: 0.1
---- !u!114 &6215085181777121791
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 114658553885513850}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00b1d8e567cf96a42a6a995f8efaf9d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &8439029551291699871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1337,99 +1344,27 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089014353931383088}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: HandleInput
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: fb4d9b74-bab2-4114-81e7-94819ae14e9b
     m_ActionName: 'Player Input/Move[/Mouse/rightButton]'
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089014353931383088}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: HandleInput
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: fb6e9c8b-89a7-463b-9bb9-56f120473c78
     m_ActionName: 'Player Input/Attack[/Keyboard/q]'
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089014353931383088}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: HandleInput
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: a5b1f991-1d93-4015-a2c9-4f49d4e25c1c
     m_ActionName: 'Player Input/Select[/Mouse/rightButton]'
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089014353931383088}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: GetPlayerInputEvent
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: 8513fae3-dfe6-4864-ab11-f011282a7e2a
     m_ActionName: 'Player Input/SpellD[/Keyboard/d]'
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089014353931383088}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: GetPlayerInputEvent
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: 6ec8dc39-f7f1-4467-8fc1-36bc27dc927c
     m_ActionName: 'Player Input/SpellF[/Keyboard/f]'
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1089014353931383088}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: GetPlayerInputEvent
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: 639de995-19a3-4811-b11c-3c7004ef59d7
     m_ActionName: 'Player Input/StopMove[/Keyboard/s]'
   m_NeverAutoSwitchControlSchemes: 0
@@ -1554,6 +1489,22 @@ CapsuleCollider:
   m_Height: 1.9065738
   m_Direction: 1
   m_Center: {x: 0, y: 0.95468354, z: 0}
+--- !u!114 &9105942959282052119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114658553885513850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2740abd91cc61b489426022f1a59cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerInput: {fileID: 970527021875988243}
+  PlayerInputEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &142119297455900911 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 913905503029243332, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
@@ -2663,6 +2614,10 @@ PrefabInstance:
     - target: {fileID: 933210281612208121, guid: bc611e269afd13c4fb235f202b7b5488, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1300140521083128419, guid: bc611e269afd13c4fb235f202b7b5488, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.1
       objectReference: {fileID: 0}
     - target: {fileID: 7102914999195952000, guid: bc611e269afd13c4fb235f202b7b5488, type: 3}
       propertyPath: m_Name

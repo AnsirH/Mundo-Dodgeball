@@ -84,7 +84,7 @@ public class AxeShooter : MonoBehaviourPun, IShooter
     }
 
     [PunRPC]
-    public void RPC_SpawnProjectil(Vector3 position, Vector3 direction)
+    private void RPC_SpawnProjectile(Vector3 position, Vector3 direction)
     {
         SpawnProjectileInternal(position, direction);
     }

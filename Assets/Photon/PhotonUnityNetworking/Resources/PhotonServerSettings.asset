@@ -49,6 +49,7 @@ MonoBehaviour:
   - RPC_HandleInput
   - RPC_SpawnProjectil
   - RPC_StartMove
+  - RPC_SpawnProjectile
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

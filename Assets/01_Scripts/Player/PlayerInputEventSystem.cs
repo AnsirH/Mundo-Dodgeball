@@ -1,70 +1,42 @@
 using Photon.Pun;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using Photon.Realtime;
-using static PlayerInputAction;
 
-public class PlayerInputEventSystem : MonoBehaviourPunCallbacks, IPlayerInputActions
+public class PlayerInputEventSystem : MonoBehaviourPunCallbacks
 {
+    [SerializeField] private PlayerInput playerInput;
     public UnityEvent<InputAction.CallbackContext> PlayerInputEvent = new();
-
-    private PhotonView playerPhotonView;
 
     private void Awake()
     {
-        playerPhotonView = GetComponent<PhotonView>();
+        playerInput = GetComponent<PlayerInput>();
     }
 
-    public void OnAttack(InputAction.CallbackContext context)
+    public override void OnEnable()
     {
-        if (playerPhotonView.IsMine)
-            PlayerInputEvent?.Invoke(context);
-    }
-
-    public void OnClick(InputAction.CallbackContext context)
-    {
-        if (playerPhotonView.IsMine)
+        if (playerInput != null && playerInput.actions != null)
         {
-            PlayerInputEvent?.Invoke(context);
-            Debug.Log("photonView.IsMine is true");
-        }
-        else
-        {
-            Debug.Log("photonView.IsMine is false");
+            var actions = playerInput.actions;
+            actions["Attack"].performed += OnInput;
+            actions["Click"].performed += OnInput;
+            actions["Move"].performed += OnInput;
         }
     }
 
-    public void OnMove(InputAction.CallbackContext context)
+    public override void OnDisable()
     {
-        if (playerPhotonView.IsMine)
+        if (playerInput != null && playerInput.actions != null)
         {
-            PlayerInputEvent?.Invoke(context);
-            Debug.Log("photonView.IsMine is true");
-        }
-        else
-        {
-            Debug.Log("photonView.IsMine is false");
+            var actions = playerInput.actions;
+            actions["Attack"].performed -= OnInput;
+            actions["Click"].performed -= OnInput;
+            actions["Move"].performed -= OnInput;
         }
     }
 
-    public void OnSpellD(InputAction.CallbackContext context)
+    private void OnInput(InputAction.CallbackContext context)
     {
-        if (playerPhotonView.IsMine)
-            PlayerInputEvent?.Invoke(context);
-    }
-
-    public void OnSpellF(InputAction.CallbackContext context)
-    {
-        if (playerPhotonView.IsMine)
-            PlayerInputEvent?.Invoke(context);
-    }
-
-    public void OnStopMove(InputAction.CallbackContext context)
-    {
-        if (playerPhotonView.IsMine)
-            PlayerInputEvent?.Invoke(context);
+        PlayerInputEvent?.Invoke(context);
     }
 }

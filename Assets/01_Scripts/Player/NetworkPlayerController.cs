@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class NetworkPlayerController : MonoBehaviourPunCallbacks
 {
     [SerializeField] private bool isOfflineMode = false;  // 오프라인 테스트 모드
+    [SerializeField] private bool isDebugMode = false;  // 디버그 모드 추가
     private PlayerController playerController;
     private PlayerInputEventSystem inputSystem;
 
@@ -32,8 +33,14 @@ public class NetworkPlayerController : MonoBehaviourPunCallbacks
         inputSystem.PlayerInputEvent.RemoveListener(OnPlayerInput);
     }
 
-    private void OnPlayerInput(InputAction.CallbackContext context)
+    public void OnPlayerInput(InputAction.CallbackContext context)
     {
+        if (isDebugMode)
+        {
+            // 디버그 로그 추가
+            Debug.Log($"Input Received: {context.action.name} from {photonView.Owner.NickName}");
+        }
+
         if (isOfflineMode)
         {
             // 오프라인 모드: 직접 입력 처리
@@ -50,6 +57,11 @@ public class NetworkPlayerController : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPC_HandleInput(string actionName)
     {
+        if (isDebugMode)
+        {
+            Debug.Log($"RPC Received: {actionName} on {photonView.Owner.NickName}");
+        }
+
         // 입력 처리
         switch (actionName)
         {
