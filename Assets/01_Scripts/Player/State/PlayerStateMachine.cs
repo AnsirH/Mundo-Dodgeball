@@ -1,54 +1,32 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.InputSystem;
-
 namespace PlayerCharacterControl.State
 {
     public class PlayerStateMachine
     {
         public PlayerStateMachine(IPlayerContext playerContext, IPlayerAction attack, IPlayerAction movement)
         {
+            // í”Œë ˆì´ì–´ ìƒíƒœ ê°ì²´ ìƒì„± ë° ì§€ì •
             states[(int)EPlayerState.Idle] = new PlayerIdleState(playerContext);
             states[(int)EPlayerState.Move] = new PlayerMoveState(playerContext, movement);
             states[(int)EPlayerState.Attack] = new PlayerAttackState(playerContext, attack);
             states[(int)EPlayerState.Die] = new PlayerDieState(playerContext);
 
-
-            // Çàµ¿ ¿Ï·á ½Ã Idle »óÅÂ·Î ÀüÈ¯
+            // í–‰ë™í˜• ì»´í¬ë„ŒíŠ¸ í–‰ë™ ì¢…ë£Œ ì´ë²¤íŠ¸ ë“±ë¡
             attack.OnActionCompleted += () => ChangeState(EPlayerState.Idle);
 
             movement.OnActionCompleted += () => ChangeState(EPlayerState.Idle);
 
+            // í˜„ì¬ ìƒíƒœ Idle ìƒíƒœë¡œ ì´ˆê¸°í™”
             ChangeState(EPlayerState.Idle);
         }
 
-        private PlayerStateBase[] states = new PlayerStateBase[4];
-
-        public void HandleInput(string stateName)
-        {
-            switch (stateName)
-            {
-                case "Click":
-                    ChangeState(EPlayerState.Attack);
-                    break;
-
-                case "Move":
-                    ChangeState(EPlayerState.Move);
-                    break;
-            }
-        }
-
-        // »óÅÂ ÀüÈ¯
-        private void ChangeState(EPlayerState newState)
+        public void ChangeState(EPlayerState newState)
         {
             if (newState == EPlayerState.None) return;
 
             ChangeState(states[(int)newState]);
         }
 
-        private void ChangeState(PlayerStateBase newState)
+        public void ChangeState(PlayerStateBase newState)
         {
             if (currentState != null && currentState != newState)
             {
@@ -60,7 +38,7 @@ namespace PlayerCharacterControl.State
             currentState.EnterState();
         }
 
-        // ÀÌÀü »óÅÂ·Î ÀüÈ¯
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½È¯
         public void UndoState()
         {
             if (prevState != null)
@@ -74,7 +52,10 @@ namespace PlayerCharacterControl.State
             currentState?.UpdateState();
         }
 
+        private PlayerStateBase[] states = new PlayerStateBase[4];
+
         PlayerStateBase currentState;
+
         PlayerStateBase prevState;
 
         public PlayerStateBase CurrentState => currentState;
