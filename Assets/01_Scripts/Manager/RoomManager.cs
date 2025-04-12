@@ -9,10 +9,22 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Diagnostics;
 using UnityEngine.UI;
 using UnityEngine.Timeline;
+using System.Security.Cryptography;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     public RoomInfo joinRoom;
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
+        SceneManager.sceneLoaded += ChangeIngameMode;
+    }
+    public override void OnDisable()
+    {
+        base.OnDisable();
+        SceneManager.sceneLoaded -= ChangeIngameMode;
+    }
     #region 방생성 로직
     public void CreateRoom(string roomName, bool isVisible, string password)
     {
@@ -153,6 +165,38 @@ public class RoomManager : MonoBehaviourPunCallbacks
         }
     }
     #endregion
+    #region 인게임 전환
+    private void CheckAllPlayersReady()
+    {
+        // 마스터 클라이언트가 아니면 처리하지 않음
+        if (!PhotonNetwork.IsMasterClient || PhotonNetwork.PlayerList.Length < 2) return;
+
+        // 모든 플레이어의 "Ready" 상태가 true인지 확인
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            // Ready 프로퍼티가 없거나 false라면 아직 준비 안 된 것으로 간주
+            if (!p.CustomProperties.ContainsKey("Ready") || !(bool)p.CustomProperties["Ready"])
+            {
+                return;
+            }
+        }
+
+        // 여기까지 왔다면, 모든 인원이 Ready 상태
+        Debug.Log("모든 플레이어가 Ready! GameScene으로 이동합니다.");
+
+        // 마스터 클라이언트가 씬 로드를 트리거하면
+        // AutomaticallySyncScene이 true면 다른 클라이언트도 자동 이동
+        PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.LoadLevel("GeneralModeScene");
+    }
+    public void ChangeIngameMode(Scene scene, LoadSceneMode mode)
+    {
+        if(scene.name != "MainScene")
+        {
+            UIManager.instance.ChangeGame(false);
+        }
+    }
+    #endregion
     // Ready 버튼이 눌렸을 때 호출되는 함수 (버튼 OnClick에 연결)
     public void OnClickReady(bool isReady)
     {
@@ -186,29 +230,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
         CheckAllPlayersReady();
     }
 
-    private void CheckAllPlayersReady()
-    {
-        // 마스터 클라이언트가 아니면 처리하지 않음
-        if (!PhotonNetwork.IsMasterClient || PhotonNetwork.PlayerList.Length < 2) return;
-
-        // 모든 플레이어의 "Ready" 상태가 true인지 확인
-        foreach (Player p in PhotonNetwork.PlayerList)
-        {
-            // Ready 프로퍼티가 없거나 false라면 아직 준비 안 된 것으로 간주
-            if (!p.CustomProperties.ContainsKey("Ready") || !(bool)p.CustomProperties["Ready"])
-            {
-                return;
-            }
-        }
-
-        // 여기까지 왔다면, 모든 인원이 Ready 상태
-        Debug.Log("모든 플레이어가 Ready! GameScene으로 이동합니다.");
-
-        // 마스터 클라이언트가 씬 로드를 트리거하면
-        // AutomaticallySyncScene이 true면 다른 클라이언트도 자동 이동
-        PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonNetwork.LoadLevel("PlayerCharacterTest");
-    }
     // 방 목록이 갱신될 때마다 Photon이 이 콜백을 호출해줌
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
@@ -225,6 +246,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     //25.03.04 스팀 출시 안할거 같아서 뺌.슈발
     public void OnConnectedToServer()
     {
+        Debug.Log("Connected to Master Server!");
         //string iconURL = SteamManager.GetPlayerAvatarURL();
         //Debug.Log(iconURL);
         //ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable()
