@@ -572,13 +572,17 @@ PrefabInstance:
       propertyPath: movement
       value: 
       objectReference: {fileID: 1689071391}
+    - target: {fileID: 4230218289760740661, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.1
+      objectReference: {fileID: 0}
     - target: {fileID: 5424137487824949208, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
       propertyPath: sceneViewId
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7635933376975437843, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6215085181777121791, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}

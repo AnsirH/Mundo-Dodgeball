@@ -1,0 +1,67 @@
+using Photon.Pun;
+using System;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class NetworkPlayerController : MonoBehaviourPunCallbacks
+{
+    [SerializeField] private bool isOfflineMode = false;  // 오프라인 테스트 모드
+    private PlayerController playerController;
+    private PlayerInputEventSystem inputSystem;
+
+    private void Awake()
+    {
+        playerController = GetComponent<PlayerController>();
+        inputSystem = GetComponent<PlayerInputEventSystem>();
+
+        // 오프라인 모드일 경우 PhotonView를 비활성화
+        if (isOfflineMode)
+        {
+            playerController.isOfflineMode = true;
+            photonView.enabled = false;
+        }
+    }
+
+    public override void OnEnable()
+    {
+        inputSystem.PlayerInputEvent.AddListener(OnPlayerInput);
+    }
+
+    public override void OnDisable()
+    {
+        inputSystem.PlayerInputEvent.RemoveListener(OnPlayerInput);
+    }
+
+    private void OnPlayerInput(InputAction.CallbackContext context)
+    {
+        if (isOfflineMode)
+        {
+            // 오프라인 모드: 직접 입력 처리
+            playerController.HandleInput(context);
+        }
+        else if (photonView.IsMine)
+        {
+            // 온라인 모드: RPC로 입력 전송
+            photonView.RPC("RPC_HandleInput", RpcTarget.All,
+                context.action.name);
+        }
+    }
+
+    [PunRPC]
+    private void RPC_HandleInput(string actionName)
+    {
+        // 입력 처리
+        switch (actionName)
+        {
+            case "Attack":
+                playerController.HandleAttackInput();
+                break;
+            case "Click":
+                playerController.HandleClickInput();
+                break;
+            case "Move":
+                playerController.HandleMoveInput();
+                break;
+        }
+    }
+}
