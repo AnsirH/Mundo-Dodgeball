@@ -1,6 +1,7 @@
 using MyGame.Utils;
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public interface IShooter
 {
@@ -42,7 +43,7 @@ public class AxeShooter : MonoBehaviourPun, IShooter
     private IPlayerContext context;
     private IRangeIndicator rangeIndicator;
     private bool isRangeActive;
-    private float currentCooldown;
+    private float currentCooldown = 0;
 
     public bool IsRangeActive => isRangeActive;
     public bool CanShoot => !IsOnCooldown;  // 쿨타임 중이 아닐 때만 공격 가능
@@ -74,6 +75,31 @@ public class AxeShooter : MonoBehaviourPun, IShooter
         this.isOfflineMode = isOfflineMode;
     }
 
+    public void SpawnProjectile(Vector3 targetPoint)
+    {
+        if (!CanShoot) return;
+
+        Vector3 direction = (targetPoint - context.Pos).normalized * 10.0f;
+        direction.y = 0.0f;
+        if (isOfflineMode)
+        {
+            // 오프라인 모드: 직접 Instantiate
+            GameObject axeObj = Instantiate(axePrefab, transform.position, Quaternion.identity);
+
+            IProjectile axe = axeObj.GetComponent<IProjectile>();
+            axe.Initialize(context, attackPower, transform.position);
+            axe.Launch(direction);
+
+            // 쿨타임 시작
+            currentCooldown = cooldownTime;
+        }
+        else if (context.IsLocalPlayer())
+        {
+            photonView.RPC("RPC_SpawnProjectile", RpcTarget.All, transform.position, direction);
+        }
+    }
+
+    // 거리 표시 활성화
     public void ActivateRange(bool isActive)
     {
         isRangeActive = isActive;
@@ -86,48 +112,12 @@ public class AxeShooter : MonoBehaviourPun, IShooter
     [PunRPC]
     private void RPC_SpawnProjectile(Vector3 position, Vector3 direction)
     {
-        SpawnProjectileInternal(position, direction);
-    }
-
-    private void SpawnProjectileInternal(Vector3 position, Vector3 direction)
-    {
-        GameObject axeObj;
-        if (isOfflineMode)
-        {
-            // 오프라인 모드: 직접 Instantiate
-            axeObj = Instantiate(axePrefab, position, Quaternion.identity);
-        }
-        else
-        {
-            // 온라인 모드: PhotonNetwork.Instantiate
-            axeObj = PhotonNetwork.Instantiate(axePrefab.name, position, Quaternion.identity);
-        }
+        // 온라인 모드: PhotonNetwork.Instantiate
+        GameObject axeObj = PhotonNetwork.Instantiate(axePrefab.name, position, Quaternion.identity);
 
         IProjectile axe = axeObj.GetComponent<IProjectile>();
         axe.Initialize(context, attackPower, transform.position);
         axe.Launch(direction);
-    }
-
-    public void SpawnProjectile(Vector3 targetPoint)
-    {
-        if (!CanShoot) return;
-
-        Vector3 direction = (targetPoint - context.Pos).normalized * 10.0f;
-        direction.y = 0.0f;
-
-        if (isOfflineMode)
-        {
-            // 오프라인 모드: 직접 생성
-            SpawnProjectileInternal(transform.position, direction);
-        }
-        else if(context.IsLocalPlayer())
-        {
-            // 온라인 모드: RPC로 생성 요청
-            photonView.RPC("RPC_SpawnProjectile", RpcTarget.All,
-                transform.position,
-                direction);
-        }
-
         // 쿨타임 시작
         currentCooldown = cooldownTime;
     }

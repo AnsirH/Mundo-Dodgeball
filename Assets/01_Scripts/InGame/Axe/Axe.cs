@@ -1,10 +1,11 @@
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
+using Photon.Pun;
 using System.Transactions;
 using UnityEngine;
 
-public class Axe : MonoBehaviour, IProjectile
+public class Axe : MonoBehaviourPun, IProjectile
 {
     public void Initialize(IPlayerContext context, float damage, Vector3 spawnPos)
     {
