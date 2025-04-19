@@ -5,6 +5,11 @@ using UnityEngine;
 
 public class IngameUIController : MonoBehaviour
 {
+    [SerializeField] TopPanelUI topPanelUI;
+    private void Start()
+    {
+        topPanelUI.StartTimer(2, 0);
+    }
     private void Update()
     {
         // 초기화를 해줬을 때만 체력바 활성화
