@@ -61,7 +61,7 @@ public class IngameController : MonoBehaviourPun
         int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
         int spawnIndex = actorNumber - 1;
 
-        PhotonNetwork.Instantiate("PlayerCharacter", playerSpawnPoints[spawnIndex].position, playerSpawnPoints[spawnIndex].rotation);
+        PhotonNetwork.Instantiate("Player", playerSpawnPoints[spawnIndex].position, playerSpawnPoints[spawnIndex].rotation);
     }
 
     IEnumerator WaitToStartGame()
