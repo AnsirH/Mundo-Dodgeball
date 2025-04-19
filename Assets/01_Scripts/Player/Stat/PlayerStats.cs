@@ -71,7 +71,7 @@ public class PlayerStats : MonoBehaviour
     /// <summary>직접 현재 체력을 설정합니다 (0~MaxHealth 범위로 클램프)</summary>
     public void SetCurrentHealth(float health)
     {
-        currentHealth = Mathf.Clamp(health, 0f, GetMaxHealth());
+        _currentHealth = Mathf.Clamp(health, 0f, GetMaxHealth());
     }
     public bool IsDead() => _currentHealth <= 0f;
 
