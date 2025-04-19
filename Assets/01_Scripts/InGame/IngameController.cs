@@ -2,6 +2,7 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class IngameController : MonoBehaviourPun
@@ -29,82 +30,106 @@ public class IngameController : MonoBehaviourPun
         StartCoroutine(WaitForGameReady());
     }
 
+    IEnumerator WaitForGameReady()
+    {
+        WaitForSeconds delay = new(1.0f);
+        playerControllers = null;
+
+        while (PhotonNetwork.PlayerList.Length < playerSpawnPoints.Length)
+        {
+            yield return delay;
+        }
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 게임이 준비 되었음을 모든 클라이언트에게 알림
+            photonView.RPC("ReadyGame_RPC", RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    public void ReadyGame_RPC()
+    {
+        CreatePlayerCharacter();
+
+        // 캐릭터 생성이 완료되었는지 확인 후 게임 시작
+        StartCoroutine(WaitToStartGame());
+    }
+
+    private void CreatePlayerCharacter()
+    {
+        int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+        int spawnIndex = actorNumber - 1;
+
+        PhotonNetwork.Instantiate("PlayerCharacter", playerSpawnPoints[spawnIndex].position, playerSpawnPoints[spawnIndex].rotation);
+    }
+
+    IEnumerator WaitToStartGame()
+    {
+        WaitForSeconds delay = new(0.5f);
+
+        // 모든 캐릭터가 생성될 때까지 대기
+        while (true)
+        {
+            var foundControllers = FindObjectsByType<NetworkPlayerController>(FindObjectsSortMode.None);
+
+            // 필요한 수 만큼 다 찾았으면 정렬 및 저장
+            if (foundControllers.Length >= playerSpawnPoints.Length)
+            {
+                playerControllers = new List<NetworkPlayerController>(new NetworkPlayerController[playerSpawnPoints.Length]);
+
+                foreach (var controller in foundControllers)
+                {
+                    PhotonView view = controller.GetComponent<PhotonView>();
+                    if (view != null)
+                    {
+                        int actorNum = view.Owner.ActorNumber;
+                        int index = actorNum - 1;
+
+                        if (index >= 0 && index < playerControllers.Count)
+                        {
+                            playerControllers[index] = controller;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"ActorNumber {actorNum}가 스폰 인덱스 범위를 벗어남.");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("PhotonView가 없는 컨트롤러 발견.");
+                    }
+                }
+
+                // 전부 정상적으로 할당됐는지 확인
+                if (playerControllers.All(c => c != null))
+                    break;
+            }
+
+            yield return delay;
+        }
+
+        StartGame();
+    }
+
     /// <summary>
     /// 게임 시작
     /// </summary>
     public void StartGame()
     {
-        foreach (PlayerController player in playerControllers)
+        foreach (NetworkPlayerController player in playerControllers)
         {
             player.enabled = true;
         }
         ingameUIController.Init();
     }
 
-    /// <summary>
-    /// 인게임 환경 준비. 플레이어 생성, 인게임 UI 초기화, 
-    /// </summary>
-    public void ReadyGame()
-    {
-        photonView.RPC("CreatePlayerCharacter_RPC", RpcTarget.All);
-        
-
-    }
-
-    /// <summary>
-    /// 플레이어 생성
-    /// </summary>
-    [PunRPC]
-    private void CreatePlayerCharacter_RPC()
-    {
-        if (!photonView.IsMine)
-            return;
-
-        if (currentPlayerCharacterCount < maxPlayerCharacterCount)
-        {
-            try
-            {
-                // 플레이어 생성
-                // 현재 플레이어 수에 맞는 위치에 생성한다.
-                Instantiate(playerCharacterPrefab, playerSpawnPoints[currentPlayerCharacterCount].position, playerSpawnPoints[currentPlayerCharacterCount].rotation);
-
-                // 현재 플레이어 수 +1
-                currentPlayerCharacterCount++;
-            }
-
-            catch (Exception ex)
-            {
-                Debug.Log($"에러 발생: {ex.Message}");
-                Debug.Log($"에러 타입: {ex.GetType()}");
-                Debug.Log($"스택 트레이스: {ex.StackTrace}");
-            }
-        }
-    }
-
-    IEnumerator WaitForGameReady()
-    {
-        WaitForSeconds secondDelay = new(1.0f);
-        playerControllers = null;
-
-        // 플레이어 컨트롤러 모두 찾을 때까지 검색
-        while(playerControllers == null || playerControllers.Length < 2)
-        {
-            playerControllers = FindObjectsOfType<PlayerController>();
-            yield return secondDelay;
-        }
-
-        StartGame();
-    }
-
     /// <summary>플레이어 캐릭터 배열</summary>
-    public PlayerController[] playerControllers;
+    public List<NetworkPlayerController> playerControllers;
     /// <summary>인게임 UI 컨트롤러</summary>
     public IngameUIController ingameUIController;
 
     public GameObject playerCharacterPrefab;
 
     public Transform[] playerSpawnPoints = new Transform[2];
-
-    public const int maxPlayerCharacterCount = 2;
-    private int currentPlayerCharacterCount = 0;
 }
