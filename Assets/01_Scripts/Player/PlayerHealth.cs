@@ -1,10 +1,7 @@
 ﻿using MoreMountains.Feedbacks;
 using Photon.Pun;
-using Photon.Realtime;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using static UnityEngine.GraphicsBuffer;
 
 public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageable, IPlayerComponent
 {
@@ -35,7 +32,7 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
 
     public void Damage(float damage)
     {
-        if (!context.IsLocalPlayer()) return;
+        if (!context.p_PhotonView.IsMine) return;
         
         context.Stats.ModifyCurrentHealth(-damage);
         mMF_FloatingText.Value = damage.ToString();

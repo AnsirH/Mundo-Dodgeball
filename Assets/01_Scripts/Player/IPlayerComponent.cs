@@ -1,3 +1,4 @@
+using Photon.Pun;
 using PlayerCharacterControl.State;
 using System;
 using UnityEngine;
@@ -8,11 +9,6 @@ using UnityEngine.InputSystem;
 /// </summary>
 public interface IPlayerContext
 {
-    /// <summary>
-    /// 현재 플레이어가 로컬 플레이어인지 확인
-    /// </summary>
-    bool IsLocalPlayer();
-
     /// <summary>
     /// 플레이어의 현재 상태
     /// </summary>
@@ -48,6 +44,8 @@ public interface IPlayerContext
     /// 플레이어의 현재 회전을 반환
     /// </summary>
     Quaternion Rot { get; }
+
+    PhotonView p_PhotonView { get; }
 
     #endregion
 

@@ -1120,6 +1120,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 5424137487824949208}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 2367554691260015081}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
@@ -1138,9 +1141,6 @@ PrefabInstance:
       addedObject: {fileID: 3562521471211086396}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5424137487824949208}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 7402131800847745899}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
@@ -1154,6 +1154,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9105942959282052119}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5203778459257994033}
     - targetCorrespondingSourceObject: {fileID: -780769333758982494, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3490007475169857344}
@@ -1256,6 +1259,31 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
   m_PrefabInstance: {fileID: 961008935505192235}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5424137487824949208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114658553885513850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 7402131800847745899}
+  - {fileID: 7087272152704519845}
+  - {fileID: 1822853794646474301}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!114 &2367554691260015081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1269,7 +1297,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOfflineMode: 0
-  isDebugMode: 0
+  isDebugMode: 1
 --- !u!114 &1089014353931383088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1282,6 +1310,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a81442b606c73e647abb041030fd7359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stats: {fileID: -5203778459257994033}
   playerAnim: {fileID: 6646368711127324858}
   movement: {fileID: 7700144322300401899}
   attack: {fileID: 8439029551291699871}
@@ -1386,31 +1415,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flashDistance: 1.5
   canUseSpellD: 1
---- !u!114 &5424137487824949208
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 114658553885513850}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 7402131800847745899}
-  - {fileID: 7087272152704519845}
-  - {fileID: 1822853794646474301}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!114 &7402131800847745899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1463,8 +1467,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fe56715cda9d194595ad954e57d7c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 613
-  healthRegenPerSec: 7
   damageTestController: {fileID: 2111329040807826123}
 --- !u!136 &809524163573960308
 CapsuleCollider:
@@ -1505,6 +1507,28 @@ MonoBehaviour:
   PlayerInputEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-5203778459257994033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114658553885513850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3639c605f11c9b8488fe2968a539820c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AttackPower:
+    baseValue: 10
+  MaxHealth:
+    baseValue: 100
+  MoveSpeed:
+    baseValue: 5
+  AttackCooldown:
+    baseValue: 1
+  HealthRegen:
+    baseValue: 1
 --- !u!1 &142119297455900911 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 913905503029243332, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
@@ -2623,7 +2647,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Axe Shooter
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -8033926779404083383, guid: bc611e269afd13c4fb235f202b7b5488, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

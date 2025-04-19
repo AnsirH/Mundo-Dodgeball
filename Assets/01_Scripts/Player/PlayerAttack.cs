@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayerAction
+public class PlayerAttack : MonoBehaviour, IPlayerComponent, IPlayerAction
 {
     private IPlayerContext context;
 
@@ -79,13 +79,13 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayer
     void PlayAttackAnimation()
     {
         context.Anim.SetTrigger("Attack");
-        photonView.RPC("RPC_PlayAnimation", RpcTarget.Others, "Attack");
+        context.p_PhotonView.RPC("RPC_PlayAnimation", RpcTarget.Others, "Attack");
     }
 
     [PunRPC]
     void RPC_PlayAnimation(string triggerName)
     {
-        if (!photonView.IsMine)
+        if (!context.p_PhotonView.IsMine)
             context.Anim.SetTrigger(triggerName);
     }
 
@@ -103,7 +103,7 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayer
     // µµ³¢ ±ËÀû È°¼ºÈ­ ¸Þ¼­µå
     public void ActivateRange(bool active)
     {
-        if (!photonView.IsMine) { return; }
+        if (!context.p_PhotonView.IsMine) { return; }
         if (active == true)
         {
             if (axeShooter.CanShoot)

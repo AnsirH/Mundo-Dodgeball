@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
     public PlayerStats Stats => stats;
 
-    public bool IsLocalPlayer() { return photonView.IsMine; }
+    public PhotonView p_PhotonView => photonView;
 
     public void OnPlayerDeath()
     {
@@ -134,29 +134,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
         attack.CancelAttack();
     }
 
-    public void HandleInput(InputAction.CallbackContext context)
+    public void HandleInput(string actionName)
     {
         if (!photonView.IsMine) return;
 
-        if (context.performed)
+        switch (actionName)
         {
-            switch (context.action.name)
-            {
-                case "Move":
-                    HandleMoveInput();
-                    break;
+            case "Move":
+                HandleMoveInput();
+                break;
 
-                case "Attack":
-                    HandleAttackInput();
-                    break;
+            case "Attack":
+                HandleAttackInput();
+                break;
 
-                case "Click":
-                    HandleClickInput();
-                    break;
+            case "Click":
+                HandleClickInput();
+                break;
 
-                default:
-                    break;
-            }
+            default:
+                break;
         }
     }
 

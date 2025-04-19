@@ -2,6 +2,7 @@ using Photon.Pun;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 public class NetworkPlayerController : MonoBehaviourPunCallbacks
 {
@@ -43,14 +44,18 @@ public class NetworkPlayerController : MonoBehaviourPunCallbacks
             Debug.Log($"Input Received: {context.action.name} from {photonView.Owner.NickName}");
         }
 
-        if (isOfflineMode)
+        if (context.performed)
         {
-            // 오프라인 모드: 직접 입력 처리
-            playerController.HandleInput(context);
-        }
-        else if (photonView.IsMine)
-        {
-            photonView.RPC("HandleInput_RPC", RpcTarget.All, context.action.name);
+            if (isOfflineMode)
+            {
+                // 오프라인 모드: 직접 입력 처리
+                playerController.HandleInput(context.action.name);
+            }
+
+            else if (playerController.p_PhotonView.IsMine)
+            {
+                playerController.p_PhotonView.RPC("HandleInput_RPC", RpcTarget.All, context.action.name);
+            }
         }
     }
 
@@ -59,21 +64,10 @@ public class NetworkPlayerController : MonoBehaviourPunCallbacks
     {
         if (isDebugMode)
         {
-            Debug.Log($"RPC Received: {actionName} on {photonView.Owner.NickName}");
+            Debug.Log($"RPC Received: {actionName} on {playerController.p_PhotonView.ViewID}");
         }
 
-        // 입력 처리
-        switch (actionName)
-        {
-            case "Attack":
-                playerController.HandleAttackInput();
-                break;
-            case "Click":
-                playerController.HandleClickInput();
-                break;
-            case "Move":
-                playerController.HandleMoveInput();
-                break;
-        }
+
+        playerController.HandleInput(actionName);
     }
 }

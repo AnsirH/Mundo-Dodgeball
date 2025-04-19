@@ -2,13 +2,13 @@ using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
 using Photon.Pun;
-using System.Transactions;
 using UnityEngine;
 
 public class Axe : MonoBehaviourPun, IProjectile
 {
     public void Initialize(IPlayerContext context, float damage, Vector3 spawnPos)
     {
+        Debug.Log(" d");
         this.context = context;
         this.damage = damage;
         transform.position = spawnPos;
@@ -16,6 +16,7 @@ public class Axe : MonoBehaviourPun, IProjectile
 
     public void Launch(Vector3 direction)
     {
+        Debug.Log(" d");
         transform.rotation = Quaternion.LookRotation(direction);
         Vector3 targetPos = transform.position + direction;
         if (moveTweenCore != null) moveTweenCore.Kill();

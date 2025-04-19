@@ -56,7 +56,6 @@ GameObject:
   m_Component:
   - component: {fileID: 933210281612208121}
   - component: {fileID: 7926816340896701928}
-  - component: {fileID: -8033926779404083383}
   m_Layer: 0
   m_Name: Axe Shooter
   m_TagString: Untagged
@@ -96,28 +95,6 @@ MonoBehaviour:
   cooldownTime: 2
   axePrefab: {fileID: 1904142371288617127, guid: 75f3bb5d178abc94a98711c3754614ef, type: 3}
   rangeIndicatorObj: {fileID: 4703885593386905413}
---- !u!114 &-8033926779404083383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7102914999195952000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &9223292669877235107
 GameObject:
   m_ObjectHideFlags: 0
