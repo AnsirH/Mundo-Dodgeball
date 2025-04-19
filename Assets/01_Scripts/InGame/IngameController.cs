@@ -33,7 +33,6 @@ public class IngameController : MonoBehaviourPun
     IEnumerator WaitForGameReady()
     {
         WaitForSeconds delay = new(1.0f);
-        playerControllers = null;
 
         while (PhotonNetwork.PlayerList.Length < playerSpawnPoints.Length)
         {
