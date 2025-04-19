@@ -203,6 +203,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     
     #endregion
 
+
     // Ready 버튼이 눌렸을 때 호출되는 함수 (버튼 OnClick에 연결)
     public void OnClickReady(bool isReady)
     {

@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     private List<IPlayerComponent> components = new List<IPlayerComponent>();
 
     //[SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
+    [SerializeField] private PlayerStats stats;
 
     [SerializeField] private Animator playerAnim;
 
@@ -51,6 +52,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     public Vector3 Pos => transform.position;
 
     public Quaternion Rot => transform.rotation;
+
+    public PlayerStats Stats => stats;
 
     public bool IsLocalPlayer() { return photonView.IsMine; }
 

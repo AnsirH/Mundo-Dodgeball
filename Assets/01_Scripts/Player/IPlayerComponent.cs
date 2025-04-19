@@ -37,6 +37,8 @@ public interface IPlayerContext
     /// </summary>
     Animator Anim { get; }
 
+    // 플레이어 스탯( 모든 능력치 수치 관리)
+    PlayerStats Stats { get; }
     /// <summary>
     /// 플레이어의 현재 위치를 반환
     /// </summary>
