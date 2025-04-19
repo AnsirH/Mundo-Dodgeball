@@ -11,7 +11,7 @@ public class PopManager : ManagerBase<PopManager>
     public LocalSelectPop localSelectPop;
     public LobbySoundControllerPop lobbySoundControllerPop;
     public InGameSettingPop inGameSettingPop;
-
+  
     #region Pop Active
     private List<PopBase> openPops = new List<PopBase>();
     private List<GameObject> DetailOpenPops = new List<GameObject>();

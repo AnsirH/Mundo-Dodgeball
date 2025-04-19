@@ -10,9 +10,6 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
 {
     private IPlayerContext context;
     private bool isOfflineMode;
-    private float currentHealth;
-    [SerializeField] private float maxHealth = 100f;
-    [SerializeField] private float healthRegenPerSec = 7.0f;
     [SerializeField] MMF_Player damageTestController;
     private MMF_FloatingText mMF_FloatingText;
 
@@ -33,24 +30,17 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     {
         this.context = context;
         this.isOfflineMode = isOfflineMode;
-        currentHealth = maxHealth;
-    }
-
-    private void HealthRegen()
-    {
-        currentHealth += healthRegenPerSec * Time.deltaTime;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        context.Stats.ResetHealth();
     }
 
     public void Damage(float damage)
     {
         if (!context.IsLocalPlayer()) return;
         
-        currentHealth = Mathf.Max(0, currentHealth - damage);
-
+        context.Stats.ModifyCurrentHealth(-damage);
         mMF_FloatingText.Value = damage.ToString();
         damageTestController.PlayFeedbacks(this.transform.position);
-        if (currentHealth <= 0)
+        if (context.Stats.IsDead())
         {
             context.OnPlayerDeath();
         }
@@ -63,19 +53,21 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
-            stream.SendNext(currentHealth);
+        {
+            // 내 로컬 currentHealth 절대값 전송
+            stream.SendNext(context.Stats.GetCurrentHealth());
+        }
         else
-            currentHealth = (float)stream.ReceiveNext();
+        {
+            // 받은 절대값으로 덮어쓰기
+            float receivedHealth = (float)stream.ReceiveNext();
+            context.Stats.SetCurrentHealth(receivedHealth);
+        }
     }
 
     public float GetHealthPercentage()
     {
-        return currentHealth / maxHealth;
-    }
-
-    public void Updated()
-    {
-        HealthRegen();
+        return context.Stats.GetCurrentHealth() / context.Stats.GetMaxHealth();
     }
 
     public void OnEnabled()
@@ -86,6 +78,10 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     public void OnDisabled()
     {
         //throw new System.NotImplementedException();
+    }
+
+    public void Updated()
+    {
     }
 }
 [CustomEditor(typeof(PlayerHealth))]
