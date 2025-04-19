@@ -20,7 +20,7 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
 
     public void ExecuteAction()
     {
-        if (!context.IsLocalPlayer()) return;
+        if (!context.p_PhotonView.IsMine) return;
 
 
         Vector3? mousePos = context.GetMousePosition();

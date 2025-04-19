@@ -1,5 +1,5 @@
-using MyGame.Utils;
 using Photon.Pun;
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,7 +29,7 @@ public interface IProjectile
     void OnHit(Collider other);
 }
 
-public class AxeShooter : MonoBehaviourPun, IShooter
+public class AxeShooter : MonoBehaviour, IShooter
 {
     private bool isOfflineMode = false;
     [Header("임시 변수")]
@@ -93,9 +93,22 @@ public class AxeShooter : MonoBehaviourPun, IShooter
             // 쿨타임 시작
             currentCooldown = cooldownTime;
         }
-        else if (context.IsLocalPlayer())
-        {
-            photonView.RPC("RPC_SpawnProjectile", RpcTarget.All, transform.position, direction);
+        else if (context.p_PhotonView.IsMine)
+        {        
+            // 온라인 모드: PhotonNetwork.Instantiate
+            GameObject axeObj = PhotonNetwork.Instantiate(axePrefab.name, transform.position, Quaternion.identity);
+
+            try
+            {
+                IProjectile axe = axeObj.GetComponent<IProjectile>();
+                axe.Initialize(context, attackPower, transform.position);
+                axe.Launch(direction);
+                // 쿨타임 시작
+                currentCooldown = cooldownTime;
+            }
+            catch (Exception e) {
+                Debug.LogException(e);
+            }
         }
     }
 
@@ -107,19 +120,6 @@ public class AxeShooter : MonoBehaviourPun, IShooter
             rangeIndicator.Show();
         else
             rangeIndicator.Hide();
-    }
-
-    [PunRPC]
-    private void RPC_SpawnProjectile(Vector3 position, Vector3 direction)
-    {
-        // 온라인 모드: PhotonNetwork.Instantiate
-        GameObject axeObj = PhotonNetwork.Instantiate(axePrefab.name, position, Quaternion.identity);
-
-        IProjectile axe = axeObj.GetComponent<IProjectile>();
-        axe.Initialize(context, attackPower, transform.position);
-        axe.Launch(direction);
-        // 쿨타임 시작
-        currentCooldown = cooldownTime;
     }
 
     // 쿨타임 관련 추가 기능들 (AxeShooter 고유 기능)
