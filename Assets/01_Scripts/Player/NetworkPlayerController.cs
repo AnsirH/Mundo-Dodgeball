@@ -50,14 +50,12 @@ public class NetworkPlayerController : MonoBehaviourPunCallbacks
         }
         else if (photonView.IsMine)
         {
-            // 온라인 모드: RPC로 입력 전송
-            photonView.RPC("RPC_HandleInput", RpcTarget.All,
-                context.action.name);
+            photonView.RPC("HandleInput_RPC", RpcTarget.All, context.action.name);
         }
     }
 
     [PunRPC]
-    private void RPC_HandleInput(string actionName)
+    private void HandleInput_RPC(string actionName)
     {
         if (isDebugMode)
         {

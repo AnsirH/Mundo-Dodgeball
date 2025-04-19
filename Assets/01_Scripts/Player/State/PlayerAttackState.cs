@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,9 +15,7 @@ namespace PlayerCharacterControl.State
         public override void EnterState()
         {
             attack.ExecuteAction();
-            context.Anim.SetTrigger("Attack");
         }
-
         public override void ExitState()
         {
         }
@@ -32,10 +31,6 @@ namespace PlayerCharacterControl.State
             //    }
             //}
         }
-
-        // 이전 상태가 이동이었는지 저장하는 변수
-        bool isPrevStateIsMove = false;
-        private readonly string AttackAnimationName = "Attack03_End";
 
         private IPlayerAction attack;
 

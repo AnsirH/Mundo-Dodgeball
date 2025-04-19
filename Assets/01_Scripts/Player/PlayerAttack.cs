@@ -33,6 +33,7 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayer
     {
         if (IsActionInProgress || !axeShooter.IsRangeActive) return;
 
+        PlayAttackAnimation();
         ActivateRange(false);
         Vector3? targetPoint = context.GetMousePosition();
         if (!targetPoint.HasValue) return;
@@ -74,6 +75,19 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayer
     }
     #endregion
 
+    // 애니메이션 트리거 전송
+    void PlayAttackAnimation()
+    {
+        context.Anim.SetTrigger("Attack");
+        photonView.RPC("RPC_PlayAnimation", RpcTarget.Others, "Attack");
+    }
+
+    [PunRPC]
+    void RPC_PlayAnimation(string triggerName)
+    {
+        if (!photonView.IsMine)
+            context.Anim.SetTrigger(triggerName);
+    }
 
     // 공격 코루틴. 시간 지나면 완료 이벤트 발행
     private IEnumerator AttackRoutine()
@@ -89,7 +103,14 @@ public class PlayerAttack : MonoBehaviourPunCallbacks, IPlayerComponent, IPlayer
     // 도끼 궤적 활성화 메서드
     public void ActivateRange(bool active)
     {
-        axeShooter.ActivateRange(active);
+        if (!photonView.IsMine) { return; }
+        if (active == true)
+        {
+            if (axeShooter.CanShoot)
+                axeShooter.ActivateRange(true);
+        }
+        else
+            axeShooter.ActivateRange(false);
     }
 
     public void CancelAttack()

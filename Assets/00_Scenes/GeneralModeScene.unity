@@ -1581,6 +1581,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1524514823713422376, guid: e42f749b3c3528141b21077354baa693, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6014893249604873676, guid: e42f749b3c3528141b21077354baa693, type: 3}
       propertyPath: m_Name
       value: GeneralMap
