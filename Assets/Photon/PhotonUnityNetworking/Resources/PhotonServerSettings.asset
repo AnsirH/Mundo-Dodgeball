@@ -51,6 +51,8 @@ MonoBehaviour:
   - RPC_StartMove
   - RPC_SpawnProjectile
   - ReadyGame_RPC
+  - HandleInput_RPC
+  - RPC_PlayAnimation
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
