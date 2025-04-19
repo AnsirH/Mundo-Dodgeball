@@ -50,6 +50,7 @@ MonoBehaviour:
   - RPC_SpawnProjectil
   - RPC_StartMove
   - RPC_SpawnProjectile
+  - ReadyGame_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

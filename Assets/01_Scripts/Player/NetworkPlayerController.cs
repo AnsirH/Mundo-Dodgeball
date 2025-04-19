@@ -10,6 +10,8 @@ public class NetworkPlayerController : MonoBehaviourPunCallbacks
     private PlayerController playerController;
     private PlayerInputEventSystem inputSystem;
 
+    public PlayerController PlayerCtrl => playerController;
+
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
