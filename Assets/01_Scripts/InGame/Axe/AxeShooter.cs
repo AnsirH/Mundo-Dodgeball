@@ -24,8 +24,7 @@ public interface IRangeIndicator
 // IProjectile.cs
 public interface IProjectile
 {
-    void Initialize(IPlayerContext context, float damage, Vector3 spawnPos);
-    void Launch(Vector3 direction);
+    void Initialize(IPlayerContext context, float damage, Vector3 spawnPos, Vector3 direction);
     void OnHit(Collider other);
 }
 
@@ -87,8 +86,7 @@ public class AxeShooter : MonoBehaviour, IShooter
             GameObject axeObj = Instantiate(axePrefab, transform.position, Quaternion.identity);
 
             IProjectile axe = axeObj.GetComponent<IProjectile>();
-            axe.Initialize(context, attackPower, transform.position);
-            axe.Launch(direction);
+            axe.Initialize(context, attackPower, transform.position, direction);
 
             // 쿨타임 시작
             currentCooldown = cooldownTime;
@@ -101,8 +99,7 @@ public class AxeShooter : MonoBehaviour, IShooter
             try
             {
                 IProjectile axe = axeObj.GetComponent<IProjectile>();
-                axe.Initialize(context, attackPower, transform.position);
-                axe.Launch(direction);
+                axe.Initialize(context, attackPower, transform.position, direction);
                 // 쿨타임 시작
                 currentCooldown = cooldownTime;
             }

@@ -6,17 +6,17 @@ using UnityEngine;
 
 public class Axe : MonoBehaviourPun, IProjectile
 {
-    public void Initialize(IPlayerContext context, float damage, Vector3 spawnPos)
+    public void Initialize(IPlayerContext context, float damage, Vector3 spawnPos, Vector3 direction)
     {
-        Debug.Log(" d");
         this.context = context;
         this.damage = damage;
         transform.position = spawnPos;
+        photonView.RPC("Launch_RPC", RpcTarget.All, direction);
     }
 
-    public void Launch(Vector3 direction)
+    [PunRPC]
+    private void Launch_RPC(Vector3 direction)
     {
-        Debug.Log(" d");
         transform.rotation = Quaternion.LookRotation(direction);
         Vector3 targetPos = transform.position + direction;
         if (moveTweenCore != null) moveTweenCore.Kill();
