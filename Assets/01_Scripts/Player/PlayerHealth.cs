@@ -81,6 +81,8 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     {
     }
 }
+
+#if UNITY_EDITOR
 [CustomEditor(typeof(PlayerHealth))]
 public class FloatingTextSpawnerEditor : Editor
 {
@@ -99,3 +101,4 @@ public class FloatingTextSpawnerEditor : Editor
         }
     }
 }
+#endif

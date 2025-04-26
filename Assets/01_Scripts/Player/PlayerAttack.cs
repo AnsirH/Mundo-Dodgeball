@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class PlayerAttack : MonoBehaviour, IPlayerComponent, IPlayerAction
+public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
 {
     private IPlayerContext context;
 
@@ -33,17 +33,14 @@ public class PlayerAttack : MonoBehaviour, IPlayerComponent, IPlayerAction
     {
         if (IsActionInProgress || !axeShooter.IsRangeActive) return;
 
-        PlayAttackAnimation();
+        // 공격 범위 디스플레이 비활성화
         ActivateRange(false);
-        Vector3? targetPoint = context.GetMousePosition();
-        if (!targetPoint.HasValue) return;
-        Vector3 direction = (targetPoint.Value - context.Pos).normalized;
-        direction.y = 0.0f;
-        transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => { axeShooter.SpawnProjectile(targetPoint.Value); };
 
-        IsActionInProgress = true;
+        // 공격 로직 실행
         currentAttackRoutine = StartCoroutine(AttackRoutine());
 
+        // 공격 실행 활성화
+        IsActionInProgress = true;
     }
     #endregion
 
@@ -79,19 +76,31 @@ public class PlayerAttack : MonoBehaviour, IPlayerComponent, IPlayerAction
     void PlayAttackAnimation()
     {
         context.Anim.SetTrigger("Attack");
-        context.p_PhotonView.RPC("RPC_PlayAnimation", RpcTarget.Others, "Attack");
-    }
-
-    [PunRPC]
-    void RPC_PlayAnimation(string triggerName)
-    {
-        if (!context.p_PhotonView.IsMine)
-            context.Anim.SetTrigger(triggerName);
     }
 
     // 공격 코루틴. 시간 지나면 완료 이벤트 발행
     private IEnumerator AttackRoutine()
     {
+        // 마우스 위치 확인
+        Vector3? targetPoint = context.GetMousePosition();
+        if (!targetPoint.HasValue) yield break;
+
+        // 공격 방향 계산
+        Vector3 direction = (targetPoint.Value - context.Pos).normalized;
+        direction.y = 0.0f;
+
+        // 공격 애니메이션
+        PlayAttackAnimation();
+
+        // 공격 방향으로 회전
+        // 회전 종료 시 공격
+        transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
+        { 
+            axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time + 0.05f);
+
+            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time + 0.05f);
+        };
+
         // 공격 애니메이션 및 로직
         yield return new WaitForSeconds(attackDuration);
 
@@ -119,5 +128,11 @@ public class PlayerAttack : MonoBehaviour, IPlayerComponent, IPlayerAction
 
         // 회전 종료
         transform.DOKill();
+    }
+
+    [PunRPC]
+    private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction, float execTime)
+    {
+        axeShooter.SpawnProjectile(StartPos, direction, execTime);
     }
 }

@@ -54,6 +54,7 @@ MonoBehaviour:
   - HandleInput_RPC
   - RPC_PlayAnimation
   - Launch_RPC
+  - ShootAxe_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

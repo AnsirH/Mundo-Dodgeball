@@ -51,7 +51,7 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
 
     public void OnDisabled()
     {
-        //throw new System.NotImplementedException();
+        StopMove();
     }
 
     public void OnEnabled()

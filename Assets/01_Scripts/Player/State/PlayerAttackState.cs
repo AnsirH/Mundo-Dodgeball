@@ -22,14 +22,6 @@ namespace PlayerCharacterControl.State
 
         public override void UpdateState()
         {
-            //if (playerController.Anim.GetCurrentAnimatorStateInfo(0).IsName(AttackAnimationName))
-            //{
-            //    if (playerController.Anim.IsInTransition(0))
-            //    {
-            //        // 이전 상태에 따른 상태 전환
-            //        playerController.StateMachine.ChangeState(isPrevStateIsMove ? EPlayerState.Move : EPlayerState.Idle);
-            //    }
-            //}
         }
 
         private IPlayerAction attack;

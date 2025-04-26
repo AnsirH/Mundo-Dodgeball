@@ -7,7 +7,7 @@ public interface IShooter
 {
     void Initialize(IPlayerContext context, bool isOfflineMode = false);
     void ActivateRange(bool isActive);
-    void SpawnProjectile(Vector3 targetPoint);
+    void SpawnProjectile(Vector3 startPos, Vector3 direction, float execTime);
     bool IsRangeActive { get; }
     bool CanShoot { get; }
 }
@@ -24,7 +24,7 @@ public interface IRangeIndicator
 // IProjectile.cs
 public interface IProjectile
 {
-    void Initialize(IPlayerContext context, float damage, Vector3 spawnPos, Vector3 direction);
+    void Initialize(IPlayerContext context, float damage, Vector3 spawnPos, Vector3 direction, float execTime);
     void OnHit(Collider other);
 }
 
@@ -74,41 +74,6 @@ public class AxeShooter : MonoBehaviour, IShooter
         this.isOfflineMode = isOfflineMode;
     }
 
-    public void SpawnProjectile(Vector3 targetPoint)
-    {
-        if (!CanShoot) return;
-
-        Vector3 direction = (targetPoint - context.Pos).normalized * 10.0f;
-        direction.y = 0.0f;
-        if (isOfflineMode)
-        {
-            // 오프라인 모드: 직접 Instantiate
-            GameObject axeObj = Instantiate(axePrefab, transform.position, Quaternion.identity);
-
-            IProjectile axe = axeObj.GetComponent<IProjectile>();
-            axe.Initialize(context, attackPower, transform.position, direction);
-
-            // 쿨타임 시작
-            currentCooldown = cooldownTime;
-        }
-        else if (context.p_PhotonView.IsMine)
-        {        
-            // 온라인 모드: PhotonNetwork.Instantiate
-            GameObject axeObj = PhotonNetwork.Instantiate(axePrefab.name, transform.position, Quaternion.identity);
-
-            try
-            {
-                IProjectile axe = axeObj.GetComponent<IProjectile>();
-                axe.Initialize(context, attackPower, transform.position, direction);
-                // 쿨타임 시작
-                currentCooldown = cooldownTime;
-            }
-            catch (Exception e) {
-                Debug.LogException(e);
-            }
-        }
-    }
-
     // 거리 표시 활성화
     public void ActivateRange(bool isActive)
     {
@@ -128,5 +93,21 @@ public class AxeShooter : MonoBehaviour, IShooter
     public float GetCooldownProgress()
     {
         return currentCooldown / cooldownTime;
+    }
+
+    public void SpawnProjectile(Vector3 startPos, Vector3 direction, float execTime)
+    {
+        if (!CanShoot) return;
+
+        direction.y = 0.0f;
+
+        // 오프라인 모드: 직접 Instantiate
+        GameObject axeObj = Instantiate(axePrefab, startPos, Quaternion.identity);
+
+        IProjectile axe = axeObj.GetComponent<IProjectile>();
+        axe.Initialize(context, attackPower, transform.position, direction, execTime);
+
+        // 쿨타임 시작
+        currentCooldown = cooldownTime;
     }
 }

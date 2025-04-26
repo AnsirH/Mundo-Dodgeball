@@ -61,13 +61,7 @@ public class Movement : MonoBehaviourPun, IMovable
         }
     }
 
-    [PunRPC]
-    public void RPC_StartMove(Vector3 targetPosition)
-    {
-        StartMoveToNewTargetInternal(targetPosition);
-    }
-
-    private void StartMoveToNewTargetInternal(Vector3 targetPosition, bool rotateTowardTarget = true)
+    public virtual void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
     {
         StopMove();
         targetPosition.y = transform.position.y;
@@ -77,7 +71,6 @@ public class Movement : MonoBehaviourPun, IMovable
         float distance = Vector3.Distance(transform.position, targetPosition);
         // 이동 시간 계산 (거리에 비례)
         float duration = distance / moveSpeed;
-
 
         // 이동
         moveTween = transform.DOMove(targetPosition, duration)
@@ -94,20 +87,6 @@ public class Movement : MonoBehaviourPun, IMovable
                 rotateTween = transform.DORotateQuaternion(targetRotation, 0.2f)
                     .SetEase(Ease.OutQuad).OnComplete(() => rotateTween = null);
             }
-        }
-    }
-
-    public virtual void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
-    {
-        if (isOfflineMode)
-        {
-            // 오프라인 모드: 직접 이동
-            StartMoveToNewTargetInternal(targetPosition);
-        }
-        else if (photonView.IsMine)
-        {
-            // 온라인 모드: RPC로 이동 요청
-            photonView.RPC("RPC_StartMove", RpcTarget.All, targetPosition);
         }
     }
 
