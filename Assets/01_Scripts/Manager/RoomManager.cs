@@ -220,6 +220,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
         // 점수 업데이트
         roomProps[playerKey] = newScore;
 
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+
         if($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
         {
             photonView.RPC(nameof(showScore), RpcTarget.All, 0);
@@ -228,7 +230,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             photonView.RPC(nameof(showScore), RpcTarget.All, 1);
         }
-        PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
 
         
 
