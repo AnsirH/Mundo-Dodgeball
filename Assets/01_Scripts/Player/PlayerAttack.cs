@@ -94,10 +94,13 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         // 공격 방향으로 회전
         // 회전 종료 시 공격
         transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
-        { 
-            axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time + 0.1f);
+        {
+            int ping = PhotonNetwork.GetPing();
+            float pingSeconds = ping * 0.001f;
+            float expectedDelay = pingSeconds * 0.5f;
+            axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time + pingSeconds);
 
-            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time + 0.05f);
+            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time + pingSeconds);
         };
 
         // 공격 애니메이션 및 로직
