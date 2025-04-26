@@ -1,6 +1,9 @@
 using UnityEngine;
+using Photon;
+using Photon.Pun;
 
-public class PlayerStats : MonoBehaviour
+[System.Serializable]
+public class PlayerStats
 {
     [Header("Primary Stats")]
     public ModifiableStat AttackPower = new ModifiableStat(10f);
@@ -12,17 +15,7 @@ public class PlayerStats : MonoBehaviour
     private float _currentHealth;
     private float _regenAccumulator = 0f;
 
-    private void Awake()
-    {
-        _currentHealth = MaxHealth.GetValue();
-    }
-
-    private void Update()
-    {
-        HandleHealthRegen();
-    }
-
-    private void HandleHealthRegen()
+    public void HandleHealthRegen()
     {
         _regenAccumulator += Time.deltaTime;
         if (_regenAccumulator >= 1f)

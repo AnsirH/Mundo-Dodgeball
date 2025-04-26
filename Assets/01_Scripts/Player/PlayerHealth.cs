@@ -29,23 +29,32 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
         this.isOfflineMode = isOfflineMode;
         context.Stats.ResetHealth();
     }
-
-    public void Damage(IPlayerContext senderContext)
+    // 실제 Damage 호출할 때 (senderContext 가지고 있을 때)
+    public void TakeDamage(IPlayerContext senderContext)
     {
-        float damage = senderContext.Stats.GetAttackPower();
-        context.Stats.ModifyCurrentHealth(-damage);
-        mMF_FloatingText.Value = damage.ToString();
+        if (!photonView.IsMine)
+            return; // 내 것만 호출하게 막기
+
+        float attackPower = senderContext.Stats.GetAttackPower();
+        photonView.RPC(nameof(Damage), RpcTarget.All, attackPower);
+    }
+    [PunRPC]
+    public void Damage(float attackPower)
+    {
+        // 1. 체력 감소
+        context.Stats.ModifyCurrentHealth(-attackPower);
+
+        // 2. 데미지 텍스트 띄우기
+        mMF_FloatingText.Value = attackPower.ToString();
+
+        // 3. 데미지 이펙트 재생
         damageTestController.PlayFeedbacks(this.transform.position);
+
+        // 4. 죽음 체크
         if (context.Stats.IsDead())
         {
             context.OnPlayerDeath();
         }
-    }
-
-    public void TestDamage(float damage) // 테스트 함수임. 여기에 기능 넣어서 테스트 하세요 수고링
-    {
-        mMF_FloatingText.Value = damage.ToString();
-        damageTestController.PlayFeedbacks(this.transform.position);
     }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -82,23 +91,23 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     }
 }
 
-#if UNITY_EDITOR
-[CustomEditor(typeof(PlayerHealth))]
-public class FloatingTextSpawnerEditor : Editor
-{
-    public float damage;
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-        PlayerHealth spawner = (PlayerHealth)target;
-        GUILayout.Space(10);
-        // 🔧 데미지 값 입력 필드
-        damage = EditorGUILayout.FloatField("Damage", damage);
-        EditorGUILayout.LabelField(" 테스트 버튼", EditorStyles.boldLabel);
-        if (GUILayout.Button("Damage Test Button"))
-        {
-            spawner.TestDamage(damage);
-        }
-    }
-}
-#endif
+//#if UNITY_EDITOR
+//[CustomEditor(typeof(PlayerHealth))]
+//public class FloatingTextSpawnerEditor : Editor
+//{
+//    public float damage;
+//    public override void OnInspectorGUI()
+//    {
+//        base.OnInspectorGUI();
+//        PlayerHealth spawner = (PlayerHealth)target;
+//        GUILayout.Space(10);
+//        // 🔧 데미지 값 입력 필드
+//        damage = EditorGUILayout.FloatField("Damage", damage);
+//        EditorGUILayout.LabelField(" 테스트 버튼", EditorStyles.boldLabel);
+//        if (GUILayout.Button("Damage Test Button"))
+//        {
+//            spawner.Damage(damage);
+//        }
+//    }
+//}
+//#endif

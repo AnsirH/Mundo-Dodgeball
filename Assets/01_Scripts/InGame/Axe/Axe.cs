@@ -36,7 +36,7 @@ public class Axe : MonoBehaviour, IProjectile
     {
         if (other.TryGetComponent<IDamageable>(out IDamageable damageable) && other.gameObject != context.Trf.gameObject)
         {
-            damageable.Damage(context);
+            damageable.TakeDamage(context);
             moveTweenCore?.Complete();
         }
     }
