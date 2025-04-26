@@ -15,6 +15,10 @@ public class PlayerStats
     private float _currentHealth;
     private float _regenAccumulator = 0f;
 
+    public PlayerStats()
+    {
+        _currentHealth = GetMaxHealth();
+    }
     public void HandleHealthRegen()
     {
         _regenAccumulator += Time.deltaTime;

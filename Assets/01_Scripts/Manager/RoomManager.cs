@@ -220,9 +220,17 @@ public class RoomManager : MonoBehaviourPunCallbacks
         // 점수 업데이트
         roomProps[playerKey] = newScore;
 
+        if($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
+        {
+            IngameController.Instance.ingameUIController.addScore(0);
+        }
+        else
+        {
+            IngameController.Instance.ingameUIController.addScore(1);
+        }
         PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
 
-        //IngameController.Instance.ingameUIController.addScore();
+        
 
     }
     #endregion
