@@ -8,16 +8,16 @@ namespace PlayerCharacterControl.State
     {
         public PlayerDieState(IPlayerContext playerContext) : base(playerContext)
         {
+            context = playerContext;
         }
 
         public override void EnterState()
         {
-            Debug.Log($"{GetType().Name} 상태 진입");
+            context.Anim.SetTrigger("Die");
         }
 
         public override void ExitState()
         {
-            Debug.Log($"{GetType().Name} 상태 종료");
         }
 
         public override void UpdateState()
