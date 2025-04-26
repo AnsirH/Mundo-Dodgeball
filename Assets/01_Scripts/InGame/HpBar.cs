@@ -37,7 +37,7 @@ public class HpBar : MonoBehaviour
             return;
         }
 
-        Vector2 targetScreenPos = Camera.main.WorldToScreenPoint(targetTrf.transform.position);
+        Vector2 targetScreenPos = Camera.main.WorldToScreenPoint(targetTrf.transform.position) + Vector3.up * 150.0f;
         rectTransform.position = targetScreenPos;
     }
 

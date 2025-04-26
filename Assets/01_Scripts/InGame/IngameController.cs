@@ -151,7 +151,5 @@ public class IngameController : MonoBehaviourPun
     /// <summary>인게임 UI 컨트롤러</summary>
     public IngameUIController ingameUIController;
 
-    public GameObject playerCharacterPrefab;
-
     public Transform[] playerSpawnPoints = new Transform[2];
 }
