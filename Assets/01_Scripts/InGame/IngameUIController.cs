@@ -46,6 +46,10 @@ public class IngameUIController : MonoBehaviour
             isInitialized = true;
         }
     }
+    public void addScore(int idx)
+    {
+        topPanelUI.AddScoreToPlayer(idx);
+    }
 
     public HpBar[] HpBars { get; private set; }
     public GameObject hpBarPrefab;

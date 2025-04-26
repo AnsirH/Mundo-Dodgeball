@@ -199,8 +199,32 @@ public class RoomManager : MonoBehaviourPunCallbacks
     }
 
     #endregion
-    #region 
-    
+    #region 점수 추가
+    [PunRPC]
+    public void AddScore(string playerKey, int amount)
+    {
+        // 현재 CustomProperties 가져오기
+        var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
+
+        int currentScore = 0;
+
+        if (roomProps.ContainsKey(playerKey))
+        {
+            // 키가 있으면 기존 점수 가져오기
+            currentScore = (int)roomProps[playerKey];
+        }
+        // 키가 없으면 currentScore = 0 (기본값)
+
+        int newScore = currentScore + amount;
+
+        // 점수 업데이트
+        roomProps[playerKey] = newScore;
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+
+        //IngameController.Instance.ingameUIController.addScore();
+
+    }
     #endregion
 
 

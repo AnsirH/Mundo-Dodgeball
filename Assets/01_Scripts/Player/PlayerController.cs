@@ -99,6 +99,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     public override void OnEnable()
     {
         base.OnEnable();
+        stats = new PlayerStats();
         inputSystem.PlayerInputEvent.AddListener(HandleInput);
         foreach (var component in components)
         {

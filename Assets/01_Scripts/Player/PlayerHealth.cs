@@ -36,26 +36,29 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
             return; // 내 것만 호출하게 막기
 
         float attackPower = senderContext.Stats.GetAttackPower();
-        photonView.RPC(nameof(Damage), RpcTarget.All, attackPower);
+        int whoAttacker = context.p_PhotonView.ViewID;
+        photonView.RPC(nameof(Damage), RpcTarget.All, whoAttacker, attackPower);
     }
     [PunRPC]
-    public void Damage(float attackPower)
+    public void Damage(int attackerActorNumber, float attackPower)
     {
-        // 1. 체력 감소
         context.Stats.ModifyCurrentHealth(-attackPower);
 
-        // 2. 데미지 텍스트 띄우기
         mMF_FloatingText.Value = attackPower.ToString();
-
-        // 3. 데미지 이펙트 재생
         damageTestController.PlayFeedbacks(this.transform.position);
 
-        // 4. 죽음 체크
         if (context.Stats.IsDead())
         {
-            context.OnPlayerDeath();
+            if (photonView.IsMine)
+            {
+                context.OnPlayerDeath();
+
+                // 죽을 때 이긴 사람 점수 올리기
+                string attackerKey = $"Score_{attackerActorNumber}";
+                photonView.RPC(nameof(ServerManager.Instance.roomManager.AddScore), RpcTarget.MasterClient, attackerKey, 1);
+            }
         }
-    }
+    } 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
