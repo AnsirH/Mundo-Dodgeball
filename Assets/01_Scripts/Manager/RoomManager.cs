@@ -222,16 +222,21 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         if($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
         {
-            photonView.RPC(nameof(IngameController.Instance.ingameUIController.addScore), RpcTarget.All, 0);
+            photonView.RPC(nameof(showScore), RpcTarget.All, 0);
         }
         else
         {
-            photonView.RPC(nameof(IngameController.Instance.ingameUIController.addScore), RpcTarget.All, 1);
+            photonView.RPC(nameof(showScore), RpcTarget.All, 1);
         }
         PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
 
         
 
+    }
+    [PunRPC]
+    private void showScore(int idx)
+    {
+        IngameController.Instance.ingameUIController.addScore(idx);
     }
     #endregion
 
