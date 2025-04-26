@@ -1,3 +1,4 @@
+using MyGame.Utils;
 using Photon.Pun;
 using System;
 using UnityEngine;
@@ -62,8 +63,9 @@ public class AxeShooter : MonoBehaviour, IShooter
 
         if (IsRangeActive)
         {
-            if (context.ClickPoint.HasValue)
-                rangeIndicator.UpdatePosition(context.ClickPoint.Value, 10.0f);
+            Vector3? mousePoint = context.MousePositionGetter.GetMousePosition(LayerMask.GetMask("Ground_1", "Ground_2"));
+            if (mousePoint.HasValue)
+                rangeIndicator.UpdatePosition(mousePoint.Value, 10.0f);
         }
     }
 

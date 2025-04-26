@@ -1302,7 +1302,6 @@ MonoBehaviour:
     HealthRegen:
       baseValue: 1
   playerAnim: {fileID: 6646368711127324858}
-  groundLayer: 
   movement: {fileID: 7700144322300401899}
   attack: {fileID: 8439029551291699871}
   playerHealth: {fileID: 1822853794646474301}

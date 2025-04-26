@@ -82,10 +82,10 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     private IEnumerator AttackRoutine()
     {
         // 마우스 위치 확인
-        if (!context.ClickPoint.HasValue) yield break;
+        if (!context.MousePositionGetter.ClickPoint.HasValue) yield break;
 
         // 공격 방향 계산
-        Vector3 direction = (context.ClickPoint.Value - context.Pos).normalized;
+        Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.Pos).normalized;
         direction.y = 0.0f;
 
         // 공격 애니메이션
@@ -111,7 +111,7 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     // 도끼 궤적 활성화 메서드
     public void ActivateRange(bool active)
     {
-        if (!context.p_PhotonView.IsMine) { return; }
+        if (!photonView.IsMine) { return; }
         if (active == true)
         {
             if (axeShooter.CanShoot)

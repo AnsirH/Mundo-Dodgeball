@@ -47,14 +47,9 @@ public interface IPlayerContext
 
     PhotonView p_PhotonView { get; }
 
+    IMousePositionGetter MousePositionGetter { get; }
+
     #endregion
-
-    Vector3? ClickPoint { get; }
-
-    /// <summary>
-    /// 플레이어의 현재 상태를 반환
-    /// </summary>
-    PlayerStateBase GetCurrentState();
 }
 
 /// <summary>

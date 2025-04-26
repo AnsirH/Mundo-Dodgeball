@@ -54,7 +54,7 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
         throw new System.NotImplementedException();
     }
 
-    private IPlayerContext context;
+    public IPlayerContext context;
     private bool isOfflineMode;
 
     private Spell spellD;
@@ -105,7 +105,10 @@ public class Flash : Spell
     public override void Execute()
     {
         base.Execute();
-        Vector3 targetVector = Utility.GetMousePosition(Camera.main).Value - owner.transform.position;
+        Vector3? mousePoint = owner.context.MousePositionGetter.ClickPoint;
+        if (!mousePoint.HasValue) return;
+
+        Vector3 targetVector = mousePoint.Value - owner.transform.position;
         if (targetVector.magnitude > distance)
         {
             owner.transform.position += targetVector.normalized * distance;

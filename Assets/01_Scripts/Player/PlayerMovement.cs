@@ -20,14 +20,14 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
 
     public void ExecuteAction()
     {
-        if (!context.p_PhotonView.IsMine || !context.ClickPoint.HasValue) return;
+        if (!photonView.IsMine || !context.MousePositionGetter.ClickPoint.HasValue) return;
 
         if (isActionInProgress)
         {
             StopMove();
         }
         isActionInProgress = true;
-        StartMoveToNewTarget(context.ClickPoint.Value);
+        StartMoveToNewTarget(context.MousePositionGetter.ClickPoint.Value);
     }
 
     public bool IsActionInProgress => isActionInProgress;

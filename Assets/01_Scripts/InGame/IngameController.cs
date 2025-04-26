@@ -80,10 +80,7 @@ public class IngameController : MonoBehaviourPun
         int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
         int spawnIndex = actorNumber - 1;
 
-        PlayerController spanwedPlayer = PhotonNetwork.Instantiate("Player", playerSpawnPoints[spawnIndex].position, playerSpawnPoints[spawnIndex].rotation).GetComponent<PlayerController>();
-        spanwedPlayer.groundLayer = $"Ground_{actorNumber}";
-        Debug.Log(spawnIndex);
-        playerControllers[spawnIndex] = spanwedPlayer;
+        PhotonNetwork.Instantiate("Player", playerSpawnPoints[spawnIndex].position, playerSpawnPoints[spawnIndex].rotation);
     }
 
     /// <summary>
@@ -95,47 +92,46 @@ public class IngameController : MonoBehaviourPun
         WaitForSeconds delay = new(0.5f);
 
         // 모든 캐릭터가 생성될 때까지 대기
-        //while (true)
-        //{
-        //    var foundControllers = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+        while (true)
+        {
+            var foundControllers = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 
-        //    // 필요한 수 만큼 다 찾았으면 정렬 및 저장
-        //    if (foundControllers.Length >= playerSpawnPoints.Length)
-        //    {
-        //        playerControllers = new List<PlayerController>(new PlayerController[playerSpawnPoints.Length]);
+            // 필요한 수 만큼 다 찾았으면 정렬 및 저장
+            if (foundControllers.Length >= playerSpawnPoints.Length)
+            {
+                playerControllers = new List<PlayerController>(new PlayerController[playerSpawnPoints.Length]);
 
-        //        foreach (var controller in foundControllers)
-        //        {
-        //            PhotonView view = controller.GetComponent<PhotonView>();
-        //            if (view != null)
-        //            {
-        //                int actorNum = view.Owner.ActorNumber;
-        //                int index = actorNum - 1;
+                foreach (var controller in foundControllers)
+                {
+                    PhotonView view = controller.GetComponent<PhotonView>();
+                    if (view != null)
+                    {
+                        int actorNum = view.Owner.ActorNumber;
+                        int index = actorNum - 1;
 
-        //                if (index >= 0 && index < playerControllers.Count)
-        //                {
-        //                    playerControllers[index] = controller;
-        //                }
-        //                else
-        //                {
-        //                    Debug.LogWarning($"ActorNumber {actorNum}가 스폰 인덱스 범위를 벗어남.");
-        //                }
-        //            }
-        //            else
-        //            {
-        //                Debug.LogWarning("PhotonView가 없는 컨트롤러 발견.");
-        //            }
-        //        }
+                        if (index >= 0 && index < playerControllers.Count)
+                        {
+                            playerControllers[index] = controller;
+                            (controller as IMousePositionGetter).SetClickableGroundLayer($"Ground_{index+1}");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"ActorNumber {actorNum}가 스폰 인덱스 범위를 벗어남.");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("PhotonView가 없는 컨트롤러 발견.");
+                    }
+                }
 
-        //        // 전부 정상적으로 할당됐는지 확인
-        //        if (playerControllers.All(c => c != null))
-        //            break;
-        //    }
+                // 전부 정상적으로 할당됐는지 확인
+                if (playerControllers.All(c => c != null))
+                    break;
+            }
 
-        while (playerControllers.Count < playerSpawnPoints.Length)
-        { 
             yield return delay;
-        }
+        }        
     }
 
     /// <summary>
