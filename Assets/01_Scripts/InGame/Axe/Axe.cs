@@ -38,7 +38,6 @@ public class Axe : MonoBehaviour, IProjectile
         {
             damageable.Damage(damage);
             moveTweenCore?.Complete();
-            ObjectPooler.Release("Axe", gameObject);
         }
     }
 

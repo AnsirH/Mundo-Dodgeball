@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
     [SerializeField] private Animator playerAnim;
 
+    private PlayerInputEventSystem inputSystem;
+
     #region IPlayerComponents
     // 이동
     [SerializeField] private PlayerMovement movement;
@@ -71,6 +73,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
     void Awake()
     {
+        inputSystem = GetComponent<PlayerInputEventSystem>();
+
         // 플레이어 컴포넌트들 초기화
         InitializeComponents();
 
@@ -88,10 +92,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
             component.Updated();
         }
     }
-
     public override void OnEnable()
     {
         base.OnEnable();
+        inputSystem.PlayerInputEvent.AddListener(HandleInput);
         foreach (var component in components)
         {
             component.OnEnabled();
@@ -101,6 +105,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     public override void OnDisable()
     {
         base.OnDisable();
+        inputSystem.PlayerInputEvent.RemoveListener(HandleInput);
         foreach (var component in components)
         {
             component.OnDisabled();
@@ -134,27 +139,30 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
         attack.CancelAttack();
     }
 
-    public void HandleInput(string actionName)
+    public void HandleInput(InputAction.CallbackContext context)
     {
         if (!photonView.IsMine) return;
 
-        switch (actionName)
+        if (context.performed)
         {
-            case "Move":
-                HandleMoveInput();
-                break;
+            switch (context.action.name)
+            {
+                case "Move":
+                    HandleMoveInput();
+                    break;
 
-            case "Attack":
-                HandleAttackInput();
-                break;
+                case "Attack":
+                    HandleAttackInput();
+                    break;
 
-            case "Click":
-                HandleClickInput();
-                break;
+                case "Click":
+                    HandleClickInput();
+                    break;
 
-            default:
-                break;
-        }
+                default:
+                    break;
+            }
+        }        
     }
 
     public void HandleMoveInput()

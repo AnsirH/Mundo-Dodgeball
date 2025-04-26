@@ -30,10 +30,9 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
         context.Stats.ResetHealth();
     }
 
-    public void Damage(float damage)
+    public void Damage(IPlayerContext senderContext)
     {
-        if (!context.p_PhotonView.IsMine) return;
-        
+        float damage = senderContext.Stats.GetAttackPower();
         context.Stats.ModifyCurrentHealth(-damage);
         mMF_FloatingText.Value = damage.ToString();
         damageTestController.PlayFeedbacks(this.transform.position);
@@ -42,6 +41,7 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
             context.OnPlayerDeath();
         }
     }
+
     public void TestDamage(float damage) // 테스트 함수임. 여기에 기능 넣어서 테스트 하세요 수고링
     {
         mMF_FloatingText.Value = damage.ToString();

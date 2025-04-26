@@ -101,8 +101,7 @@ public class AxeShooter : MonoBehaviour, IShooter
 
         direction.y = 0.0f;
 
-        // 오프라인 모드: 직접 Instantiate
-        GameObject axeObj = Instantiate(axePrefab, startPos, Quaternion.identity);
+        GameObject axeObj = ObjectPooler.Get("Axe");
 
         IProjectile axe = axeObj.GetComponent<IProjectile>();
         axe.Initialize(context, attackPower, transform.position, direction, execTime);
