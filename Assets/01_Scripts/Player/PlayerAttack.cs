@@ -95,7 +95,7 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         // 회전 종료 시 공격
         transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
         { 
-            axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time + 0.05f);
+            axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time + 0.1f);
 
             photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time + 0.05f);
         };
