@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using MyGame.Utils;
+using System.Collections;
 
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
@@ -167,6 +168,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
     public void HandleMoveInput()
     {
+        StartCoroutine(ActiveClickPointer());
         if (!attack.IsActionInProgress)
         {
             stateMachine.ChangeState(EPlayerState.Move);
@@ -187,5 +189,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
             stateMachine.ChangeState(EPlayerState.Attack);
             movement.StopMove();
         }
+    }
+
+    private IEnumerator ActiveClickPointer()
+    {
+        GameObject clickPointer = ObjectPooler.Get("ClickPointer");
+        clickPointer.transform.position = GetMousePosition().Value;
+
+        yield return new WaitForSeconds(1.0f);
+
+        ObjectPooler.Release("ClickPointer", clickPointer);
     }
 }

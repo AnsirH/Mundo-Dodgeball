@@ -1,4 +1,3 @@
-using Photon.Pun;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -58,7 +57,6 @@ public class ObjectPooler : MonoBehaviour
     private GameObject CreatePooledObject(GameObject prefab)
     {
         var obj = Instantiate(prefab, transform);
-        obj.GetComponent<PhotonView>().ViewID = PhotonNetwork.AllocateViewID(false);
         obj.SetActive(false);
         return obj;
     }
