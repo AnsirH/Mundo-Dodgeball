@@ -173,6 +173,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
     {
         // 마우스 위치 저장
         ClickPoint = GetMousePosition(groundLayer);
+        if (ClickPoint.Value == null) return;
 
         StartCoroutine(ActiveClickPointer());
         if (!attack.IsActionInProgress)
