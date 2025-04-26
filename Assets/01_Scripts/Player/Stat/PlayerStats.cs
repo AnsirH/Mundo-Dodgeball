@@ -6,7 +6,7 @@ using Photon.Pun;
 public class PlayerStats
 {
     [Header("Primary Stats")]
-    public ModifiableStat AttackPower = new ModifiableStat(10f);
+    public ModifiableStat AttackPower = new ModifiableStat(30f);
     public ModifiableStat MaxHealth = new ModifiableStat(100f);
     public ModifiableStat MoveSpeed = new ModifiableStat(5f);
     public ModifiableStat AttackCooldown = new ModifiableStat(1f);
