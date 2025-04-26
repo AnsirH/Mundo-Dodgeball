@@ -914,7 +914,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControllers: []
   ingameUIController: {fileID: 155276323}
-  playerCharacterPrefab: {fileID: 114658553885513850, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
   playerSpawnPoints:
   - {fileID: 1227419753}
   - {fileID: 831542415}

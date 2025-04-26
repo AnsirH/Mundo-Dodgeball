@@ -51,3 +51,6 @@ MonoBehaviour:
   - tag: ClickPointer
     prefab: {fileID: 4444344020326820683, guid: 338f7866e87093a4cb8184529f6199ea, type: 3}
     size: 10
+  - tag: HitEffect
+    prefab: {fileID: 1834194341294532, guid: d5f26854a8904624c8073139cd2eb346, type: 3}
+    size: 10

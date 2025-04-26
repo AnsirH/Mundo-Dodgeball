@@ -1,5 +1,6 @@
 ﻿using MoreMountains.Feedbacks;
 using Photon.Pun;
+using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,6 +36,7 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
         if (!photonView.IsMine)
             return; // 내 것만 호출하게 막기
 
+
         float attackPower = senderContext.Stats.GetAttackPower();
         int whoAttacker = context.p_PhotonView.ViewID;
         photonView.RPC(nameof(Damage), RpcTarget.All, whoAttacker, attackPower);
@@ -42,6 +44,7 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     [PunRPC]
     public void Damage(int attackerActorNumber, float attackPower)
     {
+        StartCoroutine(ActiveHitEffect());
         context.Stats.ModifyCurrentHealth(-attackPower);
 
         mMF_FloatingText.Value = attackPower.ToString();
@@ -91,6 +94,15 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
 
     public void Updated()
     {
+    }
+
+    IEnumerator ActiveHitEffect()
+    {
+        GameObject hitEffect = ObjectPooler.Get("HitEffect");
+
+        yield return new WaitForSeconds(0.5f);
+
+        ObjectPooler.Release("HitEffect", hitEffect);
     }
 }
 
