@@ -10,7 +10,7 @@ public class PlayerStats
     public ModifiableStat MaxHealth = new ModifiableStat(100f);
     public ModifiableStat MoveSpeed = new ModifiableStat(5f);
     public ModifiableStat AttackCooldown = new ModifiableStat(1f);
-    public ModifiableStat HealthRegen = new ModifiableStat(1f);
+    public ModifiableStat HealthRegen = new ModifiableStat(2f);
 
     private float _currentHealth;
     private float _regenAccumulator = 0f;

@@ -94,6 +94,7 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
 
     public void Updated()
     {
+        context.Stats.HandleHealthRegen();
     }
 
     IEnumerator ActiveHitEffect()
