@@ -33,7 +33,7 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     // 실제 Damage 호출할 때 (senderContext 가지고 있을 때)
     public void TakeDamage(IPlayerContext senderContext)
     {
-        if (!photonView.IsMine)
+        if (!photonView.IsMine || context.Stats.IsDead())
             return; // 내 것만 호출하게 막기
 
 
@@ -100,7 +100,7 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     IEnumerator ActiveHitEffect()
     {
         GameObject hitEffect = ObjectPooler.Get("HitEffect");
-
+        hitEffect.transform.position = transform.position;
         yield return new WaitForSeconds(0.5f);
 
         ObjectPooler.Release("HitEffect", hitEffect);
