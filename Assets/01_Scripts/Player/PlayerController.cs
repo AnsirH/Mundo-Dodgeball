@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
     private PlayerInputEventSystem inputSystem;
 
+    public string groundLayer;
+
     #region IPlayerComponents
     // 이동
     [SerializeField] private PlayerMovement movement;
@@ -69,7 +71,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
     public PlayerStateBase GetCurrentState() { return stateMachine.CurrentState; }
 
-    public Vector3? GetMousePosition(string layer = "Ground") { return Utility.GetMousePosition(Camera.main, layer); }
+    public Vector3? ClickPoint { get; private set; }
+
     #endregion
 
     void Awake()
@@ -168,6 +171,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
     public void HandleMoveInput()
     {
+        // 마우스 위치 저장
+        ClickPoint = GetMousePosition(groundLayer);
+
         StartCoroutine(ActiveClickPointer());
         if (!attack.IsActionInProgress)
         {
@@ -184,6 +190,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
 
     public void HandleClickInput()
     {
+        // 마우스 위치 저장
+        ClickPoint = GetMousePosition(groundLayer);
+
         if (!attack.IsActionInProgress && attack.CanExecuteAction)
         {
             stateMachine.ChangeState(EPlayerState.Attack);
@@ -191,10 +200,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext
         }
     }
 
+    public Vector3? GetMousePosition(string layer = "Ground") { return Utility.GetMousePosition(Camera.main, layer); }
+
     private IEnumerator ActiveClickPointer()
     {
         GameObject clickPointer = ObjectPooler.Get("ClickPointer");
-        clickPointer.transform.position = GetMousePosition().Value;
+        clickPointer.transform.position = GetMousePosition(groundLayer).Value;
 
         yield return new WaitForSeconds(1.0f);
 

@@ -20,18 +20,14 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
 
     public void ExecuteAction()
     {
-        if (!context.p_PhotonView.IsMine) return;
-
-
-        Vector3? mousePos = context.GetMousePosition();
-        if (!mousePos.HasValue) return;
+        if (!context.p_PhotonView.IsMine || !context.ClickPoint.HasValue) return;
 
         if (isActionInProgress)
         {
             StopMove();
         }
         isActionInProgress = true;
-        StartMoveToNewTarget(mousePos.Value);
+        StartMoveToNewTarget(context.ClickPoint.Value);
     }
 
     public bool IsActionInProgress => isActionInProgress;

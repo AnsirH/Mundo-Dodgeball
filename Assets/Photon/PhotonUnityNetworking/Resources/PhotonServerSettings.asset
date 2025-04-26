@@ -55,6 +55,7 @@ MonoBehaviour:
   - RPC_PlayAnimation
   - Launch_RPC
   - ShootAxe_RPC
+  - Damage
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

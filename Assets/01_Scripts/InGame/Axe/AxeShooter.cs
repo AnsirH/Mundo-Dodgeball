@@ -62,9 +62,8 @@ public class AxeShooter : MonoBehaviour, IShooter
 
         if (IsRangeActive)
         {
-            Vector3? mousePosition = context.GetMousePosition();
-            if (mousePosition.HasValue)
-                rangeIndicator.UpdatePosition(mousePosition.Value, 10.0f);
+            if (context.ClickPoint.HasValue)
+                rangeIndicator.UpdatePosition(context.ClickPoint.Value, 10.0f);
         }
     }
 

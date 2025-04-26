@@ -82,11 +82,10 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     private IEnumerator AttackRoutine()
     {
         // 마우스 위치 확인
-        Vector3? targetPoint = context.GetMousePosition();
-        if (!targetPoint.HasValue) yield break;
+        if (!context.ClickPoint.HasValue) yield break;
 
         // 공격 방향 계산
-        Vector3 direction = (targetPoint.Value - context.Pos).normalized;
+        Vector3 direction = (context.ClickPoint.Value - context.Pos).normalized;
         direction.y = 0.0f;
 
         // 공격 애니메이션

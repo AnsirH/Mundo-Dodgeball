@@ -49,10 +49,7 @@ public interface IPlayerContext
 
     #endregion
 
-    /// <summary>
-    /// 플레이어의 마우스 위치를 반환
-    /// </summary>
-    Vector3? GetMousePosition(string layer="Ground");
+    Vector3? ClickPoint { get; }
 
     /// <summary>
     /// 플레이어의 현재 상태를 반환
