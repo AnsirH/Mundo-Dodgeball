@@ -1,5 +1,7 @@
-﻿using MoreMountains.Feedbacks;
+﻿using ExitGames.Client.Photon;
+using MoreMountains.Feedbacks;
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using UnityEditor;
 using UnityEngine;
@@ -60,10 +62,25 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
 
                 // 죽을 때 이긴 사람 점수 올리기
                 string attackerKey = $"Score_{attackerActorNumber}";
-                photonView.RPC(nameof(ServerManager.Instance.roomManager.AddScore), RpcTarget.MasterClient, attackerKey, 1);
+                sendAddScore(attackerKey, 1);
             }
         }
-    } 
+    }
+    private void sendAddScore(string key, int vaule)
+    {
+        object[] content = new object[] { key, vaule};
+
+        RaiseEventOptions options = new RaiseEventOptions
+        {
+            Receivers = ReceiverGroup.MasterClient // 모든 플레이어에게 브로드캐스트
+        };
+
+        SendOptions sendOptions = new SendOptions
+        {
+            Reliability = true
+        };
+        PhotonNetwork.RaiseEvent(NetworkEventCodes.AddScoreEvent, content, options, sendOptions);
+    }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)

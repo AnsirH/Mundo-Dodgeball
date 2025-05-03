@@ -10,25 +10,27 @@ using UnityEngine.Diagnostics;
 using UnityEngine.UI;
 using UnityEngine.Timeline;
 using System.Security.Cryptography;
-
-public class RoomManager : MonoBehaviourPunCallbacks
+using ExitGames.Client.Photon;
+public static class NetworkEventCodes // 이벤트 코드
 {
-
-    #region 포톤 이벤트 바이트
-    [HideInInspector] public const byte AddScoreEvent = 0x01;
-    #endregion
-
+    public const byte AddScoreEvent = 1; 
+    public const byte ScoreUpdated = 2; 
+}
+public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
+{
     public RoomInfo joinRoom;
 
     public override void OnEnable()
     {
         base.OnEnable();
         SceneManager.sceneLoaded += ChangeIngameMode;
+        PhotonNetwork.AddCallbackTarget(this);
     }
     public override void OnDisable()
     {
         base.OnDisable();
         SceneManager.sceneLoaded -= ChangeIngameMode;
+        PhotonNetwork.RemoveCallbackTarget(this);
     }
     #region 방생성 로직
     public void CreateRoom(string roomName, bool isVisible, string password)
@@ -50,7 +52,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         };
         if(!string.IsNullOrEmpty(password))
         {
-            roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "Password", password } };
+            roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "Password", password }, {"Round", 0} };
             roomOptions.CustomRoomPropertiesForLobby = new string[]{"Password"};
         }
         // 방 생성 시도
@@ -207,7 +209,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
     #region 점수 추가
     // 이벤트 보내기
     //public void AddScoreEvent(string playerName)
-    [PunRPC]
     public void AddScore(string playerKey, int amount)
     {
         Debug.Log("check LOG : AddScore!");
@@ -309,4 +310,50 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         //PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
     }
+    public void OnEvent(EventData photonEvent)
+    {
+        if (photonEvent.Code == NetworkEventCodes.AddScoreEvent)
+        {
+            object[] data = (object[])photonEvent.CustomData;
+            string playerKey = (string)data[0];
+            int amount = (int)data[1];
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                // 점수 계산은 마스터만
+                var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
+                int currentScore = roomProps.ContainsKey(playerKey) ? (int)roomProps[playerKey] : 0;
+                int newScore = currentScore + amount;
+
+                // 업데이트
+                roomProps[playerKey] = newScore;
+                PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+
+                // 점수 UI 업데이트 브로드캐스트 (선택)
+                object[] result = new object[] { playerKey, newScore };
+                RaiseEventOptions broadcastOpts = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+                SendOptions sendOptions = new SendOptions
+                {
+                    Reliability = true
+                };
+                PhotonNetwork.RaiseEvent(NetworkEventCodes.ScoreUpdated, result, broadcastOpts, sendOptions);
+            }
+        }
+
+        if (photonEvent.Code == NetworkEventCodes.ScoreUpdated)
+        {
+            object[] result = (object[])photonEvent.CustomData;
+            string playerKey = (string)result[0];
+            if ($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
+            {
+                showScore(0);
+            }
+            else
+            {
+                showScore(1);
+            }
+        }
+    }
+
+
 }
