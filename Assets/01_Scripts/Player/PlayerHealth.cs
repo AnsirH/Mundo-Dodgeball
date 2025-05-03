@@ -38,7 +38,6 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
         if (photonView.IsMine || context.Stats.IsDead())
             return; // 내 것만 호출하게 막기
 
-
         float attackPower = senderContext.Stats.GetAttackPower();
         int whoAttacker = context.p_PhotonView.ViewID;
         photonView.RPC(nameof(Damage), RpcTarget.All, whoAttacker, attackPower);
