@@ -7,15 +7,6 @@ using UnityEngine.InputSystem;
 using MyGame.Utils;
 using System.Collections;
 
-public interface IMousePositionGetter
-{
-    public void SetClickableGroundLayer(string groundLayer);
-
-    public string GroundLayer { get; }
-
-    public Vector3? ClickPoint { get; }
-    public Vector3? GetMousePosition(LayerMask groundLayer);
-}
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMousePositionGetter
 {
@@ -208,7 +199,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     public void HandleMoveInput()
     {
         // 마우스 위치 저장
-        ClickPoint = GetMousePosition(LayerMask.GetMask(GroundLayer));
+        ClickPoint = GetMousePosition(LayerMask.GetMask("Ground_1", "Ground_2"));
         if (!ClickPoint.HasValue) return;
 
         StartCoroutine(ActiveClickPointer());

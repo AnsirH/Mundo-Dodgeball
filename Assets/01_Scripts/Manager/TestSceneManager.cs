@@ -1,5 +1,6 @@
 using Photon.Pun;
 using UnityEngine;
+using MyGame.Utils;
 
 public class TestSceneManager : MonoBehaviourPunCallbacks
 {

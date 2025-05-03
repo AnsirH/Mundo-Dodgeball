@@ -538,6 +538,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &860112807
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 860112808}
+  m_Layer: 3
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &860112808
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 860112807}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 12.69, z: 0}
+  m_LocalScale: {x: 8.34, y: 8.32, z: 10.15}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1227419752
 GameObject:
   m_ObjectHideFlags: 0
@@ -649,6 +680,7 @@ GameObject:
   - component: {fileID: 1641783613}
   - component: {fileID: 1641783612}
   - component: {fileID: 1641783611}
+  - component: {fileID: 1641783615}
   m_Layer: 3
   m_Name: Plane
   m_TagString: Untagged
@@ -746,6 +778,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1641783615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1641783610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dae051e757e405049b842fbcea1a2396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sections:
+  - {fileID: 860112808}
 --- !u!1 &1811244418
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,6 +958,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f596b5328c47144392fe38f6e3e5e9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerAmount: 2
   playerControllers: []
   ingameUIController: {fileID: 155276323}
   playerSpawnPoints:
@@ -981,6 +1028,7 @@ SceneRoots:
   - {fileID: 515546623}
   - {fileID: 434291705}
   - {fileID: 1641783614}
+  - {fileID: 860112808}
   - {fileID: 4898434332386804756}
   - {fileID: 1811244423}
   - {fileID: 2084351839}

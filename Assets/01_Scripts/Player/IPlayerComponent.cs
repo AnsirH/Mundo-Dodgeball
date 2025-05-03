@@ -2,7 +2,7 @@ using Photon.Pun;
 using PlayerCharacterControl.State;
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using MyGame.Utils;
 
 /// <summary>
 /// 플레이어 컴포넌트들이 필요로 하는 기능을 제공하는 인터페이스

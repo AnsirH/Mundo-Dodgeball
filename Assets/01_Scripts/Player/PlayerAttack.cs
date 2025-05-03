@@ -98,9 +98,10 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
             int ping = PhotonNetwork.GetPing();
             float pingSeconds = ping * 0.001f;
             float expectedDelay = pingSeconds * 0.5f;
-            axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time + pingSeconds);
 
-            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time/* + pingSeconds*/);
+            StartCoroutine(InvokeCoroutine(() => { axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time); },pingSeconds));
+
+            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time + pingSeconds);
         };
 
         // 공격 애니메이션 및 로직
@@ -136,5 +137,12 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction, float execTime)
     {
         axeShooter.SpawnProjectile(StartPos, direction, execTime);
+    }
+
+
+    private IEnumerator InvokeCoroutine(Action action, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        action?.Invoke();  // null 체크 후 실행
     }
 }
