@@ -17,7 +17,7 @@ public class Axe : MonoBehaviour, IProjectile
     private void Launch(Vector3 direction, float execTime)
     {
         // 시간 차이 계산
-        float timeInterval = (float)PhotonNetwork.Time - execTime;
+        float timeInterval = Mathf.Max((float)PhotonNetwork.Time - execTime, 0.0f);
         float adjustedFlyTime = flyTime - timeInterval;
 
         // 위치 설정

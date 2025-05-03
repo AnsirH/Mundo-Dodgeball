@@ -1,4 +1,4 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using Photon.Pun;
 using System;
 using System.Collections;
@@ -14,10 +14,10 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     private Coroutine currentAttackRoutine;
 
     [Header("References")]
-    // µµ³¢ ¹ß»çÃ¼
+    // ë„ë¼ ë°œì‚¬ì²´
     [SerializeField] private AxeShooter axeShooter;
 
-    // Ä³¸¯ÅÍ µµ³¢ ¸ğµ¨¸µ
+    // ìºë¦­í„° ë„ë¼ ëª¨ë¸ë§
     [SerializeField] private GameObject axeObj;
 
     #region IPlayerAction Implementation
@@ -33,13 +33,13 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     {
         if (IsActionInProgress || !axeShooter.IsRangeActive) return;
 
-        // °ø°İ ¹üÀ§ µğ½ºÇÃ·¹ÀÌ ºñÈ°¼ºÈ­
+        // ê³µê²© ë²”ìœ„ ë””ìŠ¤í”Œë ˆì´ ë¹„í™œì„±í™”
         ActivateRange(false);
 
-        // °ø°İ ·ÎÁ÷ ½ÇÇà
+        // ê³µê²© ë¡œì§ ì‹¤í–‰
         currentAttackRoutine = StartCoroutine(AttackRoutine());
 
-        // °ø°İ ½ÇÇà È°¼ºÈ­
+        // ê³µê²© ì‹¤í–‰ í™œì„±í™”
         IsActionInProgress = true;
     }
     #endregion
@@ -72,27 +72,27 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     }
     #endregion
 
-    // ¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å Àü¼Û
+    // ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±° ì „ì†¡
     void PlayAttackAnimation()
     {
         context.Anim.SetTrigger("Attack");
     }
 
-    // °ø°İ ÄÚ·çÆ¾. ½Ã°£ Áö³ª¸é ¿Ï·á ÀÌº¥Æ® ¹ßÇà
+    // ê³µê²© ì½”ë£¨í‹´. ì‹œê°„ ì§€ë‚˜ë©´ ì™„ë£Œ ì´ë²¤íŠ¸ ë°œí–‰
     private IEnumerator AttackRoutine()
     {
-        // ¸¶¿ì½º À§Ä¡ È®ÀÎ
+        // ë§ˆìš°ìŠ¤ ìœ„ì¹˜ í™•ì¸
         if (!context.MousePositionGetter.ClickPoint.HasValue) yield break;
 
-        // °ø°İ ¹æÇâ °è»ê
+        // ê³µê²© ë°©í–¥ ê³„ì‚°
         Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.Pos).normalized;
         direction.y = 0.0f;
 
-        // °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç
+        // ê³µê²© ì• ë‹ˆë©”ì´ì…˜
         PlayAttackAnimation();
 
-        // °ø°İ ¹æÇâÀ¸·Î È¸Àü
-        // È¸Àü Á¾·á ½Ã °ø°İ
+        // ê³µê²© ë°©í–¥ìœ¼ë¡œ íšŒì „
+        // íšŒì „ ì¢…ë£Œ ì‹œ ê³µê²©
         transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
         {
             int ping = PhotonNetwork.GetPing();
@@ -100,10 +100,10 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
             float expectedDelay = pingSeconds * 0.5f;
             axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time + pingSeconds);
 
-            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time + pingSeconds);
+            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time/* + pingSeconds*/);
         };
 
-        // °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç ¹× ·ÎÁ÷
+        // ê³µê²© ì• ë‹ˆë©”ì´ì…˜ ë° ë¡œì§
         yield return new WaitForSeconds(attackDuration);
 
         IsActionInProgress = false;
@@ -111,7 +111,7 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         OnActionCompleted?.Invoke();
     }
 
-    // µµ³¢ ±ËÀû È°¼ºÈ­ ¸Ş¼­µå
+    // ë„ë¼ ê¶¤ì  í™œì„±í™” ë©”ì„œë“œ
     public void ActivateRange(bool active)
     {
         if (!photonView.IsMine) { return; }
@@ -128,7 +128,7 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     {
         ActivateRange(false);
 
-        // È¸Àü Á¾·á
+        // íšŒì „ ì¢…ë£Œ
         transform.DOKill();
     }
 
