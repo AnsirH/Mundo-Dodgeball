@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using MyGame.Utils;
+using UnityEngine.SceneManagement;
 
 public class IngameController : MonoBehaviourPun
 {
@@ -47,7 +48,7 @@ public class IngameController : MonoBehaviourPun
         if (PhotonNetwork.IsMasterClient)
         {
             // 게임이 준비 되었음을 모든 클라이언트에게 알림
-            photonView.RPC("CreatePlayerCharacter_RPC", RpcTarget.All);
+            photonView.RPC(nameof(CreatePlayerCharacter_RPC), RpcTarget.All);
         }
 
         // 캐릭터 생성이 완료되었는지 확인 후 게임 시작
@@ -148,8 +149,14 @@ public class IngameController : MonoBehaviourPun
             player.enabled = true;
         }
         ingameUIController.Init();
+        ingameUIController.OnRoundPanel(ServerManager.Instance.roomManager.GetCurrentRound());
     }
-
+    [PunRPC]
+    void ReloadSceneRPC()
+    {
+        // Photon 연결 유지한 채 현재 씬 리로드
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
     /// <summary>플레이어 캐릭터 배열</summary>
     public List<PlayerController> playerControllers = new List<PlayerController>(2);
     /// <summary>인게임 UI 컨트롤러</summary>

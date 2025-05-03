@@ -6,6 +6,7 @@ using UnityEngine;
 public class IngameUIController : MonoBehaviour
 {
     [SerializeField] TopPanelUI topPanelUI;
+    [SerializeField] RoundUI roundUI;
     private void Start()
     {
         topPanelUI.StartTimer(2, 0);
@@ -55,4 +56,9 @@ public class IngameUIController : MonoBehaviour
     public GameObject hpBarPrefab;
 
     public bool isInitialized = false;
+
+    public void OnRoundPanel(int idx) 
+    {
+        roundUI.PlayAnimation(idx);
+    }
 }
