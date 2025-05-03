@@ -95,13 +95,12 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         // 회전 종료 시 공격
         transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
         {
-            int ping = PhotonNetwork.GetPing();
-            float pingSeconds = ping * 0.001f;
-            float expectedDelay = pingSeconds * 0.5f;
+            float now = (float)PhotonNetwork.Time;
+            float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
 
-            StartCoroutine(InvokeCoroutine(() => { axeShooter.SpawnProjectile(axeShooter.transform.position, direction, (float)PhotonNetwork.Time); },pingSeconds));
+            axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
 
-            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, (float)PhotonNetwork.Time + pingSeconds);
+            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, now + expectedDelay);
         };
 
         // 공격 애니메이션 및 로직
