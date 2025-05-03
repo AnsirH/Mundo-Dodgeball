@@ -14,7 +14,8 @@ using ExitGames.Client.Photon;
 public static class NetworkEventCodes // 이벤트 코드
 {
     public const byte AddScoreEvent = 1; 
-    public const byte ScoreUpdated = 2; 
+    public const byte ScoreUpdated = 2;
+    public const byte NextRound = 3; 
 }
 public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
@@ -53,7 +54,7 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         if(!string.IsNullOrEmpty(password))
         {
             roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "Password", password }, {"Round", 0} };
-            roomOptions.CustomRoomPropertiesForLobby = new string[]{"Password"};
+            roomOptions.CustomRoomPropertiesForLobby = new string[]{"Password", "Round" };
         }
         // 방 생성 시도
         PhotonNetwork.CreateRoom(roomName, roomOptions, TypedLobby.Default);
@@ -204,52 +205,37 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
             UIManager.instance.ChangeGame(false);
         }
     }
-
     #endregion
     #region 점수 추가
-    // 이벤트 보내기
-    //public void AddScoreEvent(string playerName)
-    public void AddScore(string playerKey, int amount)
-    {
-        Debug.Log("check LOG : AddScore!");
-        // 현재 CustomProperties 가져오기
-        var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
 
-        int currentScore = 0;
-
-        if (roomProps.ContainsKey(playerKey))
-        {
-            // 키가 있으면 기존 점수 가져오기
-            currentScore = (int)roomProps[playerKey];
-        }
-        // 키가 없으면 currentScore = 0 (기본값)
-
-        int newScore = currentScore + amount;
-
-        // 점수 업데이트
-        roomProps[playerKey] = newScore;
-
-        PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
-        Debug.Log($"log : --------------{playerKey}");
-        if ($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
-        {
-            photonView.RPC(nameof(showScore), RpcTarget.All, 0);
-        }
-        else
-        {
-            photonView.RPC(nameof(showScore), RpcTarget.All, 1);
-        }
-
-        
-
-    }
     [PunRPC]
     private void showScore(int idx)
     {
         IngameController.Instance.ingameUIController.addScore(idx);
     }
     #endregion
+    #region 다음 라운드
+    public int GetCurrentRound()
+    {
+        if (PhotonNetwork.CurrentRoom == null) return 0;
+        print("dagashgahashga ++== " + PhotonNetwork.CurrentRoom.CustomProperties["Round"]);
+        object roundValue;
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("Round", out roundValue))
+        {
+            return (int)roundValue;
+        }
 
+        return 0; // 기본값
+    }
+    private void NextRound()
+    {
+        RaiseEventOptions options = new RaiseEventOptions
+        {
+            Receivers = ReceiverGroup.All // 모든 클라이언트에게
+        };
+        PhotonNetwork.RaiseEvent(NetworkEventCodes.NextRound, null, options, SendOptions.SendReliable);
+    }
+    #endregion
 
     // Ready 버튼이 눌렸을 때 호출되는 함수 (버튼 OnClick에 연결)
     public void OnClickReady(bool isReady)
@@ -323,21 +309,28 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
             {
                 // 점수 계산은 마스터만
                 var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
+
+                // 기존 점수 계산
                 int currentScore = roomProps.ContainsKey(playerKey) ? (int)roomProps[playerKey] : 0;
                 int newScore = currentScore + amount;
-
-                // 업데이트
                 roomProps[playerKey] = newScore;
+
+                // 기존 Round 가져오기
+                int currentRound = roomProps.ContainsKey("Round") ? (int)roomProps["Round"] : 0;
+                roomProps["Round"] = currentRound + 1;
+
+                // 커스텀 프로퍼티 업데이트
                 PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
 
-                // 점수 UI 업데이트 브로드캐스트 (선택)
+                // 점수 UI 업데이트 브로드캐스트
                 object[] result = new object[] { playerKey, newScore };
                 RaiseEventOptions broadcastOpts = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-                SendOptions sendOptions = new SendOptions
-                {
-                    Reliability = true
-                };
+                SendOptions sendOptions = new SendOptions { Reliability = true };
+
                 PhotonNetwork.RaiseEvent(NetworkEventCodes.ScoreUpdated, result, broadcastOpts, sendOptions);
+
+                // 다음 라운드 함수 예약
+                Invoke(nameof(NextRound), 3f);
             }
         }
 
@@ -348,14 +341,19 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
             string playerKey = (string)result[0];
             if ($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
             {
-                showScore(0);
+                showScore(1);
             }
             else
             {
-                showScore(1);
+                showScore(0);
             }
         }
+
+        // 재시작(다음라운드)
+        if (photonEvent.Code == NetworkEventCodes.NextRound)
+        {
+            string currentScene = SceneManager.GetActiveScene().name;
+            SceneManager.LoadScene(currentScene);
+        }
     }
-
-
 }
