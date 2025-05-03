@@ -6,8 +6,8 @@ public class ReSourceManager : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] List<Sprite> playerIconImageList;
-    public Sprite GetPlayerIcon(int index)
-    {
-        return playerIconImageList[index];
-    }
+    [SerializeField] List<Sprite> roundImageList;
+    public Sprite GetPlayerIcon(int index) => playerIconImageList[index];
+
+    public Sprite GetRoundImage(int index) => roundImageList[index];
 }

@@ -312,6 +312,7 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
     }
     public void OnEvent(EventData photonEvent)
     {
+        // 스코어 추가
         if (photonEvent.Code == NetworkEventCodes.AddScoreEvent)
         {
             object[] data = (object[])photonEvent.CustomData;
@@ -340,6 +341,7 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
             }
         }
 
+        // 모두 UI대응
         if (photonEvent.Code == NetworkEventCodes.ScoreUpdated)
         {
             object[] result = (object[])photonEvent.CustomData;
