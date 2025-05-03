@@ -1,9 +1,9 @@
 using Photon.Pun;
-using Photon.Pun.UtilityScripts;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using MyGame.Utils;
 
 public class IngameController : MonoBehaviourPun
 {

@@ -1305,7 +1305,7 @@ MonoBehaviour:
     SynchronizeEnabled: 1
     InterpolateOption: 2
     InterpolateRotateTowardsSpeed: 180
-    InterpolateLerpSpeed: 5
+    InterpolateLerpSpeed: 20
   m_ScaleModel:
     SynchronizeEnabled: 0
     InterpolateOption: 0
