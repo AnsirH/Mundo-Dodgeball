@@ -77,7 +77,7 @@ namespace PlayerCharacterControl.Camera
 
 #if UNITY_EDITOR
         
-        private void OnDrawGizmos()
+        private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
 

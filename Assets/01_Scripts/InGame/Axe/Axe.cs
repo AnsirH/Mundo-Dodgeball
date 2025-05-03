@@ -21,6 +21,7 @@ public class Axe : MonoBehaviour, IProjectile
         float adjustedFlyTime = flyTime - timeInterval;
         float execTimeRatio = timeInterval / flyTime;
 
+        // 10.0f은 이동거리( 변수로 수정해야 함 )
         Vector3 adjustedStartPosition = transform.position + direction * 10.0f * execTimeRatio;
         transform.position = adjustedStartPosition;
         // 위치 설정
