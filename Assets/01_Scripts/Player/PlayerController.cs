@@ -29,6 +29,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
 
     [SerializeField] private Animator playerAnim;
 
+    private PhotonTransformViewClassic ptv;
+    private Vector3 previousPosition;
+
     private PlayerInputEventSystem inputSystem;
 
     #region IPlayerComponents
@@ -96,12 +99,15 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     void Awake()
     {
         inputSystem = GetComponent<PlayerInputEventSystem>();
+        ptv = GetComponent<PhotonTransformViewClassic>();
 
         // 플레이어 컴포넌트들 초기화
         InitializeComponents();
 
         // 상태 머신 초기화
         stateMachine = new(this, attack, movement);
+
+        previousPosition = transform.position;
     }
 
     void Update()
@@ -112,6 +118,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
         foreach (var component in components)
         {
             component.Updated();
+        }
+
+
+        if (photonView.IsMine)
+        {
+            Vector3 velocity = (transform.position - previousPosition) / Time.deltaTime;
+
+            // 보간/예측을 위한 속도 전달
+            ptv.SetSynchronizedValues(velocity, 0f);  // 회전속도는 안 쓰면 0
+
+            previousPosition = transform.position;
         }
     }
     public override void OnEnable()
