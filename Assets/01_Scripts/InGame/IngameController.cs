@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Pun.UtilityScripts;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using UnityEngine;
 
 public class IngameController : MonoBehaviourPun
 {
+    #region 싱글톤 패턴
     public static IngameController Instance { get; private set; }
 
     private void Awake()
@@ -34,7 +36,9 @@ public class IngameController : MonoBehaviourPun
         StartCoroutine(StartGameProcess());
 
     }
-
+    #endregion
+    public int playerAmount = 2;
+    private List<int> PunPlayerScores = new List<int>();
     IEnumerator StartGameProcess()
     {
         // 모든 플레이어가 접속했는지 확인

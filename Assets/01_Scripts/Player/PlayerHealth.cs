@@ -52,8 +52,10 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
 
         if (context.Stats.IsDead())
         {
+            Debug.Log("check LOG : isDead!");
             if (photonView.IsMine)
             {
+                Debug.Log("check LOG : isMine");
                 context.OnPlayerDeath();
 
                 // 죽을 때 이긴 사람 점수 올리기

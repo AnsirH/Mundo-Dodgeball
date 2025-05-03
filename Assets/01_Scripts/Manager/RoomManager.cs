@@ -13,6 +13,11 @@ using System.Security.Cryptography;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
+
+    #region 포톤 이벤트 바이트
+    [HideInInspector] public const byte AddScoreEvent = 0x01;
+    #endregion
+
     public RoomInfo joinRoom;
 
     public override void OnEnable()
@@ -200,9 +205,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     #endregion
     #region 점수 추가
+    // 이벤트 보내기
+    //public void AddScoreEvent(string playerName)
     [PunRPC]
     public void AddScore(string playerKey, int amount)
     {
+        Debug.Log("check LOG : AddScore!");
         // 현재 CustomProperties 가져오기
         var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
 
@@ -221,8 +229,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
         roomProps[playerKey] = newScore;
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
-
-        if($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
+        Debug.Log($"log : --------------{playerKey}");
+        if ($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
         {
             photonView.RPC(nameof(showScore), RpcTarget.All, 0);
         }
