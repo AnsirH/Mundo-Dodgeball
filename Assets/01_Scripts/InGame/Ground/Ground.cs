@@ -6,25 +6,6 @@ public class Ground : MonoBehaviour
 {
     public Transform[] sections;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 targetPoint = Utility.GetMousePosition(Camera.main, LayerMask.GetMask("Ground")).Value;
-
-            if (GetAdjustedPoint(0, sections[0].position, targetPoint, out Vector3 adjustedPoint))
-            {
-                GameObject.CreatePrimitive(PrimitiveType.Cube).transform.position = adjustedPoint;
-            }
-        }
-    }
-
     public int GetSectionNumber(Vector3 targetPoint)
     {
         targetPoint.y = transform.position.y;
@@ -52,7 +33,12 @@ public class Ground : MonoBehaviour
         Vector3 targetPath = targetPoint - startPoint;
         Ray ray = new Ray(startPoint, targetPath);
 
-        if (RayIntersectsOBB_XZ(ray, sections[sectionNum].position, sections[sectionNum].rotation, sections[sectionNum].lossyScale * 0.5f, out Vector3 hit))
+        if (RayIntersectsOBB_XZ(
+            ray, 
+            sections[sectionNum].position, sections[sectionNum].rotation, 
+            new Vector2(sections[sectionNum].lossyScale.x, sections[sectionNum].lossyScale.z) * 0.5f, 
+            out Vector3 hit
+            ))
         {
             adjustedPoint = hit;
             return true;
@@ -85,7 +71,7 @@ public class Ground : MonoBehaviour
         if (tmin > tzmax || tzmin > tmax) return false;
 
         tmin = Mathf.Max(tmin, tzmin);
-
+        if (tmin < 0) tmin = -tmin;
         Vector3 localHit = localOrigin + localDirection * tmin;
         hit = Matrix4x4.TRS(obbCenter, obbRotation, Vector3.one).MultiplyPoint(localHit);
         return true;

@@ -156,4 +156,6 @@ public class IngameController : MonoBehaviourPun
     public IngameUIController ingameUIController;
 
     public Transform[] playerSpawnPoints = new Transform[2];
+
+    public Ground ground;
 }
