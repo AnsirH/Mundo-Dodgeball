@@ -36,8 +36,7 @@ public class TestSceneManager : MonoBehaviourPunCallbacks
     {
         for (int i = 0; i < testPlayerCount; i++)
         {
-            Vector3 spawnPos = new Vector3(i * 2f, 0f, 0f);
-            GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPos, Quaternion.identity);
+            GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, ground.sections[i].position, Quaternion.identity);
 
             // 각 플레이어에 고유한 이름 할당
             player.GetComponent<PhotonView>().Owner.NickName = $"TestPlayer_{i}";
