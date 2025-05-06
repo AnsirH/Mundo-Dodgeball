@@ -10,18 +10,17 @@ using MyGame.Utils;
 public interface IPlayerContext
 {
     /// <summary>
-    /// 플레이어의 현재 상태
-    /// </summary>
-    PlayerStateBase PlayerState { get; }
-
-    // 플레이어 스탯 프로퍼티 추가할 것
-
-    /// <summary>
     /// 플레이어가 사망했을 때 호출
     /// </summary>
     void OnPlayerDeath();
 
+    void InitGround(Ground ground, int sectionNum);
+
     #region properties
+    /// <summary>
+    /// 플레이어의 현재 상태
+    /// </summary>
+    PlayerStateBase PlayerState { get; }
 
     /// <summary>
     /// 플레이어의 트랜스폼을 반환

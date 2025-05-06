@@ -63,7 +63,7 @@ public class AxeShooter : MonoBehaviour, IShooter
 
         if (IsRangeActive)
         {
-            Vector3? mousePoint = context.MousePositionGetter.GetMousePosition(LayerMask.GetMask("Ground_1", "Ground_2"));
+            Vector3? mousePoint = context.MousePositionGetter.GetMousePosition();
             if (mousePoint.HasValue)
                 rangeIndicator.UpdatePosition(mousePoint.Value, 10.0f);
         }

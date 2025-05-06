@@ -6,15 +6,15 @@ public class HpBar : MonoBehaviour
 {
     /// <summary> 체력바를 플레이어에게 매치합니다.( 체력바 초기화, 체력바 타겟 설정 ) </summary>
     /// <param name="targetPlayerHealth">할당할 플레이어의 체력 컴포넌트</param>
-    public void Init(PlayerHealth targetPlayerHealth)
+    public void Init(IPlayerContext context)
     {
-        playerHealth = targetPlayerHealth;
-        targetTrf = targetPlayerHealth.transform;
+        playerContext = context;
+        targetTrf = context.Trf;
     }
     /// <summary> 체력값 반영 </summary>
     public void UpdateDisplay()
     {
-        if (playerHealth == null)
+        if (playerContext == null)
         {
             Debug.Log($"{gameObject.name} is not matched PlayerHealth");
             return;
@@ -22,8 +22,10 @@ public class HpBar : MonoBehaviour
 
         float resultHp = 0;
 
-        if (playerHealth.GetHealthPercentage() >= 0) 
-            resultHp = playerHealth.GetHealthPercentage();
+        if (playerContext.Stats.GetCurrentHealth() >= 0)
+        {
+            resultHp = playerContext.Stats.GetCurrentHealth() / playerContext.Stats.GetMaxHealth();
+        }
 
         valueBarRtrf.localScale = new Vector3(resultHp, 1.0f, 1.0f);
     }
@@ -41,7 +43,7 @@ public class HpBar : MonoBehaviour
         rectTransform.position = targetScreenPos;
     }
 
-    public PlayerHealth playerHealth;
+    public IPlayerContext playerContext;
     public RectTransform rectTransform;
     public RectTransform valueBarRtrf;
     public Transform targetTrf;

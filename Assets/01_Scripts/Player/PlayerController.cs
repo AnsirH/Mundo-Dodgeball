@@ -1,5 +1,4 @@
 using Photon.Pun;
-using PlayerCharacterControl;
 using PlayerCharacterControl.State;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,15 +14,25 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     // 플레이어 스크립트 리스트
     private List<IPlayerComponent> components = new List<IPlayerComponent>();
 
-    //[SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
     [SerializeField] private PlayerStats stats;
 
     [SerializeField] private Animator playerAnim;
 
-    private PhotonTransformViewClassic ptv;
+    [SerializeField] private PlayerInputEventSystem inputSystem;
+
+    [SerializeField] private PhotonTransformViewClassic ptv;
     private Vector3 previousPosition;
 
-    private PlayerInputEventSystem inputSystem;
+    // IngameController가 할당
+    // 인게임 필드
+    public Ground PlayGround { get; private set; }
+    public int GroundSectionNum { get; private set; }
+    public void InitGround(Ground ground, int sectionNum)
+    {
+        PlayGround = ground;
+        GroundSectionNum = sectionNum;
+    }
+
 
     #region IPlayerComponents
     // 이동
@@ -75,16 +84,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     #endregion
 
     #region IMousePositionGetter Implementation
-    public void SetClickableGroundLayer(string groundLayer)
-    {
-        GroundLayer = groundLayer;
-    }
-
-    public string GroundLayer { get; private set; }
 
     public Vector3? ClickPoint { get; private set; }
 
-    public Vector3? GetMousePosition(LayerMask groundLayer) { return Utility.GetMousePosition(Camera.main, groundLayer); }
+    public Vector3? GetMousePosition() 
+    {
+        return Utility.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+    }
     #endregion
 
     void Awake()
@@ -199,10 +205,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     public void HandleMoveInput()
     {
         // 마우스 위치 저장
-        ClickPoint = GetMousePosition(LayerMask.GetMask("Ground_1", "Ground_2"));
-        if (!ClickPoint.HasValue) return;
+        ClickPoint = GetMousePosition();
+        if (!ClickPoint.HasValue || !PlayGround.GetAdjustedPoint(GroundSectionNum, Pos, ClickPoint.Value, out Vector3 adjustedPoint)) return;
 
-        StartCoroutine(ActiveClickPointer());
+        ClickPoint = adjustedPoint;
+
+        StartCoroutine(ActiveClickPointer(ClickPoint.Value));
         if (!attack.IsActionInProgress)
         {
             stateMachine.ChangeState(EPlayerState.Move);
@@ -219,7 +227,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     public void HandleClickInput()
     {
         // 마우스 위치 저장
-        ClickPoint = GetMousePosition(LayerMask.GetMask("Ground_1", "Ground_2"));
+        ClickPoint = GetMousePosition();
 
         if (!attack.IsActionInProgress && attack.CanExecuteAction)
         {
@@ -229,10 +237,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     }
 
 
-    private IEnumerator ActiveClickPointer()
+    private IEnumerator ActiveClickPointer(Vector3 targetPoint)
     {
         GameObject clickPointer = ObjectPooler.Get("ClickPointer");
-        clickPointer.transform.position = GetMousePosition(LayerMask.GetMask(GroundLayer)).Value;
+
+        targetPoint.y = PlayGround.transform.position.y;
+        clickPointer.transform.position = targetPoint;
 
         yield return new WaitForSeconds(1.0f);
 

@@ -4,6 +4,7 @@ using MyGame.Utils;
 
 public class TestSceneManager : MonoBehaviourPunCallbacks
 {
+    [SerializeField] private Ground ground;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private int testPlayerCount = 2;  // 테스트할 플레이어 수
 
@@ -40,9 +41,7 @@ public class TestSceneManager : MonoBehaviourPunCallbacks
 
             // 각 플레이어에 고유한 이름 할당
             player.GetComponent<PhotonView>().Owner.NickName = $"TestPlayer_{i}";
-            IMousePositionGetter mouse = player.GetComponent<PlayerController>();
-            mouse.SetClickableGroundLayer("Ground_1");
-            print(mouse.GroundLayer);
+            player.GetComponent<IPlayerContext>().InitGround(ground, i);
         }
     }
 }
