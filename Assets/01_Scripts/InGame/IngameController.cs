@@ -119,7 +119,7 @@ public class IngameController : MonoBehaviourPun
                         if (index >= 0 && index < playerControllers.Count)
                         {
                             playerControllers[index] = controller;
-                            controller.InitGround(ground, index);
+                            controller.InitGround(index);
                         }
                         else
                         {

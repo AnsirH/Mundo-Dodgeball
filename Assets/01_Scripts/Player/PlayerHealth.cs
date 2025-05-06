@@ -3,8 +3,8 @@ using MoreMountains.Feedbacks;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageable, IPlayerComponent
 {
@@ -31,6 +31,10 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
         this.context = context;
         this.isOfflineMode = isOfflineMode;
         context.Stats.ResetHealth();
+    }
+
+    public void HandleInput(InputAction.CallbackContext context)
+    {
     }
     // 실제 Damage 호출할 때 (senderContext 가지고 있을 때)
     public void TakeDamage(IPlayerContext senderContext)

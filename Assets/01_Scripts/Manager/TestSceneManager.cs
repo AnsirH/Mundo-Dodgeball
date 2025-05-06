@@ -40,7 +40,7 @@ public class TestSceneManager : MonoBehaviourPunCallbacks
 
             // 각 플레이어에 고유한 이름 할당
             player.GetComponent<PhotonView>().Owner.NickName = $"TestPlayer_{i}";
-            player.GetComponent<IPlayerContext>().InitGround(ground, i);
+            player.GetComponent<IPlayerContext>().InitGround(i);
         }
     }
 }

@@ -54,3 +54,6 @@ MonoBehaviour:
   - tag: HitEffect
     prefab: {fileID: 1834194341294532, guid: d5f26854a8904624c8073139cd2eb346, type: 3}
     size: 10
+  - tag: FlashEffect
+    prefab: {fileID: 6669307902679017890, guid: 4e9617b2734167247a2d6491e821b27b, type: 3}
+    size: 5

@@ -1,28 +1,13 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using MyGame.Utils;
-using UnityEngine.Diagnostics;
 
 public class PlayerSpell : MonoBehaviour, IPlayerComponent
 {
     private void Awake()
     {
-        spellD = new Flash(this);
-    }
-
-    public void OnSpellD()
-    {
-        if (canUseSpellD)
-        {
-            spellD.Execute();
-        }
-    }
-
-    private void SetSpellable()
-    {
-        canUseSpellD = true;
+        spellD = new Heal(context);
+        spellF = new Flash(context);
     }
 
     public void Initialize(IPlayerContext context, bool isOfflineMode = false)
@@ -33,50 +18,81 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
 
     public void Updated()
     {
-        if (!spellD.CanUsable)
+        if (spellD.currentCoolTime > 0)
         {
             spellD.CoolDown(Time.deltaTime);
+        }
+
+        if (spellF.currentCoolTime > 0)
+        {
+            spellF.CoolDown(Time.deltaTime);
         }
     }
 
     public void OnEnabled()
     {
-        throw new System.NotImplementedException();
     }
 
     public void OnDisabled()
     {
-        throw new System.NotImplementedException();
     }
 
     public void HandleInput(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        if (context.action.name == "D")
+        {
+            if (spellD.CanUsable)
+            {
+                spellD.Execute();
+            }
+        }
+        if (context.action.name == "F")
+        {
+            if (spellF.CanUsable)
+            {
+                spellF.Execute();
+                StartCoroutine(SpawnEffect("FlashEffect", this.context.MousePositionGetter.ClickPoint.Value));
+            }
+        }
+    }
+
+
+    private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
+    {
+        GameObject effect = ObjectPooler.Get(effectTag);
+
+        if (effect == null)
+        {
+            Debug.LogError($"Effect with tag {effectTag} not found in ObjectPooler.");
+            yield break;
+        }
+
+        targetPoint.y = IngameController.Instance.ground.transform.position.y;
+        effect.transform.position = targetPoint;
+
+        yield return new WaitForSeconds(1.0f);
+
+        ObjectPooler.Release(effectTag, effect);
     }
 
     public IPlayerContext context;
     private bool isOfflineMode;
 
     private Spell spellD;
-
-    public float flashDistance = 1.5f;
-    public bool canUseSpellD = true;
+    private Spell spellF;
 
     public bool Controllable { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 }
 
-public class Spell
+public abstract class Spell
 {
-    public PlayerSpell owner;
-    public Spell(PlayerSpell owner)
+    public IPlayerContext context;
+    public Spell(IPlayerContext context)
     {
-        this.owner = owner;
+        this.context = context;
     }
 
-    public virtual void Execute()
-    {
-        if (!CanUsable) { return; }
-    }
+    public abstract void Execute();
 
     public void CoolDown(float decreaseValue)
     {
@@ -98,29 +114,39 @@ public class Spell
 
 public class Flash : Spell
 {
-    public Flash(PlayerSpell owner) : base(owner)
+    public Flash(IPlayerContext context) : base(context)
     {
+        this.context = context;
     }
 
     public override void Execute()
     {
-        base.Execute();
-        Vector3? mousePoint = owner.context.MousePositionGetter.ClickPoint;
-        if (!mousePoint.HasValue) return;
+        Vector3 targetPoint = context.MousePositionGetter.ClickPoint.Value;
+        Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.Pos).normalized;
 
-        Vector3 targetVector = mousePoint.Value - owner.transform.position;
-        if (targetVector.magnitude > distance)
-        {
-            owner.transform.position += targetVector.normalized * distance;
-        }
-        else
-        {
-            owner.transform.position += targetVector;
-        }
-        owner.transform.rotation = Quaternion.LookRotation(targetVector);
+        context.Trf.position = targetPoint;
+        context.Trf.rotation = Quaternion.LookRotation(direction);
+
 
         currentCoolTime = maxCoolTime;
     }
 
     float distance = 3.0f;
+}
+
+public class Heal : Spell
+{
+    public Heal(IPlayerContext context) : base(context)
+    {
+        this.context = context;
+    }
+
+    public override void Execute()
+    {
+        context.Stats.ModifyCurrentHealth(healAmount);
+
+        currentCoolTime = maxCoolTime;
+    }
+
+    float healAmount = 60.0f;
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using MyGame.Utils;
 using System.Collections;
+using System.Linq;
 
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMousePositionGetter
@@ -23,17 +24,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     [SerializeField] private PhotonTransformViewClassic ptv;
     private Vector3 previousPosition;
 
-    // IngameController가 할당
-    // 인게임 필드
-    public Ground PlayGround { get; private set; }
-    public int GroundSectionNum { get; private set; }
-    public void InitGround(Ground ground, int sectionNum)
-    {
-        PlayGround = ground;
-        GroundSectionNum = sectionNum;
-    }
-
-
     #region IPlayerComponents
     // 이동
     [SerializeField] private PlayerMovement movement;
@@ -41,6 +31,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     [SerializeField] private PlayerAttack attack;
     // 체력
     [SerializeField] private PlayerHealth playerHealth;
+    // 스펠
+    [SerializeField] private PlayerSpell playerSpell;
 
     public bool isOfflineMode;
 
@@ -78,6 +70,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
         QuitAllAction();
         stateMachine.ChangeState(EPlayerState.Die);
     }
+
+    public void InitGround(int sectionNum)
+    {
+        GroundSectionNum = sectionNum;
+    }
+    public int GroundSectionNum { get; private set; }
 
     public IMousePositionGetter MousePositionGetter => this;
 
@@ -158,7 +156,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
             playerHealth,      // 체력은 가장 먼저 초기화
             movement,  // 이동은 그 다음
             attack,      // 공격은 이동 이후
-            //playerSpell      // 스킬은 마지막
+            playerSpell      // 스킬은 마지막
         };
 
         components = initializationOrder;
@@ -172,8 +170,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
 
     private void QuitAllAction()
     {
-        movement.StopMove();
-        attack.CancelAttack();
+        components.Where(comp => comp as IPlayerAction != null)
+            .ToList()
+            .ForEach(comp => (comp as IPlayerAction).StopAction());
     }
 
     public void HandleInput(InputAction.CallbackContext context)
@@ -185,67 +184,67 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
             switch (context.action.name)
             {
                 case "Move":
-                    HandleMoveInput();
+                    // 마우스 위치 저장
+                    ClickPoint = GetMousePosition();
+                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, Pos, ClickPoint.Value, out Vector3 adjustedPoint)) return;
+
+                    ClickPoint = adjustedPoint;
+                    StartCoroutine(SpawnEffect("ClickPointer", ClickPoint.Value));
+
+                    if (!attack.IsActionInProgress)
+                        stateMachine.ChangeState(EPlayerState.Move);
                     break;
 
                 case "Attack":
-                    HandleAttackInput();
                     break;
 
                 case "Click":
-                    HandleClickInput();
+                    // 마우스 위치 저장
+                    ClickPoint = GetMousePosition();
+                    if (!attack.IsActionInProgress && attack.CanExecuteAction)
+                    {
+                        stateMachine.ChangeState(EPlayerState.Attack);
+                    }
+                    else
+                        return;
+                    break;
+
+                case "D":
+                    break;
+                case "F":
+                    // 마우스 위치 저장
+                    ClickPoint = GetMousePosition();
+                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, Pos, ClickPoint.Value, out adjustedPoint)) return;
+
+                    ClickPoint = adjustedPoint;
                     break;
 
                 default:
                     break;
             }
+
+            foreach(var component in components)
+            {
+                component.HandleInput(context);
+            }
         }        
     }
 
-    public void HandleMoveInput()
+    private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
     {
-        // 마우스 위치 저장
-        ClickPoint = GetMousePosition();
-        if (!ClickPoint.HasValue || !PlayGround.GetAdjustedPoint(GroundSectionNum, Pos, ClickPoint.Value, out Vector3 adjustedPoint)) return;
+        GameObject effect = ObjectPooler.Get(effectTag);
 
-        ClickPoint = adjustedPoint;
-
-        StartCoroutine(ActiveClickPointer(ClickPoint.Value));
-        if (!attack.IsActionInProgress)
+        if (effect == null)
         {
-            stateMachine.ChangeState(EPlayerState.Move);
-            attack.ActivateRange(false);
+            Debug.LogError($"Effect with tag {effectTag} not found in ObjectPooler.");
+            yield break;
         }
-    }
 
-    public void HandleAttackInput()
-    {
-        if (!attack.IsActionInProgress)
-            attack.ActivateRange(true);
-    }
-
-    public void HandleClickInput()
-    {
-        // 마우스 위치 저장
-        ClickPoint = GetMousePosition();
-
-        if (!attack.IsActionInProgress && attack.CanExecuteAction)
-        {
-            stateMachine.ChangeState(EPlayerState.Attack);
-            movement.StopMove();
-        }
-    }
-
-
-    private IEnumerator ActiveClickPointer(Vector3 targetPoint)
-    {
-        GameObject clickPointer = ObjectPooler.Get("ClickPointer");
-
-        targetPoint.y = PlayGround.transform.position.y;
-        clickPointer.transform.position = targetPoint;
+        targetPoint.y = IngameController.Instance.ground.transform.position.y;
+        effect.transform.position = targetPoint;
 
         yield return new WaitForSeconds(1.0f);
 
-        ObjectPooler.Release("ClickPointer", clickPointer);
+        ObjectPooler.Release(effectTag, effect);
     }
 }

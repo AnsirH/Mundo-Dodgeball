@@ -3,6 +3,8 @@ using PlayerCharacterControl.State;
 using System;
 using UnityEngine;
 using MyGame.Utils;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 플레이어 컴포넌트들이 필요로 하는 기능을 제공하는 인터페이스
@@ -14,7 +16,7 @@ public interface IPlayerContext
     /// </summary>
     void OnPlayerDeath();
 
-    void InitGround(Ground ground, int sectionNum);
+    void InitGround(int sectionNum);
 
     #region properties
     /// <summary>
@@ -48,6 +50,8 @@ public interface IPlayerContext
 
     IMousePositionGetter MousePositionGetter { get; }
 
+    int GroundSectionNum { get; }
+
     #endregion
 }
 
@@ -76,6 +80,8 @@ public interface IPlayerComponent
     /// </summary>
     void OnDisabled();
 
+    public void HandleInput(InputAction.CallbackContext context);
+
     public bool Controllable { get; set; }
 }
 
@@ -84,6 +90,7 @@ public interface IPlayerAction
 {
     event Action OnActionCompleted;
     void ExecuteAction();
+    void StopAction();
     bool IsActionInProgress { get; }
     bool CanExecuteAction { get; }
 }

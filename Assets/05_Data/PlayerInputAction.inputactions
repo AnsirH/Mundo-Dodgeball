@@ -9,7 +9,7 @@
                     "name": "Move",
                     "type": "Button",
                     "id": "fb4d9b74-bab2-4114-81e7-94819ae14e9b",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -33,19 +33,19 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SpellD",
+                    "name": "D",
                     "type": "Button",
                     "id": "8513fae3-dfe6-4864-ab11-f011282a7e2a",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SpellF",
+                    "name": "F",
                     "type": "Button",
                     "id": "6ec8dc39-f7f1-4467-8fc1-36bc27dc927c",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -101,7 +101,7 @@
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "SpellD",
+                    "action": "D",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -112,7 +112,7 @@
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "SpellF",
+                    "action": "F",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
