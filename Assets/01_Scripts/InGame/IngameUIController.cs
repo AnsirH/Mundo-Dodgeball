@@ -40,7 +40,7 @@ public class IngameUIController : MonoBehaviour
             for (int i = 0; i < playerCount; ++i)
             {
                 HpBars[i] = Instantiate(hpBarPrefab, transform).GetComponent<HpBar>();
-                HpBars[i].Init(IngameController.Instance.playerControllers[i].Health);
+                HpBars[i].Init(IngameController.Instance.playerControllers[i]);
             }
 
             // 초기화 된 상태로 설정

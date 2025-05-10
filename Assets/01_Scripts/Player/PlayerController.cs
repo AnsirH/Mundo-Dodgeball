@@ -1,11 +1,11 @@
 using Photon.Pun;
-using PlayerCharacterControl;
 using PlayerCharacterControl.State;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using MyGame.Utils;
 using System.Collections;
+using System.Linq;
 
 
 public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMousePositionGetter
@@ -15,15 +15,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     // 플레이어 스크립트 리스트
     private List<IPlayerComponent> components = new List<IPlayerComponent>();
 
-    //[SerializeField] private PlayerAnimEventHandler playerAnimEventHandler;
     [SerializeField] private PlayerStats stats;
 
     [SerializeField] private Animator playerAnim;
 
-    private PhotonTransformViewClassic ptv;
-    private Vector3 previousPosition;
+    [SerializeField] private PlayerInputEventSystem inputSystem;
 
-    private PlayerInputEventSystem inputSystem;
+    [SerializeField] private PhotonTransformViewClassic ptv;
+    private Vector3 previousPosition;
 
     #region IPlayerComponents
     // 이동
@@ -32,6 +31,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     [SerializeField] private PlayerAttack attack;
     // 체력
     [SerializeField] private PlayerHealth playerHealth;
+    // 스펠
+    [SerializeField] private PlayerSpell playerSpell;
 
     public bool isOfflineMode;
 
@@ -70,21 +71,24 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
         stateMachine.ChangeState(EPlayerState.Die);
     }
 
+    public void InitGround(int sectionNum)
+    {
+        GroundSectionNum = sectionNum;
+    }
+    public int GroundSectionNum { get; private set; }
+
     public IMousePositionGetter MousePositionGetter => this;
 
     #endregion
 
     #region IMousePositionGetter Implementation
-    public void SetClickableGroundLayer(string groundLayer)
-    {
-        GroundLayer = groundLayer;
-    }
-
-    public string GroundLayer { get; private set; }
 
     public Vector3? ClickPoint { get; private set; }
 
-    public Vector3? GetMousePosition(LayerMask groundLayer) { return Utility.GetMousePosition(Camera.main, groundLayer); }
+    public Vector3? GetMousePosition() 
+    {
+        return Utility.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+    }
     #endregion
 
     void Awake()
@@ -152,7 +156,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
             playerHealth,      // 체력은 가장 먼저 초기화
             movement,  // 이동은 그 다음
             attack,      // 공격은 이동 이후
-            //playerSpell      // 스킬은 마지막
+            playerSpell      // 스킬은 마지막
         };
 
         components = initializationOrder;
@@ -166,8 +170,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
 
     private void QuitAllAction()
     {
-        movement.StopMove();
-        attack.CancelAttack();
+        components.Where(comp => comp as IPlayerAction != null)
+            .ToList()
+            .ForEach(comp => (comp as IPlayerAction).StopAction());
     }
 
     public void HandleInput(InputAction.CallbackContext context)
@@ -179,63 +184,67 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
             switch (context.action.name)
             {
                 case "Move":
-                    HandleMoveInput();
+                    // 마우스 위치 저장
+                    ClickPoint = GetMousePosition();
+                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, Pos, ClickPoint.Value, out Vector3 adjustedPoint)) return;
+
+                    ClickPoint = adjustedPoint;
+                    StartCoroutine(SpawnEffect("ClickPointer", ClickPoint.Value));
+
+                    if (!attack.IsActionInProgress)
+                        stateMachine.ChangeState(EPlayerState.Move);
                     break;
 
                 case "Attack":
-                    HandleAttackInput();
                     break;
 
                 case "Click":
-                    HandleClickInput();
+                    // 마우스 위치 저장
+                    ClickPoint = GetMousePosition();
+                    if (!attack.IsActionInProgress && attack.CanExecuteAction)
+                    {
+                        stateMachine.ChangeState(EPlayerState.Attack);
+                    }
+                    else
+                        return;
+                    break;
+
+                case "D":
+                    break;
+                case "F":
+                    // 마우스 위치 저장
+                    ClickPoint = GetMousePosition();
+                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, Pos, ClickPoint.Value, out adjustedPoint)) return;
+
+                    ClickPoint = adjustedPoint;
                     break;
 
                 default:
                     break;
             }
+
+            foreach(var component in components)
+            {
+                component.HandleInput(context);
+            }
         }        
     }
 
-    public void HandleMoveInput()
+    private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
     {
-        // 마우스 위치 저장
-        ClickPoint = GetMousePosition(LayerMask.GetMask("Ground_1", "Ground_2"));
-        if (!ClickPoint.HasValue) return;
+        GameObject effect = ObjectPooler.Get(effectTag);
 
-        StartCoroutine(ActiveClickPointer());
-        if (!attack.IsActionInProgress)
+        if (effect == null)
         {
-            stateMachine.ChangeState(EPlayerState.Move);
-            attack.ActivateRange(false);
+            Debug.LogError($"Effect with tag {effectTag} not found in ObjectPooler.");
+            yield break;
         }
-    }
 
-    public void HandleAttackInput()
-    {
-        if (!attack.IsActionInProgress)
-            attack.ActivateRange(true);
-    }
-
-    public void HandleClickInput()
-    {
-        // 마우스 위치 저장
-        ClickPoint = GetMousePosition(LayerMask.GetMask("Ground_1", "Ground_2"));
-
-        if (!attack.IsActionInProgress && attack.CanExecuteAction)
-        {
-            stateMachine.ChangeState(EPlayerState.Attack);
-            movement.StopMove();
-        }
-    }
-
-
-    private IEnumerator ActiveClickPointer()
-    {
-        GameObject clickPointer = ObjectPooler.Get("ClickPointer");
-        clickPointer.transform.position = GetMousePosition(LayerMask.GetMask(GroundLayer)).Value;
+        targetPoint.y = IngameController.Instance.ground.transform.position.y;
+        effect.transform.position = targetPoint;
 
         yield return new WaitForSeconds(1.0f);
 
-        ObjectPooler.Release("ClickPointer", clickPointer);
+        ObjectPooler.Release(effectTag, effect);
     }
 }

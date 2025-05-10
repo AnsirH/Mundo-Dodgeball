@@ -3,6 +3,8 @@ using PlayerCharacterControl.State;
 using System;
 using UnityEngine;
 using MyGame.Utils;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 플레이어 컴포넌트들이 필요로 하는 기능을 제공하는 인터페이스
@@ -10,18 +12,17 @@ using MyGame.Utils;
 public interface IPlayerContext
 {
     /// <summary>
-    /// 플레이어의 현재 상태
-    /// </summary>
-    PlayerStateBase PlayerState { get; }
-
-    // 플레이어 스탯 프로퍼티 추가할 것
-
-    /// <summary>
     /// 플레이어가 사망했을 때 호출
     /// </summary>
     void OnPlayerDeath();
 
+    void InitGround(int sectionNum);
+
     #region properties
+    /// <summary>
+    /// 플레이어의 현재 상태
+    /// </summary>
+    PlayerStateBase PlayerState { get; }
 
     /// <summary>
     /// 플레이어의 트랜스폼을 반환
@@ -48,6 +49,8 @@ public interface IPlayerContext
     PhotonView p_PhotonView { get; }
 
     IMousePositionGetter MousePositionGetter { get; }
+
+    int GroundSectionNum { get; }
 
     #endregion
 }
@@ -77,6 +80,8 @@ public interface IPlayerComponent
     /// </summary>
     void OnDisabled();
 
+    public void HandleInput(InputAction.CallbackContext context);
+
     public bool Controllable { get; set; }
 }
 
@@ -85,6 +90,7 @@ public interface IPlayerAction
 {
     event Action OnActionCompleted;
     void ExecuteAction();
+    void StopAction();
     bool IsActionInProgress { get; }
     bool CanExecuteAction { get; }
 }

@@ -21,6 +21,8 @@ public class PlayerInputEventSystem : MonoBehaviourPunCallbacks
             actions["Attack"].performed += OnInput;
             actions["Click"].performed += OnInput;
             actions["Move"].performed += OnInput;
+            actions["D"].performed += OnInput;
+            actions["F"].performed += OnInput;
         }
     }
 
@@ -32,6 +34,8 @@ public class PlayerInputEventSystem : MonoBehaviourPunCallbacks
             actions["Attack"].performed -= OnInput;
             actions["Click"].performed -= OnInput;
             actions["Move"].performed -= OnInput;
+            actions["D"].performed -= OnInput;
+            actions["F"].performed -= OnInput;
         }
     }
 

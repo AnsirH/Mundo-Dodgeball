@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using System;
-using Photon.Pun;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
 {
@@ -17,6 +17,36 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
     public void Updated()
     {
     }
+
+    public void OnDisabled()
+    {
+        StopMove();
+    }
+
+    public void OnEnabled()
+    {
+        StopMove();
+    }
+
+    public void HandleInput(InputAction.CallbackContext context)
+    {
+        switch (context.action.name)
+        {
+            case "Move":
+                break;
+            case "Click":
+                StopMove();
+                OnMoveComplete();
+                break;
+            case "F":                
+                StopMove();
+                OnMoveComplete();
+                break;
+        }
+    }
+
+    public bool Controllable { get; set; } = true;
+
 
     public void ExecuteAction()
     {
@@ -34,8 +64,6 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
 
     public bool CanExecuteAction => Controllable;
 
-    public bool Controllable { get; set; } = true;
-
     public event Action OnActionCompleted;
 
     protected override void OnMoveComplete()
@@ -45,18 +73,8 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
         OnActionCompleted?.Invoke();
     }
 
-    public void OnDisabled()
+    public void StopAction()
     {
         StopMove();
     }
-
-    public void OnEnabled()
-    {
-        //throw new System.NotImplementedException();
-    }
-
-    //private Vector3 GetAdjustedTargetPosition(Vector3 targetPosition)
-    //{
-
-    //}
 }

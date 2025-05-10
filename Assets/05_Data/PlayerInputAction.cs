@@ -95,7 +95,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""name"": ""Move"",
                     ""type"": ""Button"",
                     ""id"": ""fb4d9b74-bab2-4114-81e7-94819ae14e9b"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -119,19 +119,19 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""SpellD"",
+                    ""name"": ""D"",
                     ""type"": ""Button"",
                     ""id"": ""8513fae3-dfe6-4864-ab11-f011282a7e2a"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""SpellF"",
+                    ""name"": ""F"",
                     ""type"": ""Button"",
                     ""id"": ""6ec8dc39-f7f1-4467-8fc1-36bc27dc927c"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -187,7 +187,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""SpellD"",
+                    ""action"": ""D"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -198,7 +198,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""SpellF"",
+                    ""action"": ""F"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -223,8 +223,8 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_PlayerInput_Move = m_PlayerInput.FindAction("Move", throwIfNotFound: true);
         m_PlayerInput_Attack = m_PlayerInput.FindAction("Attack", throwIfNotFound: true);
         m_PlayerInput_Click = m_PlayerInput.FindAction("Click", throwIfNotFound: true);
-        m_PlayerInput_SpellD = m_PlayerInput.FindAction("SpellD", throwIfNotFound: true);
-        m_PlayerInput_SpellF = m_PlayerInput.FindAction("SpellF", throwIfNotFound: true);
+        m_PlayerInput_D = m_PlayerInput.FindAction("D", throwIfNotFound: true);
+        m_PlayerInput_F = m_PlayerInput.FindAction("F", throwIfNotFound: true);
         m_PlayerInput_StopMove = m_PlayerInput.FindAction("StopMove", throwIfNotFound: true);
     }
 
@@ -309,8 +309,8 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerInput_Move;
     private readonly InputAction m_PlayerInput_Attack;
     private readonly InputAction m_PlayerInput_Click;
-    private readonly InputAction m_PlayerInput_SpellD;
-    private readonly InputAction m_PlayerInput_SpellF;
+    private readonly InputAction m_PlayerInput_D;
+    private readonly InputAction m_PlayerInput_F;
     private readonly InputAction m_PlayerInput_StopMove;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player Input".
@@ -336,13 +336,13 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Click => m_Wrapper.m_PlayerInput_Click;
         /// <summary>
-        /// Provides access to the underlying input action "PlayerInput/SpellD".
+        /// Provides access to the underlying input action "PlayerInput/D".
         /// </summary>
-        public InputAction @SpellD => m_Wrapper.m_PlayerInput_SpellD;
+        public InputAction @D => m_Wrapper.m_PlayerInput_D;
         /// <summary>
-        /// Provides access to the underlying input action "PlayerInput/SpellF".
+        /// Provides access to the underlying input action "PlayerInput/F".
         /// </summary>
-        public InputAction @SpellF => m_Wrapper.m_PlayerInput_SpellF;
+        public InputAction @F => m_Wrapper.m_PlayerInput_F;
         /// <summary>
         /// Provides access to the underlying input action "PlayerInput/StopMove".
         /// </summary>
@@ -382,12 +382,12 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Click.started += instance.OnClick;
             @Click.performed += instance.OnClick;
             @Click.canceled += instance.OnClick;
-            @SpellD.started += instance.OnSpellD;
-            @SpellD.performed += instance.OnSpellD;
-            @SpellD.canceled += instance.OnSpellD;
-            @SpellF.started += instance.OnSpellF;
-            @SpellF.performed += instance.OnSpellF;
-            @SpellF.canceled += instance.OnSpellF;
+            @D.started += instance.OnD;
+            @D.performed += instance.OnD;
+            @D.canceled += instance.OnD;
+            @F.started += instance.OnF;
+            @F.performed += instance.OnF;
+            @F.canceled += instance.OnF;
             @StopMove.started += instance.OnStopMove;
             @StopMove.performed += instance.OnStopMove;
             @StopMove.canceled += instance.OnStopMove;
@@ -411,12 +411,12 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Click.started -= instance.OnClick;
             @Click.performed -= instance.OnClick;
             @Click.canceled -= instance.OnClick;
-            @SpellD.started -= instance.OnSpellD;
-            @SpellD.performed -= instance.OnSpellD;
-            @SpellD.canceled -= instance.OnSpellD;
-            @SpellF.started -= instance.OnSpellF;
-            @SpellF.performed -= instance.OnSpellF;
-            @SpellF.canceled -= instance.OnSpellF;
+            @D.started -= instance.OnD;
+            @D.performed -= instance.OnD;
+            @D.canceled -= instance.OnD;
+            @F.started -= instance.OnF;
+            @F.performed -= instance.OnF;
+            @F.canceled -= instance.OnF;
             @StopMove.started -= instance.OnStopMove;
             @StopMove.performed -= instance.OnStopMove;
             @StopMove.canceled -= instance.OnStopMove;
@@ -482,19 +482,19 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnClick(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "SpellD" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "D" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSpellD(InputAction.CallbackContext context);
+        void OnD(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "SpellF" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "F" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSpellF(InputAction.CallbackContext context);
+        void OnF(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "StopMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

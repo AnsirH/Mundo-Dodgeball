@@ -248,6 +248,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 114658553885513850, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 782652118409282240, guid: 06f8e0e61fc7b154c9bc6dd0ededc809, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.4418435
@@ -712,7 +716,7 @@ GameObject:
   - component: {fileID: 1641783612}
   - component: {fileID: 1641783611}
   - component: {fileID: 1641783615}
-  m_Layer: 3
+  m_Layer: 7
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -996,6 +1000,7 @@ MonoBehaviour:
   playerSpawnPoints:
   - {fileID: 1227419753}
   - {fileID: 831542415}
+  ground: {fileID: 0}
 --- !u!1001 &4898434332386804756
 PrefabInstance:
   m_ObjectHideFlags: 0

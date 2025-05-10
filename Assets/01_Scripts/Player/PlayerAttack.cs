@@ -3,6 +3,7 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
 {
@@ -42,6 +43,10 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         // 공격 실행 활성화
         IsActionInProgress = true;
     }
+
+    public void StopAction()
+    {
+    }
     #endregion
 
     #region IPlayerComponent Implementation
@@ -57,26 +62,52 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
 
     public void OnEnabled()
     {
-        //throw new System.NotImplementedException();
     }
 
     public void OnDisabled()
     {
         CancelAttack();
+    }
 
-        if (currentAttackRoutine != null)
+    public void HandleInput(InputAction.CallbackContext context)
+    {
+        switch (context.action.name)
         {
-            StopCoroutine(currentAttackRoutine);
-            IsActionInProgress = false;
+            case "Move":
+                ActivateRange(false);
+                break;
+
+            case "Attack":
+                ActivateRange(!CanExecuteAction);
+                break;
+
+            case "Click":
+                if (CanExecuteAction)
+                {
+                    ExecuteAction();
+                }
+                break;
+            case "F":
+                if (IsActionInProgress)
+                {
+                    CancelAttack();
+
+                    float now = (float)PhotonNetwork.Time;
+                    float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
+
+                    Vector3 direction = this.context.Trf.forward.normalized;
+                    direction.y = 0.0f;
+
+                    axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
+
+                    photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, now + expectedDelay);
+                }
+                break;
         }
+
+        
     }
     #endregion
-
-    // 애니메이션 트리거 전송
-    void PlayAttackAnimation()
-    {
-        context.Anim.SetTrigger("Attack");
-    }
 
     // 공격 코루틴. 시간 지나면 완료 이벤트 발행
     private IEnumerator AttackRoutine()
@@ -89,7 +120,7 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         direction.y = 0.0f;
 
         // 공격 애니메이션
-        PlayAttackAnimation();
+        context.Anim.SetTrigger("Attack");
 
         // 공격 방향으로 회전
         // 회전 종료 시 공격
@@ -97,6 +128,7 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         {
             float now = (float)PhotonNetwork.Time;
             float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
+            axeObj.SetActive(false);
 
             axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
 
@@ -130,18 +162,18 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
 
         // 회전 종료
         transform.DOKill();
+
+        if (currentAttackRoutine != null)
+        {
+            StopCoroutine(currentAttackRoutine);
+            IsActionInProgress = false;
+            axeObj.SetActive(true);
+        }
     }
 
     [PunRPC]
     private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction, float execTime)
     {
         axeShooter.SpawnProjectile(StartPos, direction, execTime);
-    }
-
-
-    private IEnumerator InvokeCoroutine(Action action, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        action?.Invoke();  // null 체크 후 실행
     }
 }

@@ -782,6 +782,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 1772443926088868188, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 7.2812877
@@ -1335,9 +1339,12 @@ MonoBehaviour:
     HealthRegen:
       baseValue: 1
   playerAnim: {fileID: 6646368711127324858}
+  inputSystem: {fileID: 9105942959282052119}
+  ptv: {fileID: 5352152691642916962}
   movement: {fileID: 7700144322300401899}
   attack: {fileID: 8439029551291699871}
   playerHealth: {fileID: 1822853794646474301}
+  playerSpell: {fileID: 3562521471211086396}
   isOfflineMode: 0
 --- !u!114 &7700144322300401899
 MonoBehaviour:
@@ -1436,8 +1443,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4707bc7001ea97b46b26cfd9d72f0b98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flashDistance: 1.5
-  canUseSpellD: 1
 --- !u!114 &7087272152704519845
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -99,16 +99,18 @@ public class IngameController : MonoBehaviourPun
         // 모든 캐릭터가 생성될 때까지 대기
         while (true)
         {
-            var foundControllers = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+            var foundControllers = GameObject.FindGameObjectsWithTag("Player")
+                .Select(go => go.GetComponent<IPlayerContext>())
+                .Where(comp => comp != null);
 
             // 필요한 수 만큼 다 찾았으면 정렬 및 저장
-            if (foundControllers.Length >= playerSpawnPoints.Length)
+            if (foundControllers.Count() >= playerSpawnPoints.Length)
             {
-                playerControllers = new List<PlayerController>(new PlayerController[playerSpawnPoints.Length]);
+                playerControllers = new List<IPlayerContext>(new IPlayerContext[playerSpawnPoints.Length]);
 
                 foreach (var controller in foundControllers)
                 {
-                    PhotonView view = controller.GetComponent<PhotonView>();
+                    PhotonView view = controller.p_PhotonView;
                     if (view != null)
                     {
                         int actorNum = view.Owner.ActorNumber;
@@ -117,7 +119,7 @@ public class IngameController : MonoBehaviourPun
                         if (index >= 0 && index < playerControllers.Count)
                         {
                             playerControllers[index] = controller;
-                            (controller as IMousePositionGetter).SetClickableGroundLayer($"Ground_{index+1}");
+                            controller.InitGround(index);
                         }
                         else
                         {
@@ -158,9 +160,11 @@ public class IngameController : MonoBehaviourPun
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     /// <summary>플레이어 캐릭터 배열</summary>
-    public List<PlayerController> playerControllers = new List<PlayerController>(2);
+    public List<IPlayerContext> playerControllers = new List<IPlayerContext>(2);
     /// <summary>인게임 UI 컨트롤러</summary>
     public IngameUIController ingameUIController;
 
     public Transform[] playerSpawnPoints = new Transform[2];
+
+    public Ground ground;
 }

@@ -350,7 +350,7 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             object[] result = (object[])photonEvent.CustomData;
             string playerKey = (string)result[0];
-            if ($"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" == playerKey)
+            if ($"Score_{IngameController.Instance.playerControllers[0].p_PhotonView.ViewID}" == playerKey)
             {
                 showScore(1);
             }
