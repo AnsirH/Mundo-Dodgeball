@@ -272,14 +272,17 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 break;
             }
         }
+        Debug.Log(IngameController.Instance.playerControllers[0].p_PhotonView.IsMine + "첫 번째");
+        Debug.Log(IngameController.Instance.playerControllers[1].p_PhotonView.IsMine + "두 번째");
+        Debug.Log(IngameController.Instance.playerControllers[winIdx].p_PhotonView.IsMine + "승자");
+
+
         if (IngameController.Instance.playerControllers[winIdx].p_PhotonView.IsMine)
         {
-            Debug.Log(IngameController.Instance.playerControllers[winIdx].Trf.gameObject.name + "1212");
             return false;
         }
         else
         {
-            Debug.Log(IngameController.Instance.playerControllers[winIdx].p_PhotonView.IsMine);
             return true;
         }
     }
