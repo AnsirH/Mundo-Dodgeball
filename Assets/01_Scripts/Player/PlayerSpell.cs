@@ -57,7 +57,7 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
                 Vector3 targetPoint = this.context.MousePositionGetter.ClickPoint.Value;
                 targetPoint.y = IngameController.Instance.ground.transform.position.y;
                 StartCoroutine(SpawnEffect("FlashEffect", targetPoint));
-                this.context.p_PhotonView.RPC(nameof(SpawnEffect_RPC), RpcTarget.Others, "FlashEffect", targetPoint);
+                this.context.p_PhotonView.RPC(nameof(SpawnEffect_RPC), RpcTarget.Others, "FlashEffect", targetPoint, 1.0f, false);
             }
         }
     }
