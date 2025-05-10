@@ -2,15 +2,21 @@ using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
 using Photon.Pun;
+using System.Collections;
 using UnityEngine;
 
 public class Axe : MonoBehaviour, IProjectile
 {
-    public void Initialize(IPlayerContext context, float damage, Vector3 spawnPos, Vector3 direction, float execTime)
+    public void Initialize(IPlayerContext context, Vector3 spawnPos, Vector3 direction, float execTime)
     {
         this.context = context;
-        this.damage = damage;
+
+        model.transform.localRotation = Quaternion.Euler(startRotation);
         transform.position = spawnPos;
+
+        model.SetActive(true);
+        droppingModel.SetActive(false);
+
         Launch(direction, execTime);
     }
 
@@ -28,12 +34,24 @@ public class Axe : MonoBehaviour, IProjectile
         Vector3 targetPos = transform.position + direction * 10.0f;
         if (moveTweenCore != null) moveTweenCore.Kill();
         moveTweenCore = transform.DOMove(targetPos, adjustedFlyTime).SetEase(Ease.Linear);
-        moveTweenCore.onComplete += () => ObjectPooler.Release("Axe", gameObject);
+        moveTweenCore.onComplete += () =>
+        {
+            StartCoroutine(DropAxe());
+        };
 
         // 회전 설정
         transform.rotation = Quaternion.LookRotation(direction);
         if (rotateTweenCore != null) rotateTweenCore.Kill();
-        rotateTweenCore = modelTrf.DOLocalRotate(new Vector3(0.0f, 810.0f, 0.0f), adjustedFlyTime, RotateMode.LocalAxisAdd).SetEase(Ease.Linear);
+        rotateTweenCore = model.transform.DOLocalRotate(new Vector3(0.0f, 810.0f, 0.0f), adjustedFlyTime, RotateMode.LocalAxisAdd).SetEase(Ease.Linear);
+    }
+
+    private IEnumerator DropAxe()
+    {
+        model.gameObject.SetActive(false);
+        droppingModel.gameObject.SetActive(true);
+        droppingModel.transform.position = new Vector3(droppingModel.transform.position.x, 0.0f, droppingModel.transform.position.z);
+        yield return new WaitForSeconds(1.0f);
+        ObjectPooler.Release("Axe", gameObject);
     }
 
     public void OnHit(Collider other)
@@ -47,7 +65,6 @@ public class Axe : MonoBehaviour, IProjectile
 
     public void OnEnable()
     {
-        modelTrf.localRotation = Quaternion.Euler(startRotation);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -56,7 +73,8 @@ public class Axe : MonoBehaviour, IProjectile
     }
 
     [Header("References")]
-    public Transform modelTrf;
+    public GameObject model;
+    public GameObject droppingModel;
 
 
     private Vector3 startRotation = new Vector3(-30.0f, 0.0f, -90.0f);
@@ -65,6 +83,5 @@ public class Axe : MonoBehaviour, IProjectile
 
 
     IPlayerContext context;
-    float damage = 0.0f;
     float flyTime = 0.6f;
 }
