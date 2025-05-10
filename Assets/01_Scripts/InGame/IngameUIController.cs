@@ -6,7 +6,7 @@ using UnityEngine;
 public class IngameUIController : MonoBehaviour
 {
     [SerializeField] TopPanelUI topPanelUI;
-    [SerializeField] RoundUI roundUI;
+    [SerializeField] InGameResultUI resultUI;
     private void Start()
     {
         topPanelUI.StartTimer(2, 0);
@@ -60,6 +60,10 @@ public class IngameUIController : MonoBehaviour
 
     public void OnRoundPanel(int idx) 
     {
-        roundUI.PlayAnimation(idx);
+        resultUI.RoundAnimPlay(idx);
+    }
+    public void OnEndGameResult(bool iswin)
+    {
+        resultUI.ShowResultAnimPlay(iswin);
     }
 }

@@ -17,11 +17,13 @@ public static class NetworkEventCodes // 이벤트 코드
     public const byte AddScoreEvent = 1; 
     public const byte ScoreUpdated = 2;
     public const byte NextRound = 3; 
+    public const byte EndGame = 4;
 }
 public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     public RoomInfo joinRoom;
 
+    private int maxScore = 3;
     public override void OnEnable()
     {
         base.OnEnable();
@@ -249,6 +251,36 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         };
         PhotonNetwork.RaiseEvent(NetworkEventCodes.NextRound, null, options, SendOptions.SendReliable);
     }
+    private void EndRound()
+    {
+        RaiseEventOptions options = new RaiseEventOptions
+        {
+            Receivers = ReceiverGroup.All // 모든 클라이언트에게
+        };
+        PhotonNetwork.RaiseEvent(NetworkEventCodes.EndGame, null, options, SendOptions.SendReliable);
+    }
+    private bool IsWin()
+    {
+        var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
+        int winIdx = 0;
+        object[] scores = (object[])roomProps["PlayerScore"];
+        for (int i = 0; i <= scores.Length; i++)
+        {
+            if ((int)scores[i] == maxScore)
+            {
+                winIdx = i;
+                break;
+            }
+        }
+        if (IngameController.Instance.playerControllers[winIdx].p_PhotonView.IsMine)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     #endregion
 
     // Ready 버튼이 눌렸을 때 호출되는 함수 (버튼 OnClick에 연결)
@@ -344,13 +376,23 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
                 PhotonNetwork.RaiseEvent(NetworkEventCodes.ScoreUpdated, result, broadcastOpts, sendOptions);
 
-                // 다음 라운드 함수 예약
-                Invoke(nameof(NextRound), 3f);
+
+                // 결과 처리
+                if(newScore < maxScore)
+                {
+                    // 다음 라운드 함수 예약
+                    Invoke(nameof(NextRound), 3f);
+                }
+                else
+                {
+                    // 게임 종료
+                    Invoke(nameof(EndRound), 0.5f);
+                }
             }
         }
 
         // 모두 UI대응
-        if (photonEvent.Code == NetworkEventCodes.ScoreUpdated)
+        else if (photonEvent.Code == NetworkEventCodes.ScoreUpdated)
         {
             object[] result = (object[])photonEvent.CustomData;
             int playerKey = (int)result[0];
@@ -358,10 +400,17 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
 
         // 재시작(다음라운드)
-        if (photonEvent.Code == NetworkEventCodes.NextRound)
+        else if (photonEvent.Code == NetworkEventCodes.NextRound)
         {
             string currentScene = SceneManager.GetActiveScene().name;
             SceneManager.LoadScene(currentScene);
+        }
+
+        // 게임 종료
+        else if (photonEvent.Code == NetworkEventCodes.EndGame)
+        {
+            IngameController.Instance.ingameUIController.OnEndGameResult(IsWin());
+            Invoke(nameof(LeaveRoom), 3f);
         }
     }
 }
