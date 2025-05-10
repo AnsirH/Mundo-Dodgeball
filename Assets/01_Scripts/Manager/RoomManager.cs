@@ -274,11 +274,13 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         if (IngameController.Instance.playerControllers[winIdx].p_PhotonView.IsMine)
         {
-            return true;
+            Debug.Log(IngameController.Instance.playerControllers[winIdx].Trf.gameObject.name + "1212");
+            return false;
         }
         else
         {
-            return false;
+            Debug.Log(IngameController.Instance.playerControllers[winIdx].p_PhotonView.IsMine);
+            return true;
         }
     }
     #endregion
