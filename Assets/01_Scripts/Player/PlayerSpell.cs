@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -44,6 +45,8 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
             if (spellD.CanUsable)
             {
                 spellD.Execute();
+                StartCoroutine(SpawnEffect("HealEffect", this.context.Trf.position, 1.5f, true));
+                this.context.p_PhotonView.RPC(nameof(SpawnEffect_RPC), RpcTarget.Others, "HealEffect", this.context.Trf.position, 1.5f, true);
             }
         }
         if (context.action.name == "F")
@@ -51,13 +54,15 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
             if (spellF.CanUsable)
             {
                 spellF.Execute();
-                StartCoroutine(SpawnEffect("FlashEffect", this.context.MousePositionGetter.ClickPoint.Value));
+                Vector3 targetPoint = this.context.MousePositionGetter.ClickPoint.Value;
+                targetPoint.y = IngameController.Instance.ground.transform.position.y;
+                StartCoroutine(SpawnEffect("FlashEffect", targetPoint));
+                this.context.p_PhotonView.RPC(nameof(SpawnEffect_RPC), RpcTarget.Others, "FlashEffect", targetPoint);
             }
         }
     }
 
-
-    private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
+    private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild=false)
     {
         GameObject effect = ObjectPooler.Get(effectTag);
 
@@ -67,12 +72,19 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
             yield break;
         }
 
-        targetPoint.y = IngameController.Instance.ground.transform.position.y;
         effect.transform.position = targetPoint;
+        if (isChild)
+            effect.transform.parent = context.Trf;
 
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(duration);
 
         ObjectPooler.Release(effectTag, effect);
+    }
+
+    [PunRPC]
+    private void SpawnEffect_RPC(string effectTag, Vector3 targetPoint)
+    {
+        StartCoroutine(SpawnEffect(effectTag, targetPoint));
     }
 
     public IPlayerContext context;
