@@ -63,15 +63,14 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
                 Debug.Log("check LOG : isMine");
                 context.OnPlayerDeath();
 
-                // 죽을 때 이긴 사람 점수 올리기
-                string attackerKey = $"Score_{attackerActorNumber}";
-                sendAddScore(attackerKey, 1);
+                // 죽을 때 이긴 사람 점수 올리기;
+                sendAddScore(attackerActorNumber, 1);
             }
         }
     }
-    private void sendAddScore(string key, int vaule)
+    private void sendAddScore(int idx, int vaule)
     {
-        object[] content = new object[] { key, vaule};
+        object[] content = new object[] { idx, vaule};
 
         RaiseEventOptions options = new RaiseEventOptions
         {

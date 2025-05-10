@@ -150,7 +150,7 @@ public class IngameController : MonoBehaviourPun
         {
             player.enabled = true;
         }
-        ingameUIController.Init();
+        ingameUIController.Init(ServerManager.Instance.roomManager.GetScore());
         ingameUIController.OnRoundPanel(ServerManager.Instance.roomManager.GetCurrentRound());
     }
     [PunRPC]
