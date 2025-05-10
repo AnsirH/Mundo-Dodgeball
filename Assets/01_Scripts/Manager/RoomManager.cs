@@ -328,7 +328,8 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 int Playeridx = IngameController.Instance.PlayerIdx(playerKey);
                 object[] score = (object[])roomProps["PlayerScore"];
                 int newScore = (int)score[Playeridx] + 1;
-                roomProps[playerKey] = newScore;
+                score[Playeridx] = newScore;
+                roomProps["PlayerScore"] = score;
 
                 // 기존 Round 가져오기
                 int currentRound = roomProps.ContainsKey("Round") ? (int)roomProps["Round"] : 0;
