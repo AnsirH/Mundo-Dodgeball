@@ -19,7 +19,11 @@ public class TopPanelUI : MonoBehaviour
         timerRunning = true;
         UpdateTimerText();
     }
-
+    public void InitScore(int master, int other)
+    {
+        scoreTexts[0].text = master.ToString();
+        scoreTexts[1].text = other.ToString();
+    }
     private void Update()
     {
         if (!timerRunning) return;

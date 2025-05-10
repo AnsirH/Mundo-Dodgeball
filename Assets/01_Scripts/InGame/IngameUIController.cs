@@ -25,7 +25,7 @@ public class IngameUIController : MonoBehaviour
     }
 
     /// <summary> UI 매니저 초기화. </summary>
-    public void Init()
+    public void Init((int masterScore, int otherScore)score)
     {
         // 플레이어 수 가져오기 from IngameController
         int playerCount = IngameController.Instance.playerControllers.Count;
@@ -45,6 +45,7 @@ public class IngameUIController : MonoBehaviour
 
             // 초기화 된 상태로 설정
             isInitialized = true;
+            topPanelUI.InitScore(score.masterScore, score.otherScore);
         }
     }
     public void addScore(int idx)

@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using UnityEngine.Timeline;
 using System.Security.Cryptography;
 using ExitGames.Client.Photon;
+using NUnit.Framework;
 public static class NetworkEventCodes // 이벤트 코드
 {
     public const byte AddScoreEvent = 1; 
@@ -51,9 +52,10 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
             PublishUserId = true,
             PlayerTtl = 5000
         };
+        object scores = new object[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         if(!string.IsNullOrEmpty(password))
         {
-            roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "Password", password }, {"Round", 0} };
+            roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "Password", password }, {"Round", 0}, {"PlayerScore", scores} };
             roomOptions.CustomRoomPropertiesForLobby = new string[]{"Password", "Round" };
         }
         // 방 생성 시도
@@ -206,19 +208,29 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
     }
     #endregion
-    #region 점수 추가
+    #region 점수 관련
 
     [PunRPC]
     private void showScore(int idx)
     {
         IngameController.Instance.ingameUIController.addScore(idx);
     }
+
+    public (int, int) GetScore()
+    {
+        var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
+        string masterKey = $"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}";
+        string otherKey = $"Score_{IngameController.Instance.playerControllers[1].photonView.ViewID}";
+        int masterScore = roomProps.ContainsKey(masterKey) ? (int)roomProps[masterKey] : 0;
+        Debug.Log("------------------------------------------------------\n"+roomProps + "\n" + $"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" +"dfasgasgfda :" + masterScore);
+        int otherScore = roomProps.ContainsKey(otherKey) ? (int)roomProps[otherKey] : 0;
+        return (masterScore, otherScore);
+    }
     #endregion
     #region 다음 라운드
     public int GetCurrentRound()
     {
         if (PhotonNetwork.CurrentRoom == null) return 0;
-        print("dagashgahashga ++== " + PhotonNetwork.CurrentRoom.CustomProperties["Round"]);
         object roundValue;
         if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("Round", out roundValue))
         {
@@ -321,7 +333,6 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
                 // 커스텀 프로퍼티 업데이트
                 PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
-
                 // 점수 UI 업데이트 브로드캐스트
                 object[] result = new object[] { playerKey, newScore };
                 RaiseEventOptions broadcastOpts = new RaiseEventOptions { Receivers = ReceiverGroup.All };
