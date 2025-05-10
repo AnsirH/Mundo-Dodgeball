@@ -17,12 +17,41 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
 
     [SerializeField] private PlayerStats stats;
 
-    [SerializeField] private Animator playerAnim;
+    [SerializeField] private Animator anim;
+
+    [SerializeField] private AudioSource audioSource;
 
     [SerializeField] private PlayerInputEventSystem inputSystem;
 
     [SerializeField] private PhotonTransformViewClassic ptv;
     private Vector3 previousPosition;
+
+    #region IPlayerContext Implementation
+
+    public Animator Anim => anim;
+    public PhotonView p_PhotonView => photonView;
+    public AudioSource Audio => audioSource;
+    public Transform Trf => transform;
+
+    public PlayerStats Stats => stats;
+
+
+    public void OnPlayerDeath()
+    {
+        // 플레이어 사망 처리
+        QuitAllAction();
+        stateMachine.ChangeState(EPlayerState.Die);
+    }
+
+    public void InitGround(int sectionNum)
+    {
+        GroundSectionNum = sectionNum;
+    }
+    public int GroundSectionNum { get; private set; }
+
+    public IMousePositionGetter MousePositionGetter => this;
+
+    #endregion
 
     #region IPlayerComponents
     // 이동
@@ -48,37 +77,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     public PlayerHealth Health => playerHealth;
 
     public PlayerStateBase PlayerState => stateMachine.CurrentState;
-    #endregion
-
-    #region IPlayerContext Implementation
-
-    public Animator Anim => playerAnim;
-
-    public Transform Trf => transform;
-
-    public Vector3 Pos => transform.position;
-
-    public Quaternion Rot => transform.rotation;
-
-    public PlayerStats Stats => stats;
-
-    public PhotonView p_PhotonView => photonView;
-
-    public void OnPlayerDeath()
-    {
-        // 플레이어 사망 처리
-        QuitAllAction();
-        stateMachine.ChangeState(EPlayerState.Die);
-    }
-
-    public void InitGround(int sectionNum)
-    {
-        GroundSectionNum = sectionNum;
-    }
-    public int GroundSectionNum { get; private set; }
-
-    public IMousePositionGetter MousePositionGetter => this;
-
     #endregion
 
     #region IMousePositionGetter Implementation
@@ -186,7 +184,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
                 case "Move":
                     // 마우스 위치 저장
                     ClickPoint = GetMousePosition();
-                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, Pos, ClickPoint.Value, out Vector3 adjustedPoint)) return;
+                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
 
                     ClickPoint = adjustedPoint;
                     StartCoroutine(SpawnEffect("ClickPointer", ClickPoint.Value));
@@ -214,7 +212,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
                 case "F":
                     // 마우스 위치 저장
                     ClickPoint = GetMousePosition();
-                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, Pos, ClickPoint.Value, out adjustedPoint)) return;
+                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out adjustedPoint)) return;
 
                     ClickPoint = adjustedPoint;
                     break;

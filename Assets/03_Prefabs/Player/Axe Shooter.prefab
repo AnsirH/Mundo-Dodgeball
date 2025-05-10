@@ -91,10 +91,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a80fd69fb1501b4fa794e9ddb72f72b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackPower: 80
   cooldownTime: 2
   axePrefab: {fileID: 1904142371288617127, guid: 75f3bb5d178abc94a98711c3754614ef, type: 3}
   rangeIndicatorObj: {fileID: 4703885593386905413}
+  sounds:
+  - {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
+  - {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
+  - {fileID: 8300000, guid: 58a5d36d6b134014ea5623d9802082e2, type: 3}
+  - {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
 --- !u!1 &9223292669877235107
 GameObject:
   m_ObjectHideFlags: 0

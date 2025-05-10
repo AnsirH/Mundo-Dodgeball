@@ -134,7 +134,7 @@ public class Flash : Spell
     public override void Execute()
     {
         Vector3 targetPoint = context.MousePositionGetter.ClickPoint.Value;
-        Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.Pos).normalized;
+        Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.Trf.position).normalized;
 
         context.Trf.position = targetPoint;
         context.Trf.rotation = Quaternion.LookRotation(direction);

@@ -54,6 +54,9 @@ public class IngameController : MonoBehaviourPun
         // 캐릭터 생성이 완료되었는지 확인 후 게임 시작
         yield return StartCoroutine(CheckPlayersCharacterSpawned());
 
+        // 캐릭터 오디오 소스 그룹 설정
+        SoundManager.instance.SetPlayerAudioGroup(playerControllers);
+
         // 게임 시작
         StartGame();
     }

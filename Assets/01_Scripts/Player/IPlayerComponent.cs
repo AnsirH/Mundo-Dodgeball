@@ -19,34 +19,23 @@ public interface IPlayerContext
     void InitGround(int sectionNum);
 
     #region properties
-    /// <summary>
-    /// 플레이어의 현재 상태
-    /// </summary>
+    /// <summary> 플레이어의 현재 상태 </summary>
     PlayerStateBase PlayerState { get; }
 
-    /// <summary>
-    /// 플레이어의 트랜스폼을 반환
-    /// </summary>
+    /// <summary> 플레이어의 트랜스폼을 반환 </summary>
     Transform Trf { get; }
 
-    /// <summary>
-    /// 플레이어의 애니메이터를 반환
-    /// </summary>
+    /// <summary> 플레이어의 애니메이터를 반환 </summary>
     Animator Anim { get; }
 
-    // 플레이어 스탯( 모든 능력치 수치 관리)
-    PlayerStats Stats { get; }
-    /// <summary>
-    /// 플레이어의 현재 위치를 반환
-    /// </summary>
-    Vector3 Pos { get; }
-
-    /// <summary>
-    /// 플레이어의 현재 회전을 반환
-    /// </summary>
-    Quaternion Rot { get; }
-
+    /// <summary> 플레이어의 PhotonView를 반환 </summary>
     PhotonView p_PhotonView { get; }
+
+    /// <summary> 플레이어의 AudioSource를 반환 </summary>
+    AudioSource Audio { get; }
+
+    /// <summary> 플레이어의 능력치 컴포넌트를 반환 </summary>
+    PlayerStats Stats { get; }
 
     IMousePositionGetter MousePositionGetter { get; }
 

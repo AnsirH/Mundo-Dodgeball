@@ -1,8 +1,4 @@
-using MyGame.Utils;
-using Photon.Pun;
-using System;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public interface IShooter
 {
@@ -38,6 +34,7 @@ public class AxeShooter : MonoBehaviour, IShooter
     [Header("References")]
     [SerializeField] private GameObject axePrefab;
     [SerializeField] private GameObject rangeIndicatorObj;
+    [SerializeField] private AudioClip[] sounds;
 
     private IPlayerContext context;
     private IRangeIndicator rangeIndicator;
@@ -105,6 +102,9 @@ public class AxeShooter : MonoBehaviour, IShooter
 
         IProjectile axe = axeObj.GetComponent<IProjectile>();
         axe.Initialize(context, transform.position, direction, execTime);
+
+        // 소리 출력
+        SoundManager.instance.PlayOneShot(context.Audio, sounds[Random.Range(0, sounds.Length)]);
 
         // 쿨타임 시작
         currentCooldown = cooldownTime;

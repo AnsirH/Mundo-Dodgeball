@@ -9,6 +9,10 @@ public class SoundManager : ManagerBase<SoundManager>
     [Header("Audio Mixer")]
     [SerializeField] private AudioMixer audioMixer;
 
+    [Header("Audio Group")]
+    [SerializeField] private AudioMixerGroup sfxGroup;
+    [SerializeField] private AudioMixerGroup bgmGroup;
+
     [Header("오디오 소스")]
     public AudioSource bgmSource;
     public AudioClip lobbyBGM;
@@ -19,8 +23,9 @@ public class SoundManager : ManagerBase<SoundManager>
     private const float MIN_DB = -80f;
     private const float MAX_DB = -20f;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         SceneManager.sceneLoaded += PlayOutGameBGM;
     }
     // 로비/메뉴 (OutGame) 볼륨 조절
@@ -28,6 +33,7 @@ public class SoundManager : ManagerBase<SoundManager>
     {
         float dB = Mathf.Lerp(MIN_DB, MAX_DB, volume);
         audioMixer.SetFloat("OutGameVolume", dB);
+        audioMixer.FindMatchingGroups("Master/OutGameGroup");
     }
     // 인게임 (InGame) 볼륨 조절
     public void SetInGameVolume(float volume)
@@ -56,5 +62,23 @@ public class SoundManager : ManagerBase<SoundManager>
             bgmSource.loop = true;
             bgmSource.Play();
         }
+    }
+
+    public void SetPlayerAudioGroup(List<IPlayerContext> playerContexts)
+    {
+        foreach (var playerContent in playerContexts)
+        {
+            AddSourceToGroup(playerContent.Audio, sfxGroup);
+        }
+    }
+
+    public void AddSourceToGroup(AudioSource source, AudioMixerGroup group)
+    {
+        source.outputAudioMixerGroup = group;
+    }
+
+    public void PlayOneShot(AudioSource source, AudioClip clip)
+    {
+        source.PlayOneShot(clip);
     }
 }
