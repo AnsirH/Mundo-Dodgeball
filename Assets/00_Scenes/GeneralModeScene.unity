@@ -478,7 +478,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topPanelUI: {fileID: 1710205013}
-  roundUI: {fileID: 366420273}
+  resultUI: {fileID: 366420273}
   hpBarPrefab: {fileID: 3221060276531642877, guid: 6cebbd192662d1b42a5d9446bfbb1930, type: 3}
   isInitialized: 0
 --- !u!1 &272010856
@@ -676,7 +676,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 366420269}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63f2816cd09433c4180b45e7730ad39e, type: 3}
+  m_Script: {fileID: 11500000, guid: e2f0cc72743a3d94dafda0d3a34711d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   sprite: {fileID: 366420271}

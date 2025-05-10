@@ -11486,6 +11486,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: eff094cfb02f89c45a3ef699ac70daa6, type: 3}
   - {fileID: 21300000, guid: c8c171aa345e8844e9af88242dec7139, type: 3}
   - {fileID: 21300000, guid: 2443f2f0e359d6c4cb5f9a83dac73483, type: 3}
+  winAndLoseImageList:
+  - {fileID: 21300000, guid: b77ce469bdcea66448443065f75092fd, type: 3}
+  - {fileID: 21300000, guid: 50c86e0914689054baea4c9d1e904ded, type: 3}
 --- !u!1 &1155081261
 GameObject:
   m_ObjectHideFlags: 0
