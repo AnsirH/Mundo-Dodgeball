@@ -52,12 +52,15 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
             PublishUserId = true,
             PlayerTtl = 5000
         };
-        object scores = new object[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        if(!string.IsNullOrEmpty(password))
+        object[] scores = new object[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable();
+        if (!string.IsNullOrEmpty(password))
         {
-            roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable() { { "Password", password }, {"Round", 0}, {"PlayerScore", scores} };
+            roomOptions.CustomRoomProperties["Password"] = password;
+            roomOptions.CustomRoomProperties["Round"] = 0;
             roomOptions.CustomRoomPropertiesForLobby = new string[]{"Password", "Round" };
         }
+        roomOptions.CustomRoomProperties["PlayerScore"] = scores;
         // 방 생성 시도
         PhotonNetwork.CreateRoom(roomName, roomOptions, TypedLobby.Default);
     }
@@ -219,11 +222,10 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public (int, int) GetScore()
     {
         var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
-        string masterKey = $"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}";
-        string otherKey = $"Score_{IngameController.Instance.playerControllers[1].photonView.ViewID}";
-        int masterScore = roomProps.ContainsKey(masterKey) ? (int)roomProps[masterKey] : 0;
-        Debug.Log("------------------------------------------------------\n"+roomProps + "\n" + $"Score_{IngameController.Instance.playerControllers[0].photonView.ViewID}" +"dfasgasgfda :" + masterScore);
-        int otherScore = roomProps.ContainsKey(otherKey) ? (int)roomProps[otherKey] : 0;
+        Debug.Log("-------------------------------------------------" + roomProps);
+        object[] scores = (object[])roomProps["PlayerScore"];
+        int masterScore = (int)scores[0];
+        int otherScore = (int)scores[1];
         return (masterScore, otherScore);
     }
     #endregion
@@ -314,7 +316,7 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         if (photonEvent.Code == NetworkEventCodes.AddScoreEvent)
         {
             object[] data = (object[])photonEvent.CustomData;
-            string playerKey = (string)data[0];
+            int playerKey = (int)data[0];
             int amount = (int)data[1];
 
             if (PhotonNetwork.IsMasterClient)
@@ -323,8 +325,9 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
 
                 // 기존 점수 계산
-                int currentScore = roomProps.ContainsKey(playerKey) ? (int)roomProps[playerKey] : 0;
-                int newScore = currentScore + amount;
+                int Playeridx = IngameController.Instance.PlayerIdx(playerKey);
+                object[] score = (object[])roomProps["PlayerScore"];
+                int newScore = (int)score[Playeridx] + 1;
                 roomProps[playerKey] = newScore;
 
                 // 기존 Round 가져오기
@@ -334,7 +337,7 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 // 커스텀 프로퍼티 업데이트
                 PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
                 // 점수 UI 업데이트 브로드캐스트
-                object[] result = new object[] { playerKey, newScore };
+                object[] result = new object[] { Playeridx, newScore };
                 RaiseEventOptions broadcastOpts = new RaiseEventOptions { Receivers = ReceiverGroup.All };
                 SendOptions sendOptions = new SendOptions { Reliability = true };
 
@@ -349,15 +352,8 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         if (photonEvent.Code == NetworkEventCodes.ScoreUpdated)
         {
             object[] result = (object[])photonEvent.CustomData;
-            string playerKey = (string)result[0];
-            if ($"Score_{IngameController.Instance.playerControllers[0].p_PhotonView.ViewID}" == playerKey)
-            {
-                showScore(1);
-            }
-            else
-            {
-                showScore(0);
-            }
+            int playerKey = (int)result[0];
+            showScore(playerKey);
         }
 
         // 재시작(다음라운드)

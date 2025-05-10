@@ -161,6 +161,17 @@ public class IngameController : MonoBehaviourPun
     }
     /// <summary>플레이어 캐릭터 배열</summary>
     public List<IPlayerContext> playerControllers = new List<IPlayerContext>(2);
+    public int PlayerIdx(int num)
+    {
+        for (int i = 0; i <= playerControllers.Count; i++)
+        {
+            if (playerControllers[i].p_PhotonView.ViewID == num)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
     /// <summary>인게임 UI 컨트롤러</summary>
     public IngameUIController ingameUIController;
 
