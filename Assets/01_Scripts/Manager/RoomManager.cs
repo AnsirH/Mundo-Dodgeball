@@ -264,17 +264,17 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         var roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
         int winIdx = 0;
         object[] scores = (object[])roomProps["PlayerScore"];
+        Debug.Log(scores);
         for (int i = 0; i <= scores.Length; i++)
         {
             if ((int)scores[i] == maxScore)
             {
+                Debug.Log("인덱스 : "+i);
+                Debug.Log("스코어 : " + (int)scores[i]);
                 winIdx = i;
                 break;
             }
         }
-        Debug.Log(IngameController.Instance.playerControllers[0].p_PhotonView.IsMine + "첫 번째");
-        Debug.Log(IngameController.Instance.playerControllers[1].p_PhotonView.IsMine + "두 번째");
-        Debug.Log(IngameController.Instance.playerControllers[winIdx].p_PhotonView.IsMine + "승자");
 
 
         if (IngameController.Instance.playerControllers[winIdx].p_PhotonView.IsMine)
