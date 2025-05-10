@@ -82,9 +82,9 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
     }
 
     [PunRPC]
-    private void SpawnEffect_RPC(string effectTag, Vector3 targetPoint)
+    private void SpawnEffect_RPC(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild = false)
     {
-        StartCoroutine(SpawnEffect(effectTag, targetPoint));
+        StartCoroutine(SpawnEffect(effectTag, targetPoint, duration, isChild));
     }
 
     public IPlayerContext context;
