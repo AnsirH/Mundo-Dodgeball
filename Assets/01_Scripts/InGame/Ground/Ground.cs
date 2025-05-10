@@ -61,7 +61,7 @@ public class Ground : MonoBehaviour
             adjustedPoint = hit;
 
 #if UNITY_EDITOR
-            StartCoroutine(SpawnStartEndAdjustedPoint(ray.origin, targetPoint, hit));
+            //StartCoroutine(SpawnStartEndAdjustedPoint(ray.origin, targetPoint, hit));
 #endif
             return true;
         }
@@ -124,7 +124,7 @@ public class Ground : MonoBehaviour
         Matrix4x4 localToWorld = Matrix4x4.TRS(section.position, section.rotation, Vector3.one);
         Vector3 worldPoint = localToWorld.MultiplyPoint(clampedLocal);
 #if UNITY_EDITOR
-        StartCoroutine(SpawnStartEndAdjustedPoint(startPoint, targetPoint, worldPoint));
+        //StartCoroutine(SpawnStartEndAdjustedPoint(startPoint, targetPoint, worldPoint));
 #endif
         return worldPoint;
     }

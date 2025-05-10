@@ -234,6 +234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topPanelUI: {fileID: 0}
+  roundUI: {fileID: 0}
   hpBarPrefab: {fileID: 3221060276531642877, guid: 6cebbd192662d1b42a5d9446bfbb1930, type: 3}
   isInitialized: 0
 --- !u!1001 &284633003
@@ -995,7 +996,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerAmount: 2
-  playerControllers: []
   ingameUIController: {fileID: 155276323}
   playerSpawnPoints:
   - {fileID: 1227419753}

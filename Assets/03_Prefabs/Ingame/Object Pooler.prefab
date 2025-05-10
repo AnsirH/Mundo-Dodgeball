@@ -57,3 +57,6 @@ MonoBehaviour:
   - tag: FlashEffect
     prefab: {fileID: 6669307902679017890, guid: 4e9617b2734167247a2d6491e821b27b, type: 3}
     size: 5
+  - tag: HealEffect
+    prefab: {fileID: 5866191771531174370, guid: 9d06d67921087d34985e927eb29a284a, type: 3}
+    size: 5
