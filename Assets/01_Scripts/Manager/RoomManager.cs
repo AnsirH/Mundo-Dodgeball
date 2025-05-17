@@ -128,11 +128,11 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
             PhotonNetwork.LeaveRoom(); // 현재 방 나가기
         }
     }
-
     public override void OnLeftRoom()
     {
         Debug.Log("방에서 나감");
         PhotonNetwork.LoadLevel("MainScene"); // 로비 씬으로 이동
+        PhotonNetwork.JoinLobby();
         UIManager.instance.ChangeGame(true);
         UIManager.instance.ChangeLobbyUI();
     }
