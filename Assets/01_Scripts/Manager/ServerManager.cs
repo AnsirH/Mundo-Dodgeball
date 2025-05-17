@@ -68,6 +68,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
         {
             ApplyRegionSetting(savedRegion);
         }
+        ApplyRegionSetting("kr");
     }
 
     void Update()
