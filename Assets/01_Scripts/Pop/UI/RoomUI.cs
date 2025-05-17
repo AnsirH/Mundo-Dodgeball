@@ -28,22 +28,31 @@ public class RoomUI : MonoBehaviour
         readyBtn.gameObject.SetActive(isReady);
         ServerManager.Instance.roomManager.OnClickReady(isReady);
     }
+    public void OnEnable()
+    {
+        initReady();
+    }
+    public void initReady()
+    {
+        masterRect.sizeDelta = new Vector2(masterRect.sizeDelta.x, 0f);
+        hostRect.sizeDelta = new Vector2(hostRect.sizeDelta.x, 0f);
+    }
     public void SetImReady(bool _isMaster, bool _isReady)
     {
         RectTransform targetRect = _isMaster ? masterRect : hostRect;
-        // 올라가야 한다면( true )
-        if (_isReady)
+        float currentHeight = targetRect.sizeDelta.y;
+        float targetHeight = _isReady ? 60f : 0f;
+
+        // 현재 높이와 목표 높이가 거의 같으면 트윈 생략
+        if (Mathf.Approximately(currentHeight, targetHeight))
         {
-            // 높이가 0이라고 가정하고 targetHeight까지 트윈
-            targetRect.DOSizeDelta(new Vector2(targetRect.sizeDelta.x, 60), 0.3f)
-                      .SetEase(Ease.OutCubic);
+            return;
         }
-        else
-        {
-            // 내려가야 한다면( false )
-            // 현재 높이가 60이라고 가정하고 0까지 트윈
-            targetRect.DOSizeDelta(new Vector2(targetRect.sizeDelta.x, 0f), 0.3f)
-                      .SetEase(Ease.InCubic);
-        }
+
+        // 트윈 실행
+        targetRect.DOSizeDelta(new Vector2(targetRect.sizeDelta.x, targetHeight), 0.3f)
+                  .SetEase(_isReady ? Ease.OutCubic : Ease.InCubic);
     }
+
+
 }

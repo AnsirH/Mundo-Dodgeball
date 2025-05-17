@@ -36,6 +36,18 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         SceneManager.sceneLoaded -= ChangeIngameMode;
         PhotonNetwork.RemoveCallbackTarget(this);
     }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            Debug.Log($"[Photon 상태 체크]");
+            Debug.Log($"- 현재 상태: {PhotonNetwork.NetworkClientState}");
+            Debug.Log($"- InRoom: {PhotonNetwork.InRoom}");
+            Debug.Log($"- InLobby: {PhotonNetwork.InLobby}");
+            Debug.Log($"- IsConnected: {PhotonNetwork.IsConnected}");
+            Debug.Log($"- IsConnectedAndReady: {PhotonNetwork.IsConnectedAndReady}");
+        }
+    }
     #region 방생성 로직
     public void CreateRoom(string roomName, bool isVisible, string password)
     {
@@ -107,6 +119,9 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
     // 방 참가 성공 시
     public override void OnJoinedRoom()
     {
+        // 방 입장 시 Ready 초기화
+        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable { { "Ready", false } };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
         UIManager.instance.ChangeRoomUI();
         UpdatePlayerUI();
         OnConnectedToServer();
@@ -132,7 +147,6 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         Debug.Log("방에서 나감");
         PhotonNetwork.LoadLevel("MainScene"); // 로비 씬으로 이동
-        PhotonNetwork.JoinLobby();
         UIManager.instance.ChangeGame(true);
         UIManager.instance.ChangeLobbyUI();
     }
@@ -140,45 +154,71 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
     #region 방들어오거나 나감
     void UpdatePlayerUI()
     {
-        Player master = PhotonNetwork.MasterClient; // 방장 정보 가져오기
-        Player otherPlayer = null; // 참여자 정보
+        Player master = PhotonNetwork.MasterClient;
+        Player otherPlayer = null;
 
+        // 모든 플레이어의 Ready 상태를 UI에 반영
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            if (player.CustomProperties.ContainsKey("Ready"))
+            if (player.CustomProperties.TryGetValue("Ready", out object readyObj) && readyObj is bool isReady)
             {
-                UIManager.instance.roomUI.SetImReady(player.IsMasterClient, (bool)player.CustomProperties["Ready"]);
+                UIManager.instance.roomUI.SetImReady(player.IsMasterClient, isReady);
             }
-            if (player != master)
+
+            if (!player.IsMasterClient)
             {
                 otherPlayer = player;
-                break;
             }
         }
 
-        // 방장 왼쪽, 참여자 오른쪽에 표시
-
+        // 닉네임 UI 업데이트
         UIManager.instance.roomUI.leftPlayerText.text = master.NickName;
         UIManager.instance.roomUI.rightPlayerText.text = otherPlayer != null ? otherPlayer.NickName : "대기 중...";
     }
+
     // 새로운 플레이어가 들어왔을 때 실행
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         UpdatePlayerUI();
-        if (newPlayer.CustomProperties.ContainsKey("Ready"))
-        {
-            UIManager.instance.roomUI.SetImReady(newPlayer.IsMasterClient, (bool)newPlayer.CustomProperties["Ready"]);
-        }
+        //if (newPlayer.CustomProperties.ContainsKey("Ready"))
+        //{
+        //    UIManager.instance.roomUI.SetImReady(newPlayer.IsMasterClient, (bool)newPlayer.CustomProperties["Ready"]);
+        //}
     }
 
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        if (changedProps.ContainsKey("Ready"))
+        {
+            bool isReady = (bool)changedProps["Ready"];
+            UIManager.instance.roomUI.SetImReady(targetPlayer.IsMasterClient, isReady);
+
+            CheckAllPlayersReady(); // 마스터 클라이언트만 이 함수 내부에서 체크
+        }
+    }
     // 플레이어가 나갔을 때 실행
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         UpdatePlayerUI();
+
         if (otherPlayer.CustomProperties.ContainsKey("Ready"))
         {
             UIManager.instance.roomUI.SetImReady(otherPlayer.IsMasterClient, (bool)otherPlayer.CustomProperties["Ready"]);
         }
+    }
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        Debug.Log($" 마스터 클라이언트 변경: {newMasterClient.NickName}");
+
+        // 새 마스터의 Ready 상태 강제 초기화
+        if (newMasterClient.IsLocal)
+        {
+            ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable { { "Ready", false } };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+        }
+
+        // UI 갱신
+        UpdatePlayerUI();
     }
     #endregion
     #region 인게임 전환
@@ -215,7 +255,6 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
     #endregion
     #region 점수 관련
 
-    [PunRPC]
     private void showScore(int idx)
     {
         IngameController.Instance.ingameUIController.addScore(idx);
@@ -300,27 +339,6 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
         UIManager.instance.roomUI.SetImReady(PhotonNetwork.IsMasterClient, isReady);
     }
 
-    // 어떤 플레이어의 CustomProperties가 변경될 때마다 호출되는 콜백
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
-    {
-        if (targetPlayer.CustomProperties.ContainsKey("Ready"))
-        {
-            UIManager.instance.roomUI.SetImReady(targetPlayer.IsMasterClient, (bool)targetPlayer.CustomProperties["Ready"]);
-        }
-        string playerIconURL = (string)targetPlayer.CustomProperties["PlayerIconURL"];
-        
-        //if (!targetPlayer.IsMasterClient)
-        //{
-        //    StartCoroutine(Utility.DownloadImage(playerIconURL, UIManager.instance.roomUI.rightPlayerImage));
-        //}
-        //else
-        //{
-        //    StartCoroutine(Utility.DownloadImage(playerIconURL, UIManager.instance.roomUI.leftPlayerImage));
-        //}
-        // 모든 플레이어가 레디인지 마스터 클라이언트가 확인
-        CheckAllPlayersReady();
-    }
-
     // 방 목록이 갱신될 때마다 Photon이 이 콜백을 호출해줌
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
@@ -338,6 +356,7 @@ public class RoomManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public void OnConnectedToServer()
     {
         Debug.Log("Connected to Master Server!");
+        PhotonNetwork.JoinLobby();
         //string iconURL = SteamManager.GetPlayerAvatarURL();
         //Debug.Log(iconURL);
         //ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable()

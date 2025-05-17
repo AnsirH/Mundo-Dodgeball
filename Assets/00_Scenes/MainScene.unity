@@ -10462,7 +10462,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1116769602}
   - component: {fileID: 1116769603}
-  - component: {fileID: 1116769604}
   m_Layer: 0
   m_Name: RoomManager
   m_TagString: Untagged
@@ -10497,28 +10496,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 597c00b4477ab344fab3af99d43a4ce7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1116769604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1116769601}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 30026
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &1120355542
 GameObject:
   m_ObjectHideFlags: 0
@@ -13688,6 +13665,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioMixer: {fileID: 24100000, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
+  sfxGroup: {fileID: 0}
+  bgmGroup: {fileID: 0}
   bgmSource: {fileID: 145478167}
   lobbyBGM: {fileID: 8300000, guid: c9a2cfb4c107c754588bbaa4ff6e5a46, type: 3}
   uiSfxSource: {fileID: 985292473}

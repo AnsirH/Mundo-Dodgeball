@@ -85,7 +85,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
         // 지역 설정
         PhotonNetwork.PhotonServerSettings.AppSettings.UseNameServer = true;
         PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = regionCode;
-        PlayerPrefs.SetString("LocalKey", regionCode);
+        PlayerPrefs.SetString("LocalKey", "kr");
         PlayerPrefs.Save();
         // 게임 버전 셋팅
         PhotonNetwork.GameVersion = gameVersion;
@@ -121,5 +121,6 @@ public class ServerManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.NickName = SteamManager.GetSteamName();
         Debug.Log("Joined Lobby!");
+        Debug.Log($"[방 생성 요청] 현재 상태: {PhotonNetwork.NetworkClientState}");
     }
 }
