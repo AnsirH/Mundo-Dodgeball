@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
 using Fusion;
+using PlayerCharacterControl.State;
 
 [RequireComponent(typeof(NetworkCharacterController))]
 public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction, IMovable
@@ -22,6 +22,12 @@ public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction,
     public bool IsMoving => isMoving;
 
     private NetworkCharacterController _cc;
+
+    public bool IsActionInProgress => isActionInProgress;
+
+    public bool CanExecuteAction => Controllable;
+
+    public event Action OnActionCompleted;
 
     public void MoveForDeltaTime(Vector3 targetPosition)
     {
@@ -60,9 +66,6 @@ public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction,
     {
         isMoving = false;
     }
-
-    // ---------------------------------------------------------------
-
     private IPlayerContext context;
     private bool isActionInProgress;
 
@@ -103,11 +106,9 @@ public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction,
                 break;
             case "Click":
                 StopMove();
-                OnMoveComplete();
                 break;
             case "F":                
                 StopMove();
-                OnMoveComplete();
                 break;
         }
     }
@@ -124,12 +125,6 @@ public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction,
         isActionInProgress = true;
         StartMoveToNewTarget(context.MousePositionGetter.ClickPoint.Value);
     }
-
-    public bool IsActionInProgress => isActionInProgress;
-
-    public bool CanExecuteAction => Controllable;
-
-    public event Action OnActionCompleted;
 
     public void StopAction()
     {

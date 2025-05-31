@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,10 +5,27 @@ using UnityEngine.SceneManagement;
 using Fusion;
 using Fusion.Sockets;
 using System;
+using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 
 public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 {
+    private PlayerInputHandler inputHandler;
+
+    [SerializeField] private NetworkPrefabRef characterPrefab;
+
+
+    private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new();
+    private HashSet<PlayerRef> playersCompletedSpawn = new();
+
+    private List<IPlayerContext> playerControllers = new();
+
+    public int ExpectedPlayerCount = 2;
+
     public static IngameController Instance { get; private set; }
+
+    public int playerAmount = 2;
+    private List<int> PunPlayerScores = new List<int>();
 
     private void Awake()
     {
@@ -35,119 +51,82 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         UIManager.instance.ChangeGame(false);
     }
 
-
     public override void Spawned()
     {
         if (Object.HasStateAuthority)
         {
-            // 마스터 클라이언트 역할 (StateAuthority 보유자)
-            StartCoroutine(StartGameProcess());
+            _ = StartGameProcessAsync();
         }
     }
-    public int playerAmount = 2;
-    private List<int> PunPlayerScores = new List<int>();
-    IEnumerator StartGameProcess()
-    {
-        // 모든 플레이어가 접속했는지 확인
-        yield return StartCoroutine(CheckPlayerConnected());
 
-        if (PhotonNetwork.IsMasterClient)
+    private async Task StartGameProcessAsync()
+    {
+        // 1. 모든 플레이어 접속 대기
+        await WaitForAllPlayersConnected();
+
+
+        // 2. 캐릭터 생성 요청
+        foreach (var player in Runner.ActivePlayers)
         {
-            // 게임이 준비 되었음을 모든 클라이언트에게 알림
-            photonView.RPC(nameof(CreatePlayerCharacter_RPC), RpcTarget.All);
+            RPC_CreatePlayerCharacter(player);
         }
 
-        // 캐릭터 생성이 완료되었는지 확인 후 게임 시작
-        yield return StartCoroutine(CheckPlayersCharacterSpawned());
+        await WaitForAllPlayersCharacterSpawned();
 
-        // 캐릭터 오디오 소스 그룹 설정
         SoundManager.instance.SetPlayerAudioGroup(playerControllers);
 
-        // 게임 시작
         StartGame();
     }
 
-    /// <summary>
-    /// 플레이어가 모두 접속하였는지 확인
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator CheckPlayerConnected()
+    private async Task WaitForAllPlayersConnected()
     {
-        WaitForSeconds delay = new(1.0f);
-
-        while (PhotonNetwork.PlayerList.Length < playerSpawnPoints.Length)
+        while (Runner.ActivePlayers.Count() < ExpectedPlayerCount)
         {
-            yield return delay;
+            await Task.Yield();
         }
     }
 
-    [PunRPC]
-    private void CreatePlayerCharacter_RPC()
+    private async Task WaitForAllPlayersCharacterSpawned()
     {
-        // 플레이어 캐릭터 생성
-        CreatePlayerCharacter();
-    }
-
-    private void CreatePlayerCharacter()
-    {
-        // 플레이어의 ActorNumber로 위치 설정
-        int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
-        int spawnIndex = actorNumber - 1;
-
-        PhotonNetwork.Instantiate("Player", playerSpawnPoints[spawnIndex].position, playerSpawnPoints[spawnIndex].rotation);
-    }
-
-    /// <summary>
-    /// 모든 플레이어의 캐릭터가 생성되었는지 확인
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator CheckPlayersCharacterSpawned()
-    {
-        WaitForSeconds delay = new(0.5f);
-
-        // 모든 캐릭터가 생성될 때까지 대기
-        while (true)
+        while (playersCompletedSpawn.Count < ExpectedPlayerCount)
         {
-            var foundControllers = GameObject.FindGameObjectsWithTag("Player")
-                .Select(go => go.GetComponent<IPlayerContext>())
-                .Where(comp => comp != null);
+            await Task.Yield();
+        }
+        playerControllers = spawnedCharacters.Values
+        .Select(no => no.GetComponent<IPlayerContext>())
+        .Where(pc => pc != null)
+        .ToList();
+    }
 
-            // 필요한 수 만큼 다 찾았으면 정렬 및 저장
-            if (foundControllers.Count() >= playerSpawnPoints.Length)
-            {
-                playerControllers = new List<IPlayerContext>(new IPlayerContext[playerSpawnPoints.Length]);
+    // 캐릭터 생성 RPC (StateAuthority → InputAuthority)
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.InputAuthority)]
+    private void RPC_CreatePlayerCharacter([RpcTarget] PlayerRef targetPlayer, RpcInfo info = default)
+    {
+        if (Runner.LocalPlayer != targetPlayer) return;
 
-                foreach (var controller in foundControllers)
-                {
-                    PhotonView view = controller.p_PhotonView;
-                    if (view != null)
-                    {
-                        int actorNum = view.Owner.ActorNumber;
-                        int index = actorNum - 1;
+        Transform spawnPoint = GetSpawnPoint(Runner.LocalPlayer);
 
-                        if (index >= 0 && index < playerControllers.Count)
-                        {
-                            playerControllers[index] = controller;
-                            controller.InitGround(index);
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"ActorNumber {actorNum}가 스폰 인덱스 범위를 벗어남.");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("PhotonView가 없는 컨트롤러 발견.");
-                    }
-                }
+        var character = Runner.Spawn(characterPrefab, spawnPoint.position, spawnPoint.rotation, Runner.LocalPlayer);
 
-                // 전부 정상적으로 할당됐는지 확인
-                if (playerControllers.All(c => c != null))
-                    break;
-            }
+        // 생성 완료 알림
+        RPC_NotifyCharacterSpawned(Runner.LocalPlayer, character);
+    }
 
-            yield return delay;
-        }        
+    // 생성 완료 알림 RPC (InputAuthority → StateAuthority)
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    private void RPC_NotifyCharacterSpawned(PlayerRef player, NetworkObject character)
+    {
+        if (!playersCompletedSpawn.Contains(player))
+        {
+            playersCompletedSpawn.Add(player);
+            spawnedCharacters[player] = character;
+        }
+    }
+
+    private Transform GetSpawnPoint(PlayerRef playerRef)
+    {
+        int index = playerRef.PlayerId;
+        return playerSpawnPoints[index];
     }
 
     /// <summary>
@@ -155,31 +134,17 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void StartGame()
     {
-        foreach (PlayerController player in playerControllers)
+        foreach (var player in spawnedCharacters.Values)
         {
-            player.enabled = true;
+            player.GetComponent<PlayerController>().enabled = true;
         }
-        ingameUIController.Init(ServerManager.Instance.roomManager.GetScore());
-        ingameUIController.OnRoundPanel(ServerManager.Instance.roomManager.GetCurrentRound());
+        //ingameUIController.Init(ServerManager.Instance.roomManager.GetScore());
+        //ingameUIController.OnRoundPanel(ServerManager.Instance.roomManager.GetCurrentRound());
     }
-    [PunRPC]
     void ReloadSceneRPC()
     {
         // Photon 연결 유지한 채 현재 씬 리로드
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-    /// <summary>플레이어 캐릭터 배열</summary>
-    public List<IPlayerContext> playerControllers = new List<IPlayerContext>(2);
-    public int PlayerIdx(int num)
-    {
-        for (int i = 0; i <= playerControllers.Count; i++)
-        {
-            if (playerControllers[i].p_PhotonView.ViewID == num)
-            {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
@@ -239,7 +204,17 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        throw new NotImplementedException();
+        var data = new NetworkInputData();
+
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, inputHandler.LeftClick);
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON1, inputHandler.RightClick);
+        data.buttons.Set(NetworkInputData.BUTTONQ, inputHandler.ButtonQ);
+        data.buttons.Set(NetworkInputData.BUTTOND, inputHandler.ButtonD);
+        data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
+
+        inputHandler.ResetInputValue();
+
+        input.Set(data);
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)

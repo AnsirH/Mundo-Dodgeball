@@ -2,11 +2,11 @@
     "name": "PlayerInputAction",
     "maps": [
         {
-            "name": "Player Input",
+            "name": "Gameplay",
             "id": "e5310efd-4fbe-491f-a140-01473b5bc5fc",
             "actions": [
                 {
-                    "name": "Move",
+                    "name": "RightClick",
                     "type": "Button",
                     "id": "fb4d9b74-bab2-4114-81e7-94819ae14e9b",
                     "expectedControlType": "",
@@ -15,19 +15,19 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Attack",
+                    "name": "Q",
                     "type": "Button",
                     "id": "fb6e9c8b-89a7-463b-9bb9-56f120473c78",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Click",
+                    "name": "LeftClick",
                     "type": "Button",
                     "id": "a5b1f991-1d93-4015-a2c9-4f49d4e25c1c",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -68,7 +68,7 @@
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "RightClick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -79,7 +79,7 @@
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "Attack",
+                    "action": "Q",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -90,7 +90,7 @@
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "Click",
+                    "action": "LeftClick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

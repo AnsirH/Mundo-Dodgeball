@@ -1,14 +1,10 @@
 using PlayerCharacterControl.State;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using MyGame.Utils;
 using System.Collections;
 using System.Linq;
 using Fusion;
-using Fusion.Sockets;
-using System;
-
 
 public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePositionGetter
 {
@@ -23,7 +19,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     [SerializeField] private AudioSource audioSource;
 
-    [SerializeField] private PlayerInputEventSystem inputSystem;
     private Vector3 previousPosition;
 
     #region IPlayerContext Implementation
@@ -89,8 +84,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     void Awake()
     {
-        inputSystem = GetComponent<PlayerInputEventSystem>();
-
         // 플레이어 컴포넌트들 초기화
         InitializeComponents();
 
@@ -104,17 +97,47 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     {
         stateMachine.UpdateCurrentState();
 
-
         // 모든 IPlayable 컴포넌트 업데이트
         foreach (var component in components)
         {
             component.Updated();
         }
+
+        if (GetInput(out NetworkInputData data))
+        {
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
+            {
+                // 마우스 위치 저장
+                ClickPoint = GetMousePosition();
+                if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
+
+                ClickPoint = adjustedPoint;
+                StartCoroutine(SpawnEffect("ClickPointer", ClickPoint.Value));
+
+                if (!attack.IsActionInProgress)
+                    stateMachine.ChangeState(EPlayerState.Move);
+            }
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            {
+                ClickPoint = GetMousePosition();
+                if (!attack.IsActionInProgress && attack.CanExecuteAction)
+                {
+                    stateMachine.ChangeState(EPlayerState.Attack);
+                }
+            }
+            if (data.buttons.IsSet(NetworkInputData.BUTTONF))
+            {
+                // 마우스 위치 저장
+                ClickPoint = GetMousePosition();
+                if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
+
+                ClickPoint = adjustedPoint;
+            }
+        }
     }
     public void OnEnable()
     {
         stats = new PlayerStats();
-        inputSystem.PlayerInputEvent.AddListener(HandleInput);
         foreach (var component in components)
         {
             component.OnEnabled();
@@ -123,7 +146,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     public void OnDisable()
     {
-        inputSystem.PlayerInputEvent.RemoveListener(HandleInput);
         foreach (var component in components)
         {
             component.OnDisabled();
@@ -156,61 +178,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
         components.Where(comp => comp as IPlayerAction != null)
             .ToList()
             .ForEach(comp => (comp as IPlayerAction).StopAction());
-    }
-
-    public void HandleInput(InputAction.CallbackContext context)
-    {
-        if (!HasStateAuthority || Stats.IsDead()) return;
-
-        if (context.performed)
-        {
-            switch (context.action.name)
-            {
-                case "Move":
-                    // 마우스 위치 저장
-                    ClickPoint = GetMousePosition();
-                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
-
-                    ClickPoint = adjustedPoint;
-                    StartCoroutine(SpawnEffect("ClickPointer", ClickPoint.Value));
-
-                    if (!attack.IsActionInProgress)
-                        stateMachine.ChangeState(EPlayerState.Move);
-                    break;
-
-                case "Attack":
-                    break;
-
-                case "Click":
-                    // 마우스 위치 저장
-                    ClickPoint = GetMousePosition();
-                    if (!attack.IsActionInProgress && attack.CanExecuteAction)
-                    {
-                        stateMachine.ChangeState(EPlayerState.Attack);
-                    }
-                    else
-                        return;
-                    break;
-
-                case "D":
-                    break;
-                case "F":
-                    // 마우스 위치 저장
-                    ClickPoint = GetMousePosition();
-                    if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out adjustedPoint)) return;
-
-                    ClickPoint = adjustedPoint;
-                    break;
-
-                default:
-                    break;
-            }
-
-            foreach(var component in components)
-            {
-                component.HandleInput(context);
-            }
-        }        
     }
 
     private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
