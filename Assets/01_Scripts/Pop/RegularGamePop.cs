@@ -1,4 +1,4 @@
-using Photon.Realtime;
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -13,7 +13,7 @@ public class RegularGamePop : MonoBehaviour
     [SerializeField] Button joinBtn;
     [SerializeField] List<RoomSlot> roomList = new List<RoomSlot>();
 
-    public void SetRoomListSlot(List<RoomInfo> _roomList)
+    public void SetRoomListSlot(List<SessionInfo> _roomList)
     {
         for(int i = 0; i < roomList.Count; i++)
         {

@@ -44,7 +44,7 @@ public class GameSelectPop : PopBase
     }
     public void CreateRoom()
     {
-        ServerManager.Instance.roomManager.CreateRoom(roomNameField.text, isVisible.isOn, passWordField.text);
+        ServerManager.Instance.roomManager.CreateRoom(passWordField.text, roomNameField.text);
     }
     public void JoinRoom()
     {
@@ -53,7 +53,7 @@ public class GameSelectPop : PopBase
             Debug.Log("no selected room!");
             return;
         }
-        ServerManager.Instance.roomManager.JoinRoom(ServerManager.Instance.roomManager.joinRoom.Name);
+        ServerManager.Instance.roomManager.JoinRoom("", ServerManager.Instance.roomManager.joinRoom.Name);
     }
     public void PassWordJoinRoom()
     {
