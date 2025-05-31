@@ -1,10 +1,68 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
+using Fusion;
 
-public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
+[RequireComponent(typeof(NetworkCharacterController))]
+public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction, IMovable
 {
+    [SerializeField] protected bool isOfflineMode = false;
+    [SerializeField] protected float moveSpeed = 5f;
+    [SerializeField] protected float rotateSpeed = 10f;
+    [SerializeField] protected float arrivalThreshold = 0.1f;
+
+    protected Vector3? currentTargetPosition;
+
+    /// <summary>
+    /// 플레이어가 이동 중인지 확인하는 변수
+    /// </summary>
+    bool isMoving = false;
+
+    public bool IsMoving => isMoving;
+
+    private NetworkCharacterController _cc;
+
+    public void MoveForDeltaTime(Vector3 targetPosition)
+    {
+        targetPosition.y = 0.0f;
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        _cc.Move(direction * moveSpeed * Runner.DeltaTime);
+    }
+
+    public void RotateForDeltaTime(Vector3 direction)
+    {
+        if (!HasStateAuthority) return;
+        Quaternion targetRotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Runner.DeltaTime); 
+        transform.rotation = targetRotation;
+    }
+
+    public void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
+    {
+        StopMove();
+
+        targetPosition.y = 0.0f;
+        currentTargetPosition = targetPosition;
+
+        isMoving = true;
+    }
+
+    private void MoveComplete()
+    {
+        _cc.Teleport(currentTargetPosition);
+        currentTargetPosition = null;
+        StopMove();
+
+        OnActionCompleted.Invoke();
+    }
+
+    public virtual void StopMove()
+    {
+        isMoving = false;
+    }
+
+    // ---------------------------------------------------------------
+
     private IPlayerContext context;
     private bool isActionInProgress;
 
@@ -16,6 +74,15 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
 
     public void Updated()
     {
+        if (isMoving)
+        {
+            if (Vector3.Distance(_cc.transform.position, currentTargetPosition.Value) > arrivalThreshold)
+                MoveForDeltaTime(currentTargetPosition.Value);
+            else
+            {
+                MoveComplete();
+            }
+        }
     }
 
     public void OnDisabled()
@@ -50,8 +117,6 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
 
     public void ExecuteAction()
     {
-        if (!photonView.IsMine || !context.MousePositionGetter.ClickPoint.HasValue) return;
-
         if (isActionInProgress)
         {
             StopMove();
@@ -65,13 +130,6 @@ public class PlayerMovement : Movement, IPlayerComponent, IPlayerAction
     public bool CanExecuteAction => Controllable;
 
     public event Action OnActionCompleted;
-
-    protected override void OnMoveComplete()
-    {
-        base.OnMoveComplete();
-        isActionInProgress = false;
-        OnActionCompleted?.Invoke();
-    }
 
     public void StopAction()
     {

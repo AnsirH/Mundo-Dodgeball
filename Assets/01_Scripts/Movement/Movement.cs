@@ -1,4 +1,3 @@
-using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,11 +6,13 @@ using System;
 
 public interface IMovable
 {
-    /// <summary> targetPosition deltaTime ̵ </summary>
-    public void MoveForDeltaTime(Vector3 targetPosition, float deltaTime);
+    /// <summary>
+    /// DeltaTime 단위 이동
+    /// </summary>
+    public void MoveForDeltaTime(Vector3 targetPosition);
 
     /// <summary> targetPosition deltaTime ȸ </summary>
-    public void RotateForDeltaTime(Vector3 targetPosition, float deltaTime);
+    public void RotateForDeltaTime(Vector3 direction);
 
     /// <summary> targetPosition   ̵ </summary>
     public void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true);

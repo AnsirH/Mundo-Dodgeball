@@ -28,9 +28,6 @@ public interface IPlayerContext
     /// <summary> 플레이어의 애니메이터를 반환 </summary>
     Animator Anim { get; }
 
-    /// <summary> 플레이어의 PhotonView를 반환 </summary>
-    PhotonView p_PhotonView { get; }
-
     /// <summary> 플레이어의 AudioSource를 반환 </summary>
     AudioSource Audio { get; }
 

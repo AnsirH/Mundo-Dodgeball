@@ -1,4 +1,3 @@
-using Photon.Pun;
 using PlayerCharacterControl.State;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,9 +5,12 @@ using UnityEngine.InputSystem;
 using MyGame.Utils;
 using System.Collections;
 using System.Linq;
+using Fusion;
+using Fusion.Sockets;
+using System;
 
 
-public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMousePositionGetter
+public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePositionGetter
 {
     // 플레이어 상태 머신
     private PlayerStateMachine stateMachine;
@@ -22,17 +24,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     [SerializeField] private AudioSource audioSource;
 
     [SerializeField] private PlayerInputEventSystem inputSystem;
-
-    [SerializeField] private PhotonTransformViewClassic ptv;
     private Vector3 previousPosition;
 
     #region IPlayerContext Implementation
 
     public Animator Anim => anim;
-    public PhotonView p_PhotonView => photonView;
     public AudioSource Audio => audioSource;
     public Transform Trf => transform;
-
     public PlayerStats Stats => stats;
 
 
@@ -92,7 +90,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
     void Awake()
     {
         inputSystem = GetComponent<PlayerInputEventSystem>();
-        ptv = GetComponent<PhotonTransformViewClassic>();
 
         // 플레이어 컴포넌트들 초기화
         InitializeComponents();
@@ -103,30 +100,19 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
         previousPosition = transform.position;
     }
 
-    void Update()
+    public override void FixedUpdateNetwork()
     {
         stateMachine.UpdateCurrentState();
+
 
         // 모든 IPlayable 컴포넌트 업데이트
         foreach (var component in components)
         {
             component.Updated();
         }
-
-
-        if (photonView.IsMine)
-        {
-            Vector3 velocity = (transform.position - previousPosition) / Time.deltaTime;
-
-            // 보간/예측을 위한 속도 전달
-            ptv.SetSynchronizedValues(velocity, 0f);  // 회전속도는 안 쓰면 0
-
-            previousPosition = transform.position;
-        }
     }
-    public override void OnEnable()
+    public void OnEnable()
     {
-        base.OnEnable();
         stats = new PlayerStats();
         inputSystem.PlayerInputEvent.AddListener(HandleInput);
         foreach (var component in components)
@@ -135,9 +121,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
         }
     }
 
-    public override void OnDisable()
+    public void OnDisable()
     {
-        base.OnDisable();
         inputSystem.PlayerInputEvent.RemoveListener(HandleInput);
         foreach (var component in components)
         {
@@ -175,7 +160,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPlayerContext, IMous
 
     public void HandleInput(InputAction.CallbackContext context)
     {
-        if (!photonView.IsMine || Stats.IsDead()) return;
+        if (!HasStateAuthority || Stats.IsDead()) return;
 
         if (context.performed)
         {
