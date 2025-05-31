@@ -55,9 +55,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void OnEndGame(PlayerNetwork winner)
+    public void OnEndGame(PlayerRef winnerRef)
     {
-        Debug.Log($"[Fusion] ½ÂÀÚ: {winner.Object.InputAuthority}");
+        Debug.Log($"[Fusion] ½ÂÀÚ: {winnerRef}");
         Invoke(nameof(LeaveRoom), 3f);
     }
 
