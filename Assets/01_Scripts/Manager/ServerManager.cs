@@ -1,28 +1,25 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Photon.Pun;
-using Photon.Realtime;
+using Fusion;
+using Fusion.Sockets;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class ServerManager : MonoBehaviourPunCallbacks
+public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     #region 싱글톤
     private static ServerManager instance;
 
-    // 외부에서 instance를 가져올 때는 이 프로퍼티를 사용
     public static ServerManager Instance
     {
         get
         {
             if (instance == null)
             {
-                // 씬 내에서 ServerManager를 찾거나, 
-                // 필요하다면 런타임에 새 오브젝트를 생성할 수도 있음
                 instance = FindObjectOfType<ServerManager>();
-
                 if (instance == null)
                 {
-                    // 만약 씬에 ServerManager가 없다면 새로 생성 (선택 사항)
                     GameObject obj = new GameObject(typeof(ServerManager).Name);
                     instance = obj.AddComponent<ServerManager>();
                 }
@@ -33,95 +30,156 @@ public class ServerManager : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        // 이미 인스턴스가 있으면, 자기 자신을 파괴해 중복을 막음
         if (instance != null && instance != this)
         {
             Destroy(this.gameObject);
             return;
         }
-
-        // 없으면 이 인스턴스를 사용
         instance = this;
-
-        // 씬 전환 시 파괴되지 않도록 설정
         DontDestroyOnLoad(this.gameObject);
     }
     #endregion
+
     public RoomManager roomManager;
     [SerializeField] private string gameVersion = "1.0";
 
-    
     private const float checkConstTime = 5f;
-    private float checkInterval = 5f; // 상태 확인 주기 (초)
+    private float checkInterval = 5f;
     private float nextCheckTime = 0f;
 
     private bool isStartGame = false;
+
+    private NetworkRunner runnerInstance;
+    public NetworkRunner Runner => runnerInstance;
+
     void Start()
     {
         string savedRegion = PlayerPrefs.GetString("LocalKey");
-        if (savedRegion == null || savedRegion == "")
+        if (string.IsNullOrEmpty(savedRegion))
         {
             PopManager.instance.localSelectPop.Open();
             return;
         }
-        else
-        {
-            ApplyRegionSetting(savedRegion);
-        }
-        ApplyRegionSetting("kr");
+        ApplyRegionSetting(savedRegion);
     }
 
     void Update()
     {
-        if (Time.time >= nextCheckTime && isStartGame)
+        if (Time.time >= nextCheckTime && isStartGame && runnerInstance != null)
         {
             nextCheckTime = Time.time + checkInterval;
             CheckConnectionStatus();
         }
     }
-    public void ApplyRegionSetting(string regionCode)
+
+    public async void ApplyRegionSetting(string regionCode)
     {
-        //  자동 동기화
-        PhotonNetwork.AutomaticallySyncScene = true;
-        // 지역 설정
-        PhotonNetwork.PhotonServerSettings.AppSettings.UseNameServer = true;
-        PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = regionCode;
-        PlayerPrefs.SetString("LocalKey", "kr");
+        PlayerPrefs.SetString("LocalKey", regionCode);
         PlayerPrefs.Save();
-        // 게임 버전 셋팅
-        PhotonNetwork.GameVersion = gameVersion;
-        PhotonNetwork.ConnectUsingSettings();
-        isStartGame = true;
-        Debug.Log("Connecting to Photon...");
+
+        runnerInstance = Instantiate(roomManager.runnerPrefab);
+        runnerInstance.ProvideInput = true;
+        runnerInstance.AddCallbacks(this);
+
+        var sceneManager = runnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>();
+
+        var startArgs = new StartGameArgs
+        {
+            GameMode = GameMode.AutoHostOrClient,
+            SessionName = "DefaultRoom",
+            Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
+            SceneManager = sceneManager,
+            CustomLobbyName = null
+        };
+
+        var result = await runnerInstance.StartGame(startArgs);
+
+        if (result.Ok)
+        {
+            isStartGame = true;
+            Debug.Log("[Fusion] 연결 성공");
+        }
+        else
+        {
+            Debug.LogError($"[Fusion] 연결 실패: {result.ShutdownReason}");
+        }
     }
+
     void CheckConnectionStatus()
     {
-        if (PhotonNetwork.IsConnectedAndReady)
+        if (runnerInstance != null && runnerInstance.IsRunning)
         {
-            // 정상 연결됨!
             checkInterval = checkConstTime;
             UIManager.instance.SetLoadingUI(false);
         }
-        else if(PhotonNetwork.NetworkClientState == ClientState.Disconnected)
+        else
         {
             checkInterval = 0.2f;
             UIManager.instance.SetLoadingUI(true);
-            PhotonNetwork.Reconnect(); // 자동 재연결 시도
+            Debug.LogWarning("[Fusion] 연결 끊김. 재시도 중...");
+            ApplyRegionSetting(PlayerPrefs.GetString("LocalKey"));
         }
     }
-    // 포톤 마스터 서버 연결완료
-    public override void OnConnectedToMaster()
+
+    public void OnConnectedToServer(NetworkRunner runner) => Debug.Log("[Fusion] 서버 연결 성공");
+    public void OnDisconnectedFromServer(NetworkRunner runner) => Debug.Log("[Fusion] 서버 연결 끊김");
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] 플레이어 입장: {player}");
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] 플레이어 퇴장: {player}");
+
+    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
+
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
-        base.OnConnectedToMaster();
-        Debug.Log("Connected to Master Server!");
-        PhotonNetwork.JoinLobby();
+        throw new NotImplementedException();
     }
 
-    // 로비 입장 완료
-    public override void OnJoinedLobby()
+    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
-        PhotonNetwork.NickName = SteamManager.GetSteamName();
-        Debug.Log("Joined Lobby!");
-        Debug.Log($"[방 생성 요청] 현재 상태: {PhotonNetwork.NetworkClientState}");
+        throw new NotImplementedException();
+    }
+
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnSceneLoadStart(NetworkRunner runner)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,9 +1,10 @@
 // RoomManager.cs
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
 // 전역 변수 및 공용 접근자
-public partial class RoomManager : MonoBehaviour
+public partial class RoomManager : NetworkBehaviour
 {
     public NetworkRunner runnerPrefab; // Runner 프리팹
     private NetworkRunner runnerInstance; // 현재 사용 중인 Runner
@@ -15,6 +16,9 @@ public partial class RoomManager : MonoBehaviour
 
     public NetworkRunner RunnerInstance => runnerInstance;
     public string RoomPassword => roomPassword;
+
+    [Networked]
+    public NetworkDictionary<PlayerRef, bool> PlayerReadyDict => new NetworkDictionary<PlayerRef, bool>();
 }
 // --------------------------------------------------------------------------------------
 // Photon Fusion 2.x 기준 RoomManager (정확한 씬 전환 포함)
