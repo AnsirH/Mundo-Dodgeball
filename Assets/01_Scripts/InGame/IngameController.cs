@@ -18,7 +18,7 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new();
     private HashSet<PlayerRef> playersCompletedSpawn = new();
 
-    private List<IPlayerContext> playerControllers = new();
+    public List<IPlayerContext> playerControllers = new();
 
     public int ExpectedPlayerCount = 2;
 

@@ -57,7 +57,7 @@ public class GameSelectPop : PopBase
     }
     public void PassWordJoinRoom()
     {
-        ServerManager.Instance.roomManager.PasswordJoinRoom(EnterPassWord.text);
+        ServerManager.Instance.roomManager.JoinRoom(EnterPassWord.text, ServerManager.Instance.roomManager.joinRoom.Name);
         EnterPassWord.text = null;
     }
     public void ButtonSwitch(bool on)
