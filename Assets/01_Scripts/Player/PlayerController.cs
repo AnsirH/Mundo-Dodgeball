@@ -12,6 +12,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     private PlayerStateMachine stateMachine;
     // 플레이어 스크립트 리스트
     private List<IPlayerComponent> components = new List<IPlayerComponent>();
+    private List<IUpdatedPlayerComponent> updatedComponents = new List<IUpdatedPlayerComponent>();
 
     [SerializeField] private PlayerStats stats;
 
@@ -19,13 +20,15 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     [SerializeField] private AudioSource audioSource;
 
+    private NetworkTransform ntrf;
+
     private Vector3 previousPosition;
 
     #region IPlayerContext Implementation
 
     public Animator Anim => anim;
     public AudioSource Audio => audioSource;
-    public Transform Trf => transform;
+    public NetworkTransform Trf => ntrf;
     public PlayerStats Stats => stats;
 
 
@@ -54,7 +57,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     // 체력
     [SerializeField] private PlayerHealth playerHealth;
     // 스펠
-    [SerializeField] private PlayerSpell playerSpell;
+    [SerializeField] private PlayerSpellActuator playerSpell;
 
     public bool isOfflineMode;
 
@@ -99,7 +102,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
         stateMachine.UpdateCurrentState();
 
         // 모든 IPlayable 컴포넌트 업데이트
-        foreach (var component in components)
+        foreach (var component in updatedComponents)
         {
             component.Updated();
         }
@@ -174,6 +177,8 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
         foreach (var component in components)
         {
             component.Initialize(this, isOfflineMode);
+            if (component is IUpdatedPlayerComponent)
+                updatedComponents.Add(component as IUpdatedPlayerComponent);
         }
     }
 

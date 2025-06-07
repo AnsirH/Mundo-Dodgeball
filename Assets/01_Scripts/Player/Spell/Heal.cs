@@ -1,18 +1,16 @@
-using UnityEngine;
+//using UnityEngine;
 
-public class Heal : Spell
-{
-    public Heal(IPlayerContext context) : base(context)
-    {
-        this.context = context;
-    }
+//public class Heal : Spell
+//{
+//    public Heal(IPlayerContext context) : base(context)
+//    {
+//        this.context = context;
+//    }
 
-    public override void Execute()
-    {
-        context.Stats.ModifyCurrentHealth(healAmount);
+//    public override void Execute()
+//    {
+//        context.Stats.ModifyCurrentHealth(healAmount);
+//    }
 
-        currentCoolTime = maxCoolTime;
-    }
-
-    float healAmount = 60.0f;
-}
+//    float healAmount = 60.0f;
+//}

@@ -14,6 +14,7 @@ public class PlayerController_Test : NetworkBehaviour
 
     // 플레이어 스크립트 리스트
     private List<IPlayerComponent> components = new List<IPlayerComponent>();
+    private List<IUpdatedPlayerComponent> updatedComponents = new List<IUpdatedPlayerComponent>();
 
     private Action<NetworkInputData> OnInputAction;
 
@@ -28,12 +29,14 @@ public class PlayerController_Test : NetworkBehaviour
             foreach (IPlayerComponent component in components)
             {
                 OnInputAction += component.HandleInput;
+                if (component is IUpdatedPlayerComponent)
+                    updatedComponents.Add(component as IUpdatedPlayerComponent);
             }
         }
     }
     public override void FixedUpdateNetwork()
     {
-        foreach (IPlayerComponent component in components)
+        foreach (IUpdatedPlayerComponent component in updatedComponents)
         {
             component.Updated();
         }

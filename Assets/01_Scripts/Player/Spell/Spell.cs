@@ -1,29 +1,20 @@
 using UnityEngine;
-public abstract class Spell
+
+namespace Mundo_dodgeball.Spell
 {
-    public IPlayerContext context;
-    public Spell(IPlayerContext context)
+    [CreateAssetMenu(fileName = "NewSpellData", menuName = "Spell Data/Create New Spell")]
+    public class SpellData : ScriptableObject
     {
-        this.context = context;
+        public SpellCategory _category;
+        public string _description = "";
+        public float _maxCoolTime = 60.0f;
+        public float _valueAmount = 0.0f;
     }
 
-    public abstract void Execute();
-
-    public void CoolDown(float decreaseValue)
+    public enum SpellCategory
     {
-        if (currentCoolTime > 0.0f)
-        {
-            currentCoolTime -= decreaseValue;
-        }
-        else
-        {
-            currentCoolTime = 0.0f;
-        }
+        None = 0,
+        Heal,
+        Flash
     }
-
-    public float currentCoolTime = 0.0f;
-    public float maxCoolTime = 5.0f;
-
-    public bool CanUsable { get { return currentCoolTime <= 0.0f; } }
 }
-
