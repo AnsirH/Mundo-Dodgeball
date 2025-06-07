@@ -45,7 +45,7 @@ public class PlayerHealth : NetworkBehaviour,/* IPunObservable, */IDamageable, I
         //photonView.RPC(nameof(Damage), RpcTarget.All, whoAttacker, attackPower);
     }
     [Rpc]
-    public void Damage(int attackerActorNumber, float attackPower)
+    public void Rpc_Damage(int attackerActorNumber, float attackPower)
     {
         StartCoroutine(ActiveHitEffect());
         context.Stats.ModifyCurrentHealth(-attackPower);
