@@ -1,14 +1,15 @@
-using System;
+Ôªøusing System;
 using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using Fusion.Sockets;
+using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    #region ΩÃ±€≈Ê
+    #region Ïã±Í∏ÄÌÜ§
     private static ServerManager instance;
 
     public static ServerManager Instance
@@ -76,20 +77,24 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         PlayerPrefs.SetString("LocalKey", regionCode);
         PlayerPrefs.Save();
-
         runnerInstance = Instantiate(roomManager.runnerPrefab);
+
         runnerInstance.ProvideInput = true;
         runnerInstance.AddCallbacks(this);
+        DontDestroyOnLoad(runnerInstance.gameObject);
 
-        var sceneManager = runnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>();
+        var sceneManager = runnerInstance.GetComponent<NetworkSceneManagerDefault>();
+        if (sceneManager == null)
+            sceneManager = runnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>();
+        else
+            Debug.Log("SceneManager already exists");
 
         var startArgs = new StartGameArgs
         {
             GameMode = GameMode.AutoHostOrClient,
             SessionName = "DefaultRoom",
-            Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
-            SceneManager = sceneManager,
-            CustomLobbyName = null
+            Scene = default,
+            SceneManager = sceneManager
         };
 
         var result = await runnerInstance.StartGame(startArgs);
@@ -97,13 +102,15 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
         if (result.Ok)
         {
             isStartGame = true;
-            Debug.Log("[Fusion] ø¨∞· º∫∞¯");
+            Debug.Log("[Fusion] Ïó∞Í≤∞ ÏÑ±Í≥µ");
         }
         else
         {
-            Debug.LogError($"[Fusion] ø¨∞· Ω«∆–: {result.ShutdownReason}");
+            Debug.LogError($"[Fusion] Ïó∞Í≤∞ Ïã§Ìå®: {result.ShutdownReason}");
         }
     }
+
+
 
     void CheckConnectionStatus()
     {
@@ -116,15 +123,15 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             checkInterval = 0.2f;
             UIManager.instance.SetLoadingUI(true);
-            Debug.LogWarning("[Fusion] ø¨∞· ≤˜±Ë. ¿ÁΩ√µµ ¡ﬂ...");
+            Debug.LogWarning("[Fusion] Ïó∞Í≤∞ ÎÅäÍπÄ. Ïû¨ÏãúÎèÑ Ï§ë...");
             ApplyRegionSetting(PlayerPrefs.GetString("LocalKey"));
         }
     }
 
-    public void OnConnectedToServer(NetworkRunner runner) => Debug.Log("[Fusion] º≠πˆ ø¨∞· º∫∞¯");
-    public void OnDisconnectedFromServer(NetworkRunner runner) => Debug.Log("[Fusion] º≠πˆ ø¨∞· ≤˜±Ë");
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] «√∑π¿ÃæÓ ¿‘¿Â: {player}");
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] «√∑π¿ÃæÓ ≈¿Â: {player}");
+    public void OnConnectedToServer(NetworkRunner runner) => Debug.Log("[Fusion] ÏÑúÎ≤Ñ Ïó∞Í≤∞ ÏÑ±Í≥µ");
+    public void OnDisconnectedFromServer(NetworkRunner runner) => Debug.Log("[Fusion] ÏÑúÎ≤Ñ Ïó∞Í≤∞ ÎÅäÍπÄ");
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] ÌîåÎ†àÏù¥Ïñ¥ ÏûÖÏû•: {player}");
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] ÌîåÎ†àÏù¥Ïñ¥ Ìá¥Ïû•: {player}");
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }

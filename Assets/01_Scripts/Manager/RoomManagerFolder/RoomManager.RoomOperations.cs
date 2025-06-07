@@ -9,7 +9,11 @@ using UnityEngine.SceneManagement;
 // Fusino 妮归 贸府
 public partial class RoomManager
 {
-    
+    public void Awake()
+    {
+        //runnerPrefab = this.gameObject.AddComponent<NetworkRunner>();
+        Debug.Log("add : runnerPrefab");
+    }
     // 规 积己
     public async void CreateRoom(string password, string roomNmae)
     {
