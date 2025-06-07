@@ -82,7 +82,8 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     }
     #endregion
 
-    void Awake()
+
+    public override void Spawned()
     {
         // 플레이어 컴포넌트들 초기화
         InitializeComponents();
@@ -107,6 +108,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
         {
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
             {
+                Debug.Log("right click!");
                 // 마우스 위치 저장
                 ClickPoint = GetMousePosition();
                 if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
@@ -119,6 +121,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
             }
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
             {
+                Debug.Log("left click!");
                 ClickPoint = GetMousePosition();
                 if (!attack.IsActionInProgress && attack.CanExecuteAction)
                 {
@@ -127,6 +130,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
             }
             if (data.buttons.IsSet(NetworkInputData.BUTTONF))
             {
+                Debug.Log("F Button pressed!");
                 // 마우스 위치 저장
                 ClickPoint = GetMousePosition();
                 if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;

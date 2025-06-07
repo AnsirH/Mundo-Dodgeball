@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(NetworkRunner))]
 public class PlayerInputEventSystem : MonoBehaviour
 {
     private PlayerInput playerInput;
@@ -27,6 +26,7 @@ public class PlayerInputEventSystem : MonoBehaviour
             actions["Move"].performed += OnInput;
             actions["D"].performed += OnInput;
             actions["F"].performed += OnInput;
+            playerInput.actions = actions;
         }
     }
 
@@ -40,6 +40,7 @@ public class PlayerInputEventSystem : MonoBehaviour
             actions["Move"].performed -= OnInput;
             actions["D"].performed -= OnInput;
             actions["F"].performed -= OnInput;
+            playerInput.actions = actions;
         }
     }
 
