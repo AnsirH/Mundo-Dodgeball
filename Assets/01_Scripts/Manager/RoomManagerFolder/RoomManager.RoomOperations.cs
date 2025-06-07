@@ -1,10 +1,11 @@
 ﻿// RoomManager.RoomOperations.cs
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using Fusion;
+using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -23,71 +24,111 @@ public partial class RoomManager
         }
 
         roomPassword = password;
-        await StartFusionSession(GameMode.Host, roomId, token);
+        //await StartSession(GameMode.Host, roomId, token);
     }
 
     // 방 참가
     public async void JoinRoom(string password, string roomName)
     {
         byte[] token = Encoding.UTF8.GetBytes(password);
-        await StartFusionSession(GameMode.Client, roomName, token);
+        //await StartSession(GameMode.Client, roomName, token);
     }
 
     // 공통 세션 시작 로직
-    private async Task StartFusionSession(GameMode mode, string roomId, byte[] token)
+    async void StartSession(string roomName)
     {
-        // ① 이전 세션이 있으면 깔끔히 종료
-        if (runnerInstance != null)
-        {
-            Debug.Log("시뮬레이션 종료 시작");
-            await runnerInstance.Shutdown();                     // 시뮬레이션 종료 요청
-            Debug.Log("시뮬레이션 종료 완료");
-            Destroy(runnerInstance.gameObject);            // 오브젝트 제거
-            runnerInstance = null;                         // 참조 해제
-            await Task.Yield();                            // 한 프레임만 기다려 주세요
-        }
         runnerInstance = Instantiate(runnerPrefab);
-        runnerInstance.ProvideInput = true;
-
-        var sceneManager = runnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>();
-
-        StartGameArgs args = new StartGameArgs
-        {
-            GameMode = mode,
-            SessionName = roomId,
-            Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
-            SceneManager = sceneManager,
-            ConnectionToken = token
-        };
         runnerInstance.AddCallbacks(this);
-        await runnerInstance.StartGame(args);
+        DontDestroyOnLoad(runnerInstance.gameObject);
+
+        var result = await runnerInstance.StartGame(new StartGameArgs
+        {
+            GameMode = GameMode.AutoHostOrClient,
+            SessionName = roomName,
+            Scene = default,
+            SceneManager = runnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>()
+        });
+
+        if (!result.Ok)
+        {
+            Debug.LogError($"StartGame 실패: {result.ShutdownReason}");
+            return;
+        }
+
+        // 자신의 닉네임을 모두에게 전송
+        string myNick = PlayerPrefs.GetString("NickName", "Player");
+        //RPC_AnnounceNickname(
+        //    RpcTargets.All, 
+        //    runnerInstance.LocalPlayer, 
+        //    myNick
+        //    );
     }
-    public void UpdatePlayerUI()
+
+    // 모든 클라이언트가 이 RPC를 통해 닉네임을 공유
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    void RPC_AnnounceNickname(NetworkRunner _, PlayerRef who, string nick)
     {
+        _nicknames[who] = nick;
+        UpdateLobbyUI();
+    }
+
+    void UpdateLobbyUI()
+    {
+        var players = runnerInstance.ActivePlayers;
+        // 왼쪽: Host, 오른쪽: other
+        var arr = new List<PlayerRef>(players);
+        PlayerRef host = arr.Count > 0 ? arr[0] : PlayerRef.None;
+        PlayerRef other = arr.Count > 1 ? arr[1] : PlayerRef.None;
+
         UIManager.instance.ChangeRoomUI();
-        var players = runnerInstance.ActivePlayers.ToList();
-        var hostRef = players.FirstOrDefault();
-        var otherRef = players.Skip(1).FirstOrDefault();
 
-        // 호스트 닉네임
-        if (hostRef != PlayerRef.None)
-        {
-            var go = runnerInstance.GetPlayerObject(hostRef);
-            var np = go.GetComponent<NetworkPlayer>();
-            UIManager.instance.roomUI.leftPlayerText.text = np.NickName.Value;
-        }
-
-        // 상대 닉네임
-        if (otherRef != PlayerRef.None)
-        {
-            var go = runnerInstance.GetPlayerObject(otherRef);
-            var np = go.GetComponent<NetworkPlayer>();
-            UIManager.instance.roomUI.rightPlayerText.text = np.NickName.Value;
-        }
+        if (host != PlayerRef.None && _nicknames.TryGetValue(host, out var hn))
+            UIManager.instance.roomUI.leftPlayerText.text = hn;
         else
-        {
+            UIManager.instance.roomUI.leftPlayerText.text = "대기 중...";
+
+        if (other != PlayerRef.None && _nicknames.TryGetValue(other, out var on))
+            UIManager.instance.roomUI.rightPlayerText.text = on;
+        else
             UIManager.instance.roomUI.rightPlayerText.text = "대기 중...";
+    }
+
+    public void OnPlayerJoined(NetworkRunner r, PlayerRef p)
+    {
+        // 새로운 플레이어가 들어오면, 본인이 미리 보낸 RPC로 닉네임 등록 완료
+        Debug.Log($"[{p}] 입장, UI 갱신");
+        UpdateLobbyUI();
+    }
+    public void OnPlayerLeft(NetworkRunner r, PlayerRef p)
+    {
+        _nicknames.Remove(p);
+        UpdateLobbyUI();
+    }
+
+    // 2) 실제로 오브젝트가 준비될 때까지 기다렸다가 닉네임을 뿌려주는 코루틴
+    private IEnumerator WaitAndSetPlayerUI(PlayerRef playerRef, bool isHost)
+    {
+        NetworkObject netObj = null;
+
+        // TryGetPlayerObject 가 true 를 반환하고, obj 가 null 아니면 탈출
+        while (!runnerInstance.TryGetPlayerObject(playerRef, out netObj) || netObj == null)
+            yield return null;
+
+        var np = netObj.GetComponent<NetworkPlayer>();
+        if (np == null)
+        {
+            Debug.LogError("[RoomManager] NetworkPlayer 컴포넌트가 없습니다!");
+            yield break;
         }
+
+        // 닉네임 가져오기
+        string nick = np.NickName.Value;
+
+        // UI에 반영
+        if (isHost)
+            UIManager.instance.roomUI.leftPlayerText.text = nick;
+        else
+            UIManager.instance.roomUI.rightPlayerText.text = nick;
     }
     // 방 떠나기
     public void LeaveRoom()

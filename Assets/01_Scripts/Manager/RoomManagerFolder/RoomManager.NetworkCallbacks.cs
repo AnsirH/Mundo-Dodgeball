@@ -12,23 +12,30 @@ public partial class RoomManager : INetworkRunnerCallbacks
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log($"[Fusion] 플레이어 입장: {player}");
-        // 로컬 플레이어가 아니라면 Host에서만 스폰
-        // (AutoHostOrClient 모드의 Host 혹은 Shared 모드)
-        if (runner.GameMode != GameMode.Single)
+
+        // Host 역할을 하는 인스턴스에서만 스폰 처리
+        if (runner.IsServer)
         {
-            // 스폰 위치를 정해둡니다 (예: Vector3.zero)
             Vector3 spawnPos = Vector3.zero;
 
-            // Spawn overload 의 onBeforeSpawned 콜백을 이용해 NickName 세팅
             runner.Spawn(playerPrefab, spawnPos, Quaternion.identity, player, (r, obj) =>
             {
+                // ① 스폰된 오브젝트에 NetworkPlayer 컴포넌트가 붙어 있는지 확인
                 var netPlayer = obj.GetComponent<NetworkPlayer>();
-                // PlayerPrefs에 저장해둔 닉네임을 할당
+                if (netPlayer == null)
+                {
+                    Debug.LogError("[Spawn] NetworkPlayer 컴포넌트가 없습니다!");
+                    return;
+                }
+
+                // ② 닉네임 세팅
                 int randomValue = UnityEngine.Random.Range(1, 101);
                 netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_" + randomValue);
+                Debug.Log($"[Spawn] NickName set to {netPlayer.NickName.Value}");
+
+                // ③ 스폰이 완전히 끝난 뒤 바로 UI 갱신
+                UpdatePlayerUI();
             });
-            // 스폰이 끝나면 UI 갱신
-            UpdatePlayerUI();
         }
     }
 

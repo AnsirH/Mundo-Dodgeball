@@ -151,10 +151,12 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
                 var netPlayer = obj.GetComponent<NetworkPlayer>();
                 // PlayerPrefs에 저장해둔 닉네임을 할당
                 int randomValue = UnityEngine.Random.Range(1, 101);
-                netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_"+ randomValue);
+                netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_" + randomValue);
+
+                roomManager.UpdatePlayerUI();
+
             });
             // 스폰이 끝나면 UI 갱신
-            roomManager.UpdatePlayerUI();
         }
     } 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] 플레이어 퇴장: {player}");

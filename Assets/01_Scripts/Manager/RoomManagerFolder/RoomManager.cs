@@ -3,6 +3,7 @@ using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 // 전역 변수 및 공용 접근자
 public partial class RoomManager : NetworkBehaviour
@@ -18,7 +19,8 @@ public partial class RoomManager : NetworkBehaviour
     public NetworkRunner RunnerInstance => runnerInstance;
     public string RoomPassword => roomPassword;
 
-    [Networked] public NetworkDictionary<int, bool> PlayerReadyDict { get; }
+    // PlayerRef → 닉네임 매핑
+    Dictionary<PlayerRef, string> _nicknames = new Dictionary<PlayerRef, string>();
     [SerializeField] public NetworkPrefabRef playerPrefab;
     // 이전 프레임 상태를 기억할 변수
     private int _lastReadyCount = -1;

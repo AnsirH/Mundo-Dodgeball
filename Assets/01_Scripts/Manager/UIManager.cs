@@ -15,7 +15,6 @@ public class UIManager : ManagerBase<UIManager>
     }
     public void ChangeRoomUI()
     {
-        Debug.Log("aadfaChageRoom UI");
         roomUI.gameObject.SetActive(true);
         lobbyUI.SetActive(false);
         PopManager.instance.AllPopClose();
