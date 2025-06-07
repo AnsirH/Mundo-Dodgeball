@@ -90,17 +90,17 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
             case "F":
                 if (IsActionInProgress)
                 {
-                    CancelAttack();
+                    //CancelAttack();
 
-                    float now = (float)PhotonNetwork.Time;
-                    float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
+                    //float now = (float)PhotonNetwork.Time;
+                    //float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
 
-                    Vector3 direction = this.context.Trf.forward.normalized;
-                    direction.y = 0.0f;
+                    //Vector3 direction = this.context.Trf.forward.normalized;
+                    //direction.y = 0.0f;
 
-                    axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
+                    //axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
 
-                    photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, now + expectedDelay);
+                    //photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, now + expectedDelay);
                 }
                 break;
         }
