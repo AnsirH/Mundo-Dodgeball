@@ -4,6 +4,7 @@ using UnityEngine;
 using MyGame.Utils;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine.InputSystem;
+using Fusion;
 
 /// <summary>
 /// 플레이어 컴포넌트들이 필요로 하는 기능을 제공하는 인터페이스
@@ -22,7 +23,7 @@ public interface IPlayerContext
     PlayerStateBase PlayerState { get; }
 
     /// <summary> 플레이어의 트랜스폼을 반환 </summary>
-    Transform Trf { get; }
+    NetworkTransform Trf { get; }
 
     /// <summary> 플레이어의 애니메이터를 반환 </summary>
     Animator Anim { get; }
@@ -51,11 +52,6 @@ public interface IPlayerComponent
     void Initialize(IPlayerContext context, bool isOfflineMode);
 
     /// <summary>
-    /// 매 프레임 호출되는 업데이트
-    /// </summary>
-    void Updated();
-
-    /// <summary>
     /// 컴포넌트가 활성화될 때 호출
     /// </summary>
     void OnEnabled();
@@ -65,9 +61,22 @@ public interface IPlayerComponent
     /// </summary>
     void OnDisabled();
 
-    public void HandleInput(InputAction.CallbackContext context);
+    public void HandleInput(NetworkInputData data);
 
     public bool Controllable { get; set; }
+}
+
+interface IUpdatedPlayerComponent
+{
+    /// <summary>
+    /// 매 프레임 호출되는 업데이트
+    /// </summary>
+    void Updated();
+
+    /// <summary>
+    /// NetworkBehaviou 전용 Update 메서드
+    /// </summary>
+    void NetworkUpdated();
 }
 
 // 행동 완료를 알리는 인터페이스

@@ -112,6 +112,10 @@ public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction
         }
     }
 
+    public void HandleInput(NetworkInputData data)
+    {
+    }
+
     public bool Controllable { get; set; } = true;
 
 

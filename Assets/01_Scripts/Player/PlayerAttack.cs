@@ -69,6 +69,10 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
         CancelAttack();
     }
 
+    public void HandleInput(NetworkInputData data)
+    {
+    }
+
     public void HandleInput(InputAction.CallbackContext context)
     {
         switch (context.action.name)
@@ -116,7 +120,7 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
         if (!context.MousePositionGetter.ClickPoint.HasValue) yield break;
 
         // 공격 방향 계산
-        Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.Trf.position).normalized;
+        Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.Trf.transform.position).normalized;
         direction.y = 0.0f;
 
         // 공격 애니메이션

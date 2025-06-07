@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Fusion;
 using Fusion.Photon.Realtime;
 using Fusion.Sockets;
-using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

@@ -1324,9 +1324,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 114658553885513850}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4707bc7001ea97b46b26cfd9d72f0b98, type: 3}
+  m_Script: {fileID: 11500000, guid: 11395fcb8ef4c0d41a03ccb1afc05061, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spellD: {fileID: 11400000, guid: 6fd5bff083f520b408d3ed4729561819, type: 2}
+  spellF: {fileID: 11400000, guid: a17d0539939b6f04ebf66a52416ccbd9, type: 2}
 --- !u!114 &1822853794646474301
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1524,6 +1526,7 @@ MonoBehaviour:
   - {fileID: 1089014353931383088}
   - {fileID: 7700144322300401899}
   - {fileID: 8439029551291699871}
+  - {fileID: 3562521471211086396}
   - {fileID: 1822853794646474301}
   - {fileID: 4716611926441708767}
   ForceRemoteRenderTimeframe: 0
