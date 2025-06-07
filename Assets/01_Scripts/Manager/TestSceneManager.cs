@@ -4,17 +4,18 @@ using Fusion;
 using Fusion.Sockets;
 using System.Collections.Generic;
 using System;
+using UnityEngine.SceneManagement;
 
 public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private Ground ground;
-    [SerializeField] private NetworkObject playerPrefab;
+    [SerializeField] private NetworkPrefabRef playerPrefab;
     [SerializeField] private int testPlayerCount = 2;  // 테스트할 플레이어 수
 
-    new public void OnConnectedToServer(NetworkRunner runner)
+    private PlayerInputHandler inputHandler;
+
+    public void OnConnectedToServer(NetworkRunner runner)
     {
-        SpawnTestPlayers();
-        Debug.Log("connect success!");
     }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
@@ -39,6 +40,17 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
+        var data = new NetworkInputData();
+
+
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, inputHandler.LeftClick);
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON1, inputHandler.RightClick);
+        data.buttons.Set(NetworkInputData.BUTTONQ, inputHandler.ButtonQ);
+        data.buttons.Set(NetworkInputData.BUTTOND, inputHandler.ButtonD);
+        data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
+
+        input.Set(data);
+        inputHandler.ResetInputValue();
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
@@ -55,6 +67,8 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
+        SpawnTestPlayers(player);
+        Debug.Log("success player join");
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -92,6 +106,7 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
     private void Awake()
     {
         StartGame(GameMode.Host);
+        inputHandler = GetComponent<PlayerInputHandler>();
     }
 
     async private void StartGame(GameMode mode)
@@ -100,28 +115,38 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
         _runner = gameObject.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;
 
-        _runner.AddCallbacks(this);
-        // Start or join (depends on gamemode ) a session with a specific name
+
+        // Create the NetworkSceneInfo from the current scene
+        var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
+        var sceneInfo = new NetworkSceneInfo();
+        if (scene.IsValid)
+        {
+            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
+        }
+
+        // Start or join (depends on gamemode) a session with a specific name
         await _runner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
-            SessionName = "TestRoom"
+            SessionName = "TestRoom",
+            Scene = scene,
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
     }
 
     private NetworkRunner _runner;
 
-    private void SpawnTestPlayers()
+    private void SpawnTestPlayers(PlayerRef player)
     {
         Debug.Log("spawn function is called!");
         for (int i = 0; i < testPlayerCount; i++)
         {
-            NetworkObject player = _runner.Spawn(playerPrefab, position: ground.sections[i].position, rotation: Quaternion.identity);
-            
+            NetworkObject spawned_player = _runner.Spawn(playerPrefab, position: ground.sections[i].position, rotation: Quaternion.identity, player);
+
 
             // 각 플레이어에 고유한 이름 할당
-            player.name = $"TestPlayer_{i}";
-            player.GetComponent<IPlayerContext>().InitGround(i);
+            spawned_player.name = $"TestPlayer_{i}";
+            spawned_player.GetComponent<IPlayerContext>().InitGround(i);
         }
     }
 }

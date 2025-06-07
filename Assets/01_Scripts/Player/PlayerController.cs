@@ -78,7 +78,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     public Vector3? GetMousePosition() 
     {
-        return Utility.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+        return GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
     }
     #endregion
 

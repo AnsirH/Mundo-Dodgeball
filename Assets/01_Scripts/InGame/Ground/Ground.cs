@@ -60,9 +60,9 @@ public class Ground : MonoBehaviour
             }
             adjustedPoint = hit;
 
-#if UNITY_EDITOR
-            //StartCoroutine(SpawnStartEndAdjustedPoint(ray.origin, targetPoint, hit));
-#endif
+//#if UNITY_EDITOR
+//            //StartCoroutine(SpawnStartEndAdjustedPoint(ray.origin, targetPoint, hit));
+//#endif
             return true;
         }
         else
