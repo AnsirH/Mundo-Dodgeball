@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Fusion;
+using Fusion.Photon.Realtime;
 using Fusion.Sockets;
 using UnityEditor.EditorTools;
 using UnityEngine;
@@ -73,43 +74,47 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    #region 지역 연결코드
     public async void ApplyRegionSetting(string regionCode)
     {
-        PlayerPrefs.SetString("LocalKey", regionCode);
-        PlayerPrefs.Save();
         runnerInstance = Instantiate(roomManager.runnerPrefab);
-
-        runnerInstance.ProvideInput = true;
+        runnerInstance.ProvideInput = false;
         runnerInstance.AddCallbacks(this);
         DontDestroyOnLoad(runnerInstance.gameObject);
 
         var sceneManager = runnerInstance.GetComponent<NetworkSceneManagerDefault>();
         if (sceneManager == null)
             sceneManager = runnerInstance.gameObject.AddComponent<NetworkSceneManagerDefault>();
-        else
-            Debug.Log("SceneManager already exists");
 
+        // 🔧 지역 설정 포함된 AppSettings 준비
+        var appSettings = PhotonAppSettings.Global.AppSettings.GetCopy();
+        appSettings.FixedRegion = regionCode.ToLower();
+
+        // 🔧 StartGame 먼저 호출
         var startArgs = new StartGameArgs
         {
-            GameMode = GameMode.AutoHostOrClient,
-            SessionName = "DefaultRoom",
+            GameMode = GameMode.Single,
+            SessionName = "", // 임의 이름
+            SceneManager = sceneManager,
             Scene = default,
-            SceneManager = sceneManager
+            CustomPhotonAppSettings = appSettings
         };
 
-        var result = await runnerInstance.StartGame(startArgs);
-
-        if (result.Ok)
+        var startResult = await runnerInstance.StartGame(startArgs);
+        if (!startResult.Ok)
         {
-            isStartGame = true;
-            Debug.Log("[Fusion] 연결 성공");
+            Debug.LogError($"[Fusion] StartGame 실패 ❌: {startResult.ShutdownReason}");
+            return;
         }
+
+        // ✅ 로비 연결
+        var lobbyResult = await runnerInstance.JoinSessionLobby(SessionLobby.ClientServer);
+        if (lobbyResult.Ok)
+            Debug.Log($"[Fusion] 로비 입장 성공 ✅ (지역: {regionCode})");
         else
-        {
-            Debug.LogError($"[Fusion] 연결 실패: {result.ShutdownReason}");
-        }
+            Debug.LogError($"[Fusion] 로비 입장 실패 ❌: {lobbyResult.ShutdownReason}");
     }
-
+    #endregion
 
 
     void CheckConnectionStatus()
@@ -128,14 +133,39 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    public void OnConnectedToServer(NetworkRunner runner) => Debug.Log("[Fusion] 서버 연결 성공");
-    public void OnDisconnectedFromServer(NetworkRunner runner) => Debug.Log("[Fusion] 서버 연결 끊김");
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] 플레이어 입장: {player}");
+    public void OnConnectedToServer(NetworkRunner runner) => Debug.Log("ServerManager : [Fusion] 서버 연결 성공!!!!!!!!!!!!!!!!!!!!");
+    public void OnDisconnectedFromServer(NetworkRunner runner) => Debug.Log("ServerManager : [Fusion] 서버 연결 끊김!!!!!!!!!!!!!!!!!!!!");
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) 
+    {
+        Debug.Log($"[Fusion] 플레이어 입장: {player}");
+        // 로컬 플레이어가 아니라면 Host에서만 스폰
+        // (AutoHostOrClient 모드의 Host 혹은 Shared 모드)
+        if (runner.GameMode != GameMode.Single)
+        {
+            // 스폰 위치를 정해둡니다 (예: Vector3.zero)
+            Vector3 spawnPos = Vector3.zero;
+
+            // Spawn overload 의 onBeforeSpawned 콜백을 이용해 NickName 세팅
+            runner.Spawn(roomManager.playerPrefab, spawnPos, Quaternion.identity, player, (r, obj) =>
+            {
+                var netPlayer = obj.GetComponent<NetworkPlayer>();
+                // PlayerPrefs에 저장해둔 닉네임을 할당
+                int randomValue = UnityEngine.Random.Range(1, 101);
+                netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_"+ randomValue);
+            });
+            // 스폰이 끝나면 UI 갱신
+            roomManager.UpdatePlayerUI();
+        }
+    } 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] 플레이어 퇴장: {player}");
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+    {
+        Debug.Log("ServerManager : update Session!");
+        PopManager.instance.gameSelectPop.regularGamePop.SetRoomListSlot(sessionList);
+    }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
@@ -157,7 +187,7 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
     {
-        throw new NotImplementedException();
+        Debug.Log($"ServerManager : 타인 연결 시도");
     }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
