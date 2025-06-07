@@ -2028,6 +2028,14 @@ PrefabInstance:
       propertyPath: playerControllers.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1003683060756051068, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
+      propertyPath: 'characterPrefab.RawGuidValue.Array.data[0]'
+      value: 6102877909895149574
+      objectReference: {fileID: 0}
+    - target: {fileID: 1003683060756051068, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
+      propertyPath: 'characterPrefab.RawGuidValue.Array.data[1]'
+      value: 705074947343367369
+      objectReference: {fileID: 0}
     - target: {fileID: 2266615268428736154, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
       propertyPath: m_Name
       value: InGameController
@@ -2100,7 +2108,12 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 6575844163141058448, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
+      propertyPath: SortKey
+      value: 1480434535
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6371175905147440021, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 16605815527407666, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}

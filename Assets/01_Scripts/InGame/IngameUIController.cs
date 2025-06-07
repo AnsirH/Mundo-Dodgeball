@@ -28,7 +28,7 @@ public class IngameUIController : MonoBehaviour
     public void Init((int masterScore, int otherScore)score)
     {
         // 플레이어 수 가져오기 from IngameController
-        int playerCount = IngameController.Instance.playerControllers.Count;
+        int playerCount = IngameController.Instance.Players.Count;
 
         if (playerCount > 0)
         {
@@ -40,7 +40,7 @@ public class IngameUIController : MonoBehaviour
             for (int i = 0; i < playerCount; ++i)
             {
                 HpBars[i] = Instantiate(hpBarPrefab, transform).GetComponent<HpBar>();
-                HpBars[i].Init(IngameController.Instance.playerControllers[i]);
+                HpBars[i].Init(IngameController.Instance.Players[i]);
             }
 
             // 초기화 된 상태로 설정

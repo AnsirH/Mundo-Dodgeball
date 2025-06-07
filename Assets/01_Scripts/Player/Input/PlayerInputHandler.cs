@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour
 {
@@ -8,23 +9,24 @@ public class PlayerInputHandler : MonoBehaviour
     public bool ButtonD { get; private set; }
     public bool ButtonF { get; private set; }
 
-    private PlayerInputAction inputActions;
+    private InputActionMap mainActionMap;
+    private PlayerInput playerInput;
 
     private void Awake()
     {
-        inputActions = new PlayerInputAction();
-        inputActions.Gameplay.LeftClick.performed += ctx => LeftClick = true;
-        inputActions.Gameplay.RightClick.performed += ctx => RightClick = true;
-        inputActions.Gameplay.Q.performed += ctx => ButtonQ = true;
-        inputActions.Gameplay.D.performed += ctx => ButtonD = true;
-        inputActions.Gameplay.F.performed += ctx => ButtonF = true;
+        playerInput = GetComponent<PlayerInput>();
+        mainActionMap = playerInput.actions.FindActionMap("Gameplay");//ActionMapÃßÃâ
+        mainActionMap.FindAction("LeftClick").performed += ctx => LeftClick = true;
+        mainActionMap.FindAction("RightClick").performed += ctx => RightClick = true;
+        mainActionMap.FindAction("Q").performed += ctx => ButtonQ = true;
+        mainActionMap.FindAction("D").performed += ctx => ButtonD = true;
+        mainActionMap.FindAction("F").performed += ctx => ButtonF = true;
 
-        inputActions.Enable();
     }
 
     private void OnDestroy()
     {
-        inputActions.Disable();
+        playerInput.actions.Disable();
     }
 
     public void ResetInputValue()

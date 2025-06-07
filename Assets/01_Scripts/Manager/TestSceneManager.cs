@@ -1,46 +1,152 @@
 using UnityEngine;
 using MyGame.Utils;
 using Fusion;
+using Fusion.Sockets;
+using System.Collections.Generic;
+using System;
+using UnityEngine.SceneManagement;
 
-public class TestSceneManager : NetworkBehaviour
+public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private Ground ground;
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private NetworkPrefabRef playerPrefab;
     [SerializeField] private int testPlayerCount = 2;  // 테스트할 플레이어 수
 
-    //private void Start()
-    //{
-    //    if (PhotonNetwork.IsConnected)
-    //    {
-    //        SpawnTestPlayers();
-    //    }
-    //    else
-    //    {
-    //        // Photon 연결
-    //        PhotonNetwork.ConnectUsingSettings();
-    //    }
-    //}
+    private PlayerInputHandler inputHandler;
 
-    //public override void OnConnectedToMaster()
-    //{
-    //    // 테스트용 룸 생성
-    //    PhotonNetwork.CreateRoom("TestRoom");
-    //}
+    public void OnConnectedToServer(NetworkRunner runner)
+    {
+    }
 
-    //public override void OnJoinedRoom()
-    //{
-    //    SpawnTestPlayers();
-    //}
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+    {
+    }
 
-    //private void SpawnTestPlayers()
-    //{
-    //    for (int i = 0; i < testPlayerCount; i++)
-    //    {
-    //        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, ground.sections[i].position, Quaternion.identity);
+    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
+    {
+    }
 
-    //        // 각 플레이어에 고유한 이름 할당
-    //        player.GetComponent<PhotonView>().Owner.NickName = $"TestPlayer_{i}";
-    //        player.GetComponent<IPlayerContext>().InitGround(i);
-    //    }
-    //}
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
+    {
+    }
+
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+    {
+    }
+
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+    {
+    }
+
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+        var data = new NetworkInputData();
+
+
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, inputHandler.LeftClick);
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON1, inputHandler.RightClick);
+        data.buttons.Set(NetworkInputData.BUTTONQ, inputHandler.ButtonQ);
+        data.buttons.Set(NetworkInputData.BUTTOND, inputHandler.ButtonD);
+        data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
+
+        input.Set(data);
+        inputHandler.ResetInputValue();
+    }
+
+    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
+    {
+    }
+
+    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+    {
+    }
+
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+    {
+    }
+
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    {
+        SpawnTestPlayers(player);
+        Debug.Log("success player join");
+    }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+    }
+
+    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
+    {
+    }
+
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
+    {
+    }
+
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+    }
+
+    public void OnSceneLoadStart(NetworkRunner runner)
+    {
+    }
+
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+    {
+    }
+
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+    {
+    }
+
+    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
+    {
+    }
+
+    private void Awake()
+    {
+        StartGame(GameMode.Host);
+        inputHandler = GetComponent<PlayerInputHandler>();
+    }
+
+    async private void StartGame(GameMode mode)
+    {
+        // Create the Fusion runner and let it know that we will be providing user input
+        _runner = gameObject.AddComponent<NetworkRunner>();
+        _runner.ProvideInput = true;
+
+
+        // Create the NetworkSceneInfo from the current scene
+        var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
+        var sceneInfo = new NetworkSceneInfo();
+        if (scene.IsValid)
+        {
+            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
+        }
+
+        // Start or join (depends on gamemode) a session with a specific name
+        await _runner.StartGame(new StartGameArgs()
+        {
+            GameMode = mode,
+            SessionName = "TestRoom",
+            Scene = scene,
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+        });
+    }
+
+    private NetworkRunner _runner;
+
+    private void SpawnTestPlayers(PlayerRef player)
+    {
+        Debug.Log("spawn function is called!");
+        for (int i = 0; i < testPlayerCount; i++)
+        {
+            NetworkObject spawned_player = _runner.Spawn(playerPrefab, position: ground.sections[i].position, rotation: Quaternion.identity, player);
+
+
+            // 각 플레이어에 고유한 이름 할당
+            spawned_player.name = $"TestPlayer_{i}";
+            spawned_player.GetComponent<IPlayerContext>().InitGround(i);
+        }
+    }
 }
