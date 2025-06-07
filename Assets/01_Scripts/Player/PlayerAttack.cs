@@ -69,6 +69,10 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
         CancelAttack();
     }
 
+    public void HandleInput(NetworkInputData data)
+    {
+    }
+
     public void HandleInput(InputAction.CallbackContext context)
     {
         switch (context.action.name)

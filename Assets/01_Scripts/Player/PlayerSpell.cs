@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerSpell : MonoBehaviour, IPlayerComponent
+public class PlayerSpell : NetworkBehaviour, IPlayerComponent
 {
     private void Awake()
     {
@@ -62,6 +62,27 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
         }
     }
 
+    public void HandleInput(NetworkInputData data)
+    {
+        if (data.buttons.IsSet(NetworkInputData.BUTTOND))
+        {
+            if (HasStateAuthority && delayD.ExpiredOrNotRunning(Runner))
+            {
+                spellD.Execute();
+                delayD = TickTimer.CreateFromSeconds(Runner, spellD.maxCoolTime);
+            }
+        }
+
+        if (data.buttons.IsSet(NetworkInputData.BUTTONF))
+        {
+            if (HasStateAuthority && delayF.ExpiredOrNotRunning(Runner))
+            {
+                spellF.Execute();
+                delayF = TickTimer.CreateFromSeconds(Runner, spellF.maxCoolTime);
+            }
+        }
+    }
+
     private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild=false)
     {
         GameObject effect = ObjectPooler.Get(effectTag);
@@ -82,7 +103,7 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
     }
 
     [Rpc]
-    private void SpawnEffect_RPC(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild = false)
+    private void RPC_SpawnEffect(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild = false)
     {
         StartCoroutine(SpawnEffect(effectTag, targetPoint, duration, isChild));
     }
@@ -94,71 +115,8 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
     private Spell spellF;
 
     public bool Controllable { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+    [Networked] private TickTimer delayD { get; set; }
+    [Networked] private TickTimer delayF { get; set; }
 }
 
-public abstract class Spell
-{
-    public IPlayerContext context;
-    public Spell(IPlayerContext context)
-    {
-        this.context = context;
-    }
-
-    public abstract void Execute();
-
-    public void CoolDown(float decreaseValue)
-    {
-        if (currentCoolTime > 0.0f)
-        {
-            currentCoolTime -= decreaseValue;
-        }
-        else
-        {
-            currentCoolTime = 0.0f;
-        }
-    }
-
-    public float currentCoolTime = 0.0f;
-    public float maxCoolTime = 5.0f;
-
-    public bool CanUsable { get { return currentCoolTime <= 0.0f; } }
-}
-
-public class Flash : Spell
-{
-    public Flash(IPlayerContext context) : base(context)
-    {
-        this.context = context;
-    }
-
-    public override void Execute()
-    {
-        Vector3 targetPoint = context.MousePositionGetter.ClickPoint.Value;
-        Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.Trf.position).normalized;
-
-        context.Trf.position = targetPoint;
-        context.Trf.rotation = Quaternion.LookRotation(direction);
-
-
-        currentCoolTime = maxCoolTime;
-    }
-
-    float distance = 3.0f;
-}
-
-public class Heal : Spell
-{
-    public Heal(IPlayerContext context) : base(context)
-    {
-        this.context = context;
-    }
-
-    public override void Execute()
-    {
-        context.Stats.ModifyCurrentHealth(healAmount);
-
-        currentCoolTime = maxCoolTime;
-    }
-
-    float healAmount = 60.0f;
-}

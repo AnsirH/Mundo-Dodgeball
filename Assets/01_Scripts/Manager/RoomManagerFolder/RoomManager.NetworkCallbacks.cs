@@ -2,7 +2,6 @@ using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
 using Fusion.Sockets;
-using UnityEngine.InputSystem.iOS;
 using System;
 // 방 생성, 참가, 퇴장, 씬 전환 로직
 public partial class RoomManager : INetworkRunnerCallbacks

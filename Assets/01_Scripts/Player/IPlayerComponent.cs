@@ -65,7 +65,7 @@ public interface IPlayerComponent
     /// </summary>
     void OnDisabled();
 
-    public void HandleInput(InputAction.CallbackContext context);
+    public void HandleInput(NetworkInputData data);
 
     public bool Controllable { get; set; }
 }

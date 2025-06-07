@@ -42,13 +42,14 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         var data = new NetworkInputData();
 
-
         data.buttons.Set(NetworkInputData.MOUSEBUTTON0, inputHandler.LeftClick);
         data.buttons.Set(NetworkInputData.MOUSEBUTTON1, inputHandler.RightClick);
         data.buttons.Set(NetworkInputData.BUTTONQ, inputHandler.ButtonQ);
         data.buttons.Set(NetworkInputData.BUTTOND, inputHandler.ButtonD);
         data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
 
+        if (inputHandler.RightClick)
+            data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground")).Value;
         input.Set(data);
         inputHandler.ResetInputValue();
     }
@@ -67,7 +68,10 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        SpawnTestPlayers(player);
+        if (_runner.IsServer)
+        {
+            SpawnTestPlayers(player);
+        }
         Debug.Log("success player join");
     }
 
@@ -105,7 +109,6 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Awake()
     {
-        StartGame(GameMode.Host);
         inputHandler = GetComponent<PlayerInputHandler>();
     }
 
@@ -147,6 +150,21 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
             // 각 플레이어에 고유한 이름 할당
             spawned_player.name = $"TestPlayer_{i}";
             spawned_player.GetComponent<IPlayerContext>().InitGround(i);
+        }
+    }
+
+    private void OnGUI()
+    {
+        if (_runner == null)
+        {
+            if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
+            {
+                StartGame(GameMode.Host);
+            }
+            if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
+            {
+                StartGame(GameMode.Client);
+            }
         }
     }
 }

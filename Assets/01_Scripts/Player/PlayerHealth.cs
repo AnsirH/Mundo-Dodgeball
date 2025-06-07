@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerHealth : NetworkBehaviour,/* IPunObservable, */IDamageable, IPlayerComponent
+public class PlayerHealth : NetworkBehaviour, IDamageable, IPlayerComponent
 {
     private IPlayerContext context;
     private bool isOfflineMode;
@@ -31,7 +31,7 @@ public class PlayerHealth : NetworkBehaviour,/* IPunObservable, */IDamageable, I
         context.Stats.ResetHealth();
     }
 
-    public void HandleInput(InputAction.CallbackContext context)
+    public void HandleInput(NetworkInputData data)
     {
     }
     // 실제 Damage 호출할 때 (senderContext 가지고 있을 때)
