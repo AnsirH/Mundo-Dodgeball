@@ -1,20 +1,17 @@
-// RoomManager.RoomOperations.cs
+ï»¿// RoomManager.RoomOperations.cs
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Fusino Äİ¹é Ã³¸®
+// Fusino ì½œë°± ì²˜ë¦¬
 public partial class RoomManager
 {
-    public void Awake()
-    {
-        //runnerPrefab = this.gameObject.AddComponent<NetworkRunner>();
-        Debug.Log("add : runnerPrefab");
-    }
-    // ¹æ »ı¼º
+    // ë°© ìƒì„±
     public async void CreateRoom(string password, string roomNmae)
     {
         string roomId = roomNmae + "[03%14]" + Guid.NewGuid();
@@ -29,16 +26,26 @@ public partial class RoomManager
         await StartFusionSession(GameMode.Host, roomId, token);
     }
 
-    // ¹æ Âü°¡
+    // ë°© ì°¸ê°€
     public async void JoinRoom(string password, string roomName)
     {
         byte[] token = Encoding.UTF8.GetBytes(password);
         await StartFusionSession(GameMode.Client, roomName, token);
     }
 
-    // °øÅë ¼¼¼Ç ½ÃÀÛ ·ÎÁ÷
+    // ê³µí†µ ì„¸ì…˜ ì‹œì‘ ë¡œì§
     private async Task StartFusionSession(GameMode mode, string roomId, byte[] token)
     {
+        // â‘  ì´ì „ ì„¸ì…˜ì´ ìˆìœ¼ë©´ ê¹”ë”íˆ ì¢…ë£Œ
+        if (runnerInstance != null)
+        {
+            Debug.Log("ì‹œë®¬ë ˆì´ì…˜ ì¢…ë£Œ ì‹œì‘");
+            await runnerInstance.Shutdown();                     // ì‹œë®¬ë ˆì´ì…˜ ì¢…ë£Œ ìš”ì²­
+            Debug.Log("ì‹œë®¬ë ˆì´ì…˜ ì¢…ë£Œ ì™„ë£Œ");
+            Destroy(runnerInstance.gameObject);            // ì˜¤ë¸Œì íŠ¸ ì œê±°
+            runnerInstance = null;                         // ì°¸ì¡° í•´ì œ
+            await Task.Yield();                            // í•œ í”„ë ˆì„ë§Œ ê¸°ë‹¤ë ¤ ì£¼ì„¸ìš”
+        }
         runnerInstance = Instantiate(runnerPrefab);
         runnerInstance.ProvideInput = true;
 
@@ -52,11 +59,37 @@ public partial class RoomManager
             SceneManager = sceneManager,
             ConnectionToken = token
         };
-
+        runnerInstance.AddCallbacks(this);
         await runnerInstance.StartGame(args);
     }
+    public void UpdatePlayerUI()
+    {
+        UIManager.instance.ChangeRoomUI();
+        var players = runnerInstance.ActivePlayers.ToList();
+        var hostRef = players.FirstOrDefault();
+        var otherRef = players.Skip(1).FirstOrDefault();
 
-    // ¹æ ¶°³ª±â
+        // í˜¸ìŠ¤íŠ¸ ë‹‰ë„¤ì„
+        if (hostRef != PlayerRef.None)
+        {
+            var go = runnerInstance.GetPlayerObject(hostRef);
+            var np = go.GetComponent<NetworkPlayer>();
+            UIManager.instance.roomUI.leftPlayerText.text = np.NickName.Value;
+        }
+
+        // ìƒëŒ€ ë‹‰ë„¤ì„
+        if (otherRef != PlayerRef.None)
+        {
+            var go = runnerInstance.GetPlayerObject(otherRef);
+            var np = go.GetComponent<NetworkPlayer>();
+            UIManager.instance.roomUI.rightPlayerText.text = np.NickName.Value;
+        }
+        else
+        {
+            UIManager.instance.roomUI.rightPlayerText.text = "ëŒ€ê¸° ì¤‘...";
+        }
+    }
+    // ë°© ë– ë‚˜ê¸°
     public void LeaveRoom()
     {
         if (runnerInstance != null)
@@ -66,42 +99,15 @@ public partial class RoomManager
         }
     }
 
-    // È£½ºÆ®°¡ ¾À ¼öµ¿À¸·Î ·ÎµåÇÏ±â
+    // í˜¸ìŠ¤íŠ¸ê°€ ì”¬ ìˆ˜ë™ìœ¼ë¡œ ë¡œë“œí•˜ê¸°
     public void LoadGameScene()
     {
         if (runnerInstance != null && runnerInstance.IsServer)
         {
-            Debug.Log("[Fusion] ¸ğµç ÇÃ·¹ÀÌ¾î ÁØºñ ¿Ï·á - ¾À ·Îµù ½ÃÀÛ");
+            Debug.Log("[Fusion] ëª¨ë“  í”Œë ˆì´ì–´ ì¤€ë¹„ ì™„ë£Œ - ì”¬ ë¡œë”© ì‹œì‘");
             SceneRef sceneRef = SceneRef.Parse("GeneralModeScene");
             NetworkLoadSceneParameters parameters = new NetworkLoadSceneParameters();
             runnerInstance.SceneManager.LoadScene(sceneRef, parameters);
         }
-    }
-
-    // ¸ğµÎ ·¹µğ ´©°¡ Çß´ÂÁö ¹Ş±â
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_Ready(PlayerRef player)
-    {
-        if (!PlayerReadyDict.ContainsKey(player))
-            PlayerReadyDict.Add(player, true);
-        else
-            PlayerReadyDict.Set(player, true);
-        Debug.Log($"{player} ¡æ ·¹µğ ¿Ï·á");
-
-        if (AllPlayersReady())
-        {
-            Debug.Log("¸ğµç ÇÃ·¹ÀÌ¾î ·¹µğ ¿Ï·á ¡æ °ÔÀÓ ½ÃÀÛ");
-            LoadGameScene();
-        }
-    }
-    // ¸ğµç ÇÃ·¹ÀÌ¾î°¡ ·¹µğ Çß´Â°¡
-    private bool AllPlayersReady()
-    {
-        foreach (var player in Runner.ActivePlayers)
-        {
-            if (!PlayerReadyDict.TryGet(player, out bool isReady) || !isReady)
-                return false;
-        }
-        return true;
     }
 }

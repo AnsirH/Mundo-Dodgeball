@@ -26,7 +26,7 @@ public class RoomUI : MonoBehaviour
         isReady = !isReady;
         noneReadyBtn.gameObject.SetActive(!isReady);
         readyBtn.gameObject.SetActive(isReady);
-        ServerManager.Instance.roomManager.RPC_Ready(ServerManager.Instance.roomManager.RunnerInstance.LocalPlayer);
+        //ServerManager.Instance.roomManager.RPC_Ready(ServerManager.Instance.roomManager.RunnerInstance.LocalPlayer);
     }
     public void OnEnable()
     {

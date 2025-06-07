@@ -211,6 +211,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (17)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -1099,6 +1103,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -6655,7 +6663,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1258134778}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.22204117
+  m_Size: 0.17026816
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6942,6 +6950,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -7199,6 +7211,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -7399,6 +7415,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot (14)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -7675,6 +7695,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot (15)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -8831,6 +8855,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -10446,6 +10474,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -10524,6 +10556,8 @@ MonoBehaviour:
   maxScore: 3
   _PlayerReadyDict:
     _items: []
+  playerPrefab:
+    RawGuidValue: 214ec664adeebee4eb1c7cbefdf5835a
 --- !u!1 &1120355542
 GameObject:
   m_ObjectHideFlags: 0
@@ -11231,6 +11265,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -12236,7 +12274,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1200103880}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.7779588}
+  m_AnchorMin: {x: 0, y: 0.8297318}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -12854,6 +12892,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot (10)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -13618,6 +13660,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot (16)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -14802,6 +14848,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -15579,6 +15629,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -15872,6 +15926,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -17438,6 +17496,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -17950,6 +18012,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -18407,6 +18473,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomSlot (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -104.09375
@@ -18633,6 +18703,10 @@ PrefabInstance:
     - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_Name
       value: RoomSlot
+      objectReference: {fileID: 0}
+    - target: {fileID: 1957004419829991669, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4384595853254518191, guid: 5d0c01da53e0e6f4f8369fcda6ccfcad, type: 3}
       propertyPath: m_AnchoredPosition.x

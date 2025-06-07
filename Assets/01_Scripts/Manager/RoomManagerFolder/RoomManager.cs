@@ -1,7 +1,8 @@
 // RoomManager.cs
-using System.Collections.Generic;
 using Fusion;
+using Fusion.Sockets;
 using UnityEngine;
+using System.Linq;
 
 // 전역 변수 및 공용 접근자
 public partial class RoomManager : NetworkBehaviour
@@ -17,8 +18,10 @@ public partial class RoomManager : NetworkBehaviour
     public NetworkRunner RunnerInstance => runnerInstance;
     public string RoomPassword => roomPassword;
 
-    [Networked]
-    public NetworkDictionary<PlayerRef, bool> PlayerReadyDict => new NetworkDictionary<PlayerRef, bool>();
+    [Networked] public NetworkDictionary<int, bool> PlayerReadyDict { get; }
+    [SerializeField] public NetworkPrefabRef playerPrefab;
+    // 이전 프레임 상태를 기억할 변수
+    private int _lastReadyCount = -1;
 }
 // --------------------------------------------------------------------------------------
 // Photon Fusion 2.x 기준 RoomManager (정확한 씬 전환 포함)

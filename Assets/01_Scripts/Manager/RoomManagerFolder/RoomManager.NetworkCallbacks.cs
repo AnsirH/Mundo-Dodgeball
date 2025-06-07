@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Fusion.Sockets;
 using System;
+using UnityEditor.EditorTools;
 // 방 생성, 참가, 퇴장, 씬 전환 로직
 public partial class RoomManager : INetworkRunnerCallbacks
 {
@@ -10,6 +11,24 @@ public partial class RoomManager : INetworkRunnerCallbacks
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log($"[Fusion] 플레이어 입장: {player}");
+        // 로컬 플레이어가 아니라면 Host에서만 스폰
+        // (AutoHostOrClient 모드의 Host 혹은 Shared 모드)
+        if (runner.GameMode != GameMode.Single)
+        {
+            // 스폰 위치를 정해둡니다 (예: Vector3.zero)
+            Vector3 spawnPos = Vector3.zero;
+
+            // Spawn overload 의 onBeforeSpawned 콜백을 이용해 NickName 세팅
+            runner.Spawn(playerPrefab, spawnPos, Quaternion.identity, player, (r, obj) =>
+            {
+                var netPlayer = obj.GetComponent<NetworkPlayer>();
+                // PlayerPrefs에 저장해둔 닉네임을 할당
+                int randomValue = UnityEngine.Random.Range(1, 101);
+                netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_" + randomValue);
+            });
+            // 스폰이 끝나면 UI 갱신
+            UpdatePlayerUI();
+        }
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -28,8 +47,8 @@ public partial class RoomManager : INetworkRunnerCallbacks
         }
         Debug.Log($"@user message@ Completed AddCallbacks for {controllers.Length} InGameControllers");
     }
-    public void OnConnectedToServer(NetworkRunner runner) => Debug.Log("[Fusion] 서버에 연결됨");
-    public void OnDisconnectedFromServer(NetworkRunner runner) => Debug.Log("[Fusion] 서버 연결 해제됨");
+    public void OnConnectedToServer(NetworkRunner runner) => Debug.Log("RoomManager : [Fusion] 서버 연결 성공!!!!!!!!!!!!!!!!!!!!");
+    public void OnDisconnectedFromServer(NetworkRunner runner) => Debug.Log("RoomManager : [Fusion] 서버 연결 끊김!!!!!!!!!!!!!!!!!!!!");
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
@@ -41,7 +60,11 @@ public partial class RoomManager : INetworkRunnerCallbacks
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, System.ArraySegment<byte> data) { }
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) 
+    {
+        Debug.Log("update Session!");
+        PopManager.instance.gameSelectPop.regularGamePop.SetRoomListSlot(sessionList);
+    }
     public void OnPlayerRefAssigned(NetworkRunner runner, PlayerRef playerRef) { }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
