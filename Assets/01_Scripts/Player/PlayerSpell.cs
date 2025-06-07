@@ -1,4 +1,4 @@
-using Photon.Pun;
+using Fusion;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -46,7 +46,7 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
             {
                 spellD.Execute();
                 StartCoroutine(SpawnEffect("HealEffect", this.context.Trf.position, 1.5f, true));
-                this.context.p_PhotonView.RPC(nameof(SpawnEffect_RPC), RpcTarget.Others, "HealEffect", this.context.Trf.position, 1.5f, true);
+                //this.context.p_PhotonView.RPC(nameof(SpawnEffect_RPC), RpcTarget.Others, "HealEffect", this.context.Trf.position, 1.5f, true);
             }
         }
         if (context.action.name == "F")
@@ -57,7 +57,7 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
                 Vector3 targetPoint = this.context.MousePositionGetter.ClickPoint.Value;
                 targetPoint.y = IngameController.Instance.ground.transform.position.y;
                 StartCoroutine(SpawnEffect("FlashEffect", targetPoint));
-                this.context.p_PhotonView.RPC(nameof(SpawnEffect_RPC), RpcTarget.Others, "FlashEffect", targetPoint, 1.0f, false);
+                //this.context.p_PhotonView.RPC(nameof(SpawnEffect_RPC), RpcTarget.Others, "FlashEffect", targetPoint, 1.0f, false);
             }
         }
     }
@@ -81,7 +81,7 @@ public class PlayerSpell : MonoBehaviour, IPlayerComponent
         ObjectPooler.Release(effectTag, effect);
     }
 
-    [PunRPC]
+    [Rpc]
     private void SpawnEffect_RPC(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild = false)
     {
         StartCoroutine(SpawnEffect(effectTag, targetPoint, duration, isChild));

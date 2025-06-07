@@ -1,4 +1,4 @@
-using Photon.Pun;
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,21 +6,15 @@ using UnityEngine.Events;
 
 namespace PlayerCharacterControl
 {
-    public class PlayerAnimEventHandler : MonoBehaviourPunCallbacks
+    public class PlayerAnimEventHandler : NetworkObject
     {
         UnityEvent<string> onAnimationEventActions = new();
         public UnityEvent<string> OnAnimationEventActions => onAnimationEventActions;
 
         public void SendEventTag(string tag)
         {
-            if (!photonView.IsMine) return;
-            photonView.RPC("SendEventTagRPC", RpcTarget.All, tag);
-        }
-
-        [PunRPC]
-        private void SendEventTagRPC(string tag)
-        {
-            onAnimationEventActions.Invoke(tag);
+            if (!HasStateAuthority) return;
+            //photonView.RPC("SendEventTagRPC", RpcTarget.All, tag);
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using DG.Tweening;
-using Photon.Pun;
+using Fusion;
 using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
+public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
 {
     private IPlayerContext context;
 
@@ -125,14 +125,14 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         // 공격 방향으로 회전
         // 회전 종료 시 공격
         transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
-        {
-            float now = (float)PhotonNetwork.Time;
-            float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
-            axeObj.SetActive(false);
+        {            
+            //float now = (float)PhotonNetwork.Time;
+            //float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
+            //axeObj.SetActive(false);
 
-            axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
+            //axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
 
-            photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, now + expectedDelay);
+            //photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, now + expectedDelay);
         };
 
         // 공격 애니메이션 및 로직
@@ -146,7 +146,7 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
     // 도끼 궤적 활성화 메서드
     public void ActivateRange(bool active)
     {
-        if (!photonView.IsMine) { return; }
+        if (!HasStateAuthority) { return; }
         if (active == true)
         {
             if (axeShooter.CanShoot)
@@ -171,7 +171,7 @@ public class PlayerAttack : MonoBehaviourPun, IPlayerComponent, IPlayerAction
         }
     }
 
-    [PunRPC]
+    [Rpc]
     private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction, float execTime)
     {
         axeShooter.SpawnProjectile(StartPos, direction, execTime);

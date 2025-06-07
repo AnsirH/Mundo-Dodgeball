@@ -1,6 +1,4 @@
 using UnityEngine;
-using Photon;
-using Photon.Pun;
 
 [System.Serializable]
 public class PlayerStats

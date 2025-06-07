@@ -2,10 +2,9 @@
 using System;
 using UnityEngine.InputSystem;
 using Fusion;
-using PlayerCharacterControl.State;
 
 [RequireComponent(typeof(NetworkCharacterController))]
-public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction, IMovable
+public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction
 {
     [SerializeField] protected bool isOfflineMode = false;
     [SerializeField] protected float moveSpeed = 5f;

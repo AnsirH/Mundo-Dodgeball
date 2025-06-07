@@ -1,12 +1,10 @@
-﻿using ExitGames.Client.Photon;
+﻿using Fusion;
 using MoreMountains.Feedbacks;
-using Photon.Pun;
-using Photon.Realtime;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageable, IPlayerComponent
+public class PlayerHealth : NetworkBehaviour,/* IPunObservable, */IDamageable, IPlayerComponent
 {
     private IPlayerContext context;
     private bool isOfflineMode;
@@ -39,14 +37,14 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     // 실제 Damage 호출할 때 (senderContext 가지고 있을 때)
     public void TakeDamage(IPlayerContext senderContext)
     {
-        if (photonView.IsMine || context.Stats.IsDead())
-            return; // 내 것만 호출하게 막기
+        //if (photonView.IsMine || context.Stats.IsDead())
+        //    return; // 내 것만 호출하게 막기
 
-        float attackPower = senderContext.Stats.GetAttackPower();
-        int whoAttacker = context.p_PhotonView.ViewID;
-        photonView.RPC(nameof(Damage), RpcTarget.All, whoAttacker, attackPower);
+        //float attackPower = senderContext.Stats.GetAttackPower();
+        //int whoAttacker = context.p_PhotonView.ViewID;
+        //photonView.RPC(nameof(Damage), RpcTarget.All, whoAttacker, attackPower);
     }
-    [PunRPC]
+    [Rpc]
     public void Damage(int attackerActorNumber, float attackPower)
     {
         StartCoroutine(ActiveHitEffect());
@@ -58,9 +56,8 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
         if (context.Stats.IsDead())
         {
             Debug.Log("check LOG : isDead!");
-            if (photonView.IsMine)
+            if (HasStateAuthority)
             {
-                Debug.Log("check LOG : isMine");
                 context.OnPlayerDeath();
 
                 // 죽을 때 이긴 사람 점수 올리기;
@@ -72,31 +69,31 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable, IDamageab
     {
         object[] content = new object[] { idx, vaule};
 
-        RaiseEventOptions options = new RaiseEventOptions
-        {
-            Receivers = ReceiverGroup.MasterClient // 모든 플레이어에게 브로드캐스트
-        };
+        //RaiseEventOptions options = new RaiseEventOptions
+        //{
+        //    Receivers = ReceiverGroup.MasterClient // 모든 플레이어에게 브로드캐스트
+        //};
 
-        SendOptions sendOptions = new SendOptions
-        {
-            Reliability = true
-        };
-        PhotonNetwork.RaiseEvent(NetworkEventCodes.AddScoreEvent, content, options, sendOptions);
+        //SendOptions sendOptions = new SendOptions
+        //{
+        //    Reliability = true
+        //};
+        //PhotonNetwork.RaiseEvent(NetworkEventCodes.AddScoreEvent, content, options, sendOptions);
     }
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            // 내 로컬 currentHealth 절대값 전송
-            stream.SendNext(context.Stats.GetCurrentHealth());
-        }
-        else
-        {
-            // 받은 절대값으로 덮어쓰기
-            float receivedHealth = (float)stream.ReceiveNext();
-            context.Stats.SetCurrentHealth(receivedHealth);
-        }
-    }
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    //{
+    //    if (stream.IsWriting)
+    //    {
+    //        // 내 로컬 currentHealth 절대값 전송
+    //        stream.SendNext(context.Stats.GetCurrentHealth());
+    //    }
+    //    else
+    //    {
+    //        // 받은 절대값으로 덮어쓰기
+    //        float receivedHealth = (float)stream.ReceiveNext();
+    //        context.Stats.SetCurrentHealth(receivedHealth);
+    //    }
+    //}
 
     public float GetHealthPercentage()
     {
