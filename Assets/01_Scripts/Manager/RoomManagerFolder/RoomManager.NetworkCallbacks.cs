@@ -33,7 +33,7 @@ public partial class RoomManager : INetworkRunnerCallbacks
                 Debug.Log($"[Spawn] NickName set to {netPlayer.NickName.Value}");
 
                 // ③ 스폰이 완전히 끝난 뒤 바로 UI 갱신
-                UpdatePlayerUI();
+                UpdateLobbyUI();
             });
         }
     }
@@ -41,6 +41,8 @@ public partial class RoomManager : INetworkRunnerCallbacks
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log($"[Fusion] 플레이어 퇴장: {player}");
+        _nicknames.Remove(player);
+        UpdateLobbyUI();
     }
 
     public void OnSceneLoadStart(NetworkRunner runner) => Debug.Log("[Fusion] 씬 로딩 시작");

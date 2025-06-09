@@ -72,7 +72,7 @@ public partial class RoomManager
         UpdateLobbyUI();
     }
 
-    void UpdateLobbyUI()
+    public void UpdateLobbyUI()
     {
         var players = runnerInstance.ActivePlayers;
         // 왼쪽: Host, 오른쪽: other
@@ -91,18 +91,6 @@ public partial class RoomManager
             UIManager.instance.roomUI.rightPlayerText.text = on;
         else
             UIManager.instance.roomUI.rightPlayerText.text = "대기 중...";
-    }
-
-    public void OnPlayerJoined(NetworkRunner r, PlayerRef p)
-    {
-        // 새로운 플레이어가 들어오면, 본인이 미리 보낸 RPC로 닉네임 등록 완료
-        Debug.Log($"[{p}] 입장, UI 갱신");
-        UpdateLobbyUI();
-    }
-    public void OnPlayerLeft(NetworkRunner r, PlayerRef p)
-    {
-        _nicknames.Remove(p);
-        UpdateLobbyUI();
     }
 
     // 2) 실제로 오브젝트가 준비될 때까지 기다렸다가 닉네임을 뿌려주는 코루틴

@@ -152,7 +152,7 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
                 int randomValue = UnityEngine.Random.Range(1, 101);
                 netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_" + randomValue);
 
-                roomManager.UpdatePlayerUI();
+                roomManager.UpdateLobbyUI();
 
             });
             // 스폰이 끝나면 UI 갱신
