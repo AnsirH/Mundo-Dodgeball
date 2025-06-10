@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -19,6 +20,9 @@ public class GameSelectPop : PopBase
     [SerializeField] Button createBtn; // 방만들기
     [SerializeField] Button cancelBtn; // 방만들기 취소
     [SerializeField] TMP_InputField EnterPassWord; // 방들어갈때, 입력창
+
+    public event Action<string, string, string> OnCreateRoomRequested;
+
     public RegularGamePop regularGamePop;
     public override void Open()
     {
@@ -44,7 +48,7 @@ public class GameSelectPop : PopBase
     }
     public void CreateRoom()
     {
-        ServerManager.Instance.roomManager.CreateRoom(passWordField.text, roomNameField.text);
+        OnCreateRoomRequested?.Invoke(roomNameField.text, passWordField.text, "GeneralGameMode");
     }
     public void JoinRoom()
     {

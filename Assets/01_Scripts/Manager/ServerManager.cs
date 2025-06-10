@@ -76,6 +76,7 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
     #region 지역 연결코드
     public async void ApplyRegionSetting(string regionCode)
     {
+        Debug.Log("Setting the Region in ServerManager");
         runnerInstance = Instantiate(roomManager.runnerPrefab);
         runnerInstance.ProvideInput = false;
         runnerInstance.AddCallbacks(this);
@@ -161,7 +162,10 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] 플레이어 퇴장: {player}");
 
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) 
+    {
+        Debug.Log($"serverManager❗ NetworkRunner 종료됨: {shutdownReason}");
+    }
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         Debug.Log("ServerManager : update Session!");
