@@ -1296,7 +1296,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733a4ac905a373745984578e139fdafc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOfflineMode: 0
   moveSpeed: 3
   rotateSpeed: 1080
   arrivalThreshold: 0.1
@@ -1524,7 +1523,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1089014353931383088}
-  - {fileID: 7700144322300401899}
   - {fileID: 8439029551291699871}
   - {fileID: 3562521471211086396}
   - {fileID: 1822853794646474301}

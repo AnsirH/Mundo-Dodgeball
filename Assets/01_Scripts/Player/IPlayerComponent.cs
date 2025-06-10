@@ -18,12 +18,11 @@ public interface IPlayerContext
 
     void InitGround(int sectionNum);
 
-    #region properties
     /// <summary> 플레이어의 현재 상태 </summary>
     PlayerStateBase PlayerState { get; }
 
-    /// <summary> 플레이어의 트랜스폼을 반환 </summary>
-    NetworkTransform Trf { get; }
+    /// <summary> 네트워크 캐릭터 컨트롤러 </summary>
+    NetworkCharacterController NCC { get; }
 
     /// <summary> 플레이어의 애니메이터를 반환 </summary>
     Animator Anim { get; }
@@ -37,8 +36,6 @@ public interface IPlayerContext
     IMousePositionGetter MousePositionGetter { get; }
 
     int GroundSectionNum { get; }
-
-    #endregion
 }
 
 /// <summary>
@@ -76,7 +73,7 @@ interface IUpdatedPlayerComponent
     /// <summary>
     /// NetworkBehaviou 전용 Update 메서드
     /// </summary>
-    void NetworkUpdated();
+    void NetworkUpdated(float runnerDeltaTime);
 }
 
 // 행동 완료를 알리는 인터페이스

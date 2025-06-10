@@ -141,7 +141,6 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void SpawnTestPlayers(PlayerRef player)
     {
-        Debug.Log("spawn function is called!");
         for (int i = 0; i < testPlayerCount; i++)
         {
             NetworkObject spawned_player = _runner.Spawn(playerPrefab, position: ground.sections[i].position, rotation: Quaternion.identity, player);
@@ -149,7 +148,6 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
             // 각 플레이어에 고유한 이름 할당
             spawned_player.name = $"TestPlayer_{i}";
-            spawned_player.GetComponent<IPlayerContext>().InitGround(i);
         }
     }
 

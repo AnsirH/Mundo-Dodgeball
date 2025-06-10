@@ -4,9 +4,8 @@ using UnityEngine.InputSystem;
 using Fusion;
 
 [RequireComponent(typeof(NetworkCharacterController))]
-public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction
+public class PlayerMovement : MonoBehaviour, IPlayerComponent, IPlayerAction, IUpdatedPlayerComponent
 {
-    [SerializeField] protected bool isOfflineMode = false;
     [SerializeField] protected float moveSpeed = 5f;
     [SerializeField] protected float rotateSpeed = 10f;
     [SerializeField] protected float arrivalThreshold = 0.1f;
@@ -22,24 +21,43 @@ public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction
 
     private NetworkCharacterController _cc;
 
+    private BaseNetworkMovementModule _movementModule;
+
     public bool IsActionInProgress => isActionInProgress;
 
     public bool CanExecuteAction => Controllable;
 
     public event Action OnActionCompleted;
 
-    public void MoveForDeltaTime(Vector3 targetPosition)
-    {
-        targetPosition.y = 0.0f;
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        _cc.Move(direction * moveSpeed * Runner.DeltaTime);
-    }
 
-    public void RotateForDeltaTime(Vector3 direction)
+    //public void MoveForDeltaTime(Vector3 targetPosition)
+    //{
+    //    targetPosition.y = 0.0f;
+    //    Vector3 direction = (targetPosition - transform.position).normalized;
+    //    _cc.Move(direction * moveSpeed * Runner.DeltaTime);
+    //}
+
+    //public void RotateForDeltaTime(Vector3 direction)
+    //{
+    //    if (!HasStateAuthority) return;
+    //    Quaternion targetRotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Runner.DeltaTime); 
+    //    transform.rotation = targetRotation;
+    //}
+
+    public void NetworkUpdated(float runnerDeltaTime)
     {
-        if (!HasStateAuthority) return;
-        Quaternion targetRotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Runner.DeltaTime); 
-        transform.rotation = targetRotation;
+        if (isMoving)
+        {
+            if (Vector3.Distance(_cc.transform.position, currentTargetPosition.Value) > arrivalThreshold)
+            {
+                Vector3 normalizedDirection = (currentTargetPosition.Value - _cc.transform.position).normalized;
+                _movementModule.MoveForDeltaTime(normalizedDirection, runnerDeltaTime);
+            }
+            else
+            {
+                MoveComplete();
+            }
+        }
     }
 
     public void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
@@ -71,20 +89,8 @@ public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction
     public void Initialize(IPlayerContext context, bool isOfflineMode)
     {
         this.context = context;
-        this.isOfflineMode = isOfflineMode;
-    }
-
-    public void Updated()
-    {
-        if (isMoving)
-        {
-            if (Vector3.Distance(_cc.transform.position, currentTargetPosition.Value) > arrivalThreshold)
-                MoveForDeltaTime(currentTargetPosition.Value);
-            else
-            {
-                MoveComplete();
-            }
-        }
+        _cc = GetComponent<NetworkCharacterController>();
+        _movementModule = new BaseNetworkMovementModule(_cc, moveSpeed, rotateSpeed);
     }
 
     public void OnDisabled()
@@ -132,5 +138,10 @@ public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction
     public void StopAction()
     {
         StopMove();
+    }
+
+    public void Updated()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -55,7 +55,7 @@ public class Axe : MonoBehaviour, IProjectile
 
     public void OnHit(Collider other)
     {
-        if (other.TryGetComponent<IDamageable>(out IDamageable damageable) && other.gameObject != context.Trf.gameObject)
+        if (other.TryGetComponent<IDamageable>(out IDamageable damageable) && other.gameObject != context.NCC.gameObject)
         {
             damageable.TakeDamage(context);
             moveTweenCore?.Complete();

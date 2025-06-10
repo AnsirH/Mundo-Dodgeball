@@ -66,7 +66,7 @@ public partial class RoomManager
 
     // 모든 클라이언트가 이 RPC를 통해 닉네임을 공유
     [Rpc(RpcSources.All, RpcTargets.All)]
-    void RPC_AnnounceNickname(NetworkRunner _, PlayerRef who, string nick)
+    void RPC_AnnounceNickname(PlayerRef who, string nick)
     {
         _nicknames[who] = nick;
         UpdateLobbyUI();

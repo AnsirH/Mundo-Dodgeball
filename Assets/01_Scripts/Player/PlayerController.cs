@@ -20,15 +20,13 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     [SerializeField] private AudioSource audioSource;
 
-    private NetworkTransform ntrf;
-
-    private Vector3 previousPosition;
+    private NetworkCharacterController cc;
 
     #region IPlayerContext Implementation
 
     public Animator Anim => anim;
     public AudioSource Audio => audioSource;
-    public NetworkTransform Trf => ntrf;
+    public NetworkCharacterController NCC => cc;
     public PlayerStats Stats => stats;
 
 
@@ -65,7 +63,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     #endregion
 
-    #region properties
     public PlayerStateMachine StateMachine => stateMachine;
 
     public PlayerMovement PM => movement;
@@ -73,7 +70,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     public PlayerHealth Health => playerHealth;
 
     public PlayerStateBase PlayerState => stateMachine.CurrentState;
-    #endregion
 
     #region IMousePositionGetter Implementation
 
@@ -93,8 +89,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
         // 상태 머신 초기화
         stateMachine = new(this, attack, movement);
-
-        previousPosition = transform.position;
     }
 
     public override void FixedUpdateNetwork()
@@ -104,7 +98,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
         // 모든 IPlayable 컴포넌트 업데이트
         foreach (var component in updatedComponents)
         {
-            component.Updated();
+            component.NetworkUpdated(Runner.DeltaTime);
         }
 
         if (GetInput(out NetworkInputData data))
