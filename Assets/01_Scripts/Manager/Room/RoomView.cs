@@ -23,7 +23,7 @@ public class RoomView : MonoBehaviour
             string roomName = roomNameInput.text;
             string roomPassword = roomPasswordInput.text;
             if (!string.IsNullOrEmpty(roomName))
-                OnCreateRoomRequested?.Invoke(roomName, roomPassword);
+                OnCreateRoomRequested?.Invoke(roomName, roomPassword, "");
         });
 
         leaveButton.onClick.AddListener(() =>
