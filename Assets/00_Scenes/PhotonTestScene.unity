@@ -729,7 +729,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ground: {fileID: 2108046955}
   playerPrefab:
-    RawGuidValue: 27f07156e88b9524bb29b3e1db4e54e3
+    RawGuidValue: 06f8e0e61fc7b154c9bc6dd0ededc809
   testPlayerCount: 1
 --- !u!4 &1661489009
 Transform:

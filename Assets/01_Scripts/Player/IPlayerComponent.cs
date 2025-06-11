@@ -1,9 +1,7 @@
-using PlayerCharacterControl.State;
+using Mundo_dodgeball.Player.StateMachine;
 using System;
 using UnityEngine;
 using MyGame.Utils;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
-using UnityEngine.InputSystem;
 using Fusion;
 
 /// <summary>
@@ -11,18 +9,11 @@ using Fusion;
 /// </summary>
 public interface IPlayerContext
 {
-    /// <summary>
-    /// 플레이어가 사망했을 때 호출
-    /// </summary>
-    void OnPlayerDeath();
+    NetworkRunner Runner { get; }
 
-    void InitGround(int sectionNum);
-
+    void ChangeState(EPlayerState state, StateTransitionInputData inputData = new());
     /// <summary> 플레이어의 현재 상태 </summary>
-    PlayerStateBase PlayerState { get; }
-
-    /// <summary> 네트워크 캐릭터 컨트롤러 </summary>
-    NetworkCharacterController NCC { get; }
+    PlayerStateBase CurrentState { get; }
 
     /// <summary> 플레이어의 애니메이터를 반환 </summary>
     Animator Anim { get; }
@@ -32,6 +23,12 @@ public interface IPlayerContext
 
     /// <summary> 플레이어의 능력치 컴포넌트를 반환 </summary>
     PlayerStats Stats { get; }
+
+    PlayerMovement Movement { get; }
+
+    PlayerAttack Attack { get; }
+
+    void InitGround(int sectionNum);
 
     IMousePositionGetter MousePositionGetter { get; }
 

@@ -46,22 +46,22 @@ public class PlayerSpellActuator : NetworkBehaviour, IPlayerComponent
         {
             case SpellCategory.None:
                 break;
-            case SpellCategory.Heal:
-                context.Stats.ModifyCurrentHealth(spellData._valueAmount);
-                RPC_SpawnEffect("HealEffect", context.NCC.transform.position);
-                break;
-            case SpellCategory.Flash:
-                Vector3 direction = inputData.targetPoint - context.NCC.transform.position;
-                float distance = direction.magnitude;
-                if (distance > spellData._valueAmount)
-                {
-                    distance = spellData._valueAmount;
-                    direction = direction.normalized * distance;
-                }
-                Quaternion targetRotation = Quaternion.LookRotation(inputData.targetPoint - context.NCC.transform.position);
-                context.NCC.Teleport(context.NCC.transform.position + direction, targetRotation);
-                RPC_SpawnEffect("FlashEffect", context.NCC.transform.position);
-                break;
+            //case SpellCategory.Heal:
+            //    context.Stats.ModifyCurrentHealth(spellData._valueAmount);
+            //    RPC_SpawnEffect("HealEffect", context.NCC.transform.position);
+            //    break;
+            //case SpellCategory.Flash:
+            //    Vector3 direction = inputData.targetPoint - context.NCC.transform.position;
+            //    float distance = direction.magnitude;
+            //    if (distance > spellData._valueAmount)
+            //    {
+            //        distance = spellData._valueAmount;
+            //        direction = direction.normalized * distance;
+            //    }
+            //    Quaternion targetRotation = Quaternion.LookRotation(inputData.targetPoint - context.NCC.transform.position);
+            //    context.NCC.Teleport(context.NCC.transform.position + direction, targetRotation);
+            //    RPC_SpawnEffect("FlashEffect", context.NCC.transform.position);
+            //    break;
         }
     }
 
@@ -77,7 +77,7 @@ public class PlayerSpellActuator : NetworkBehaviour, IPlayerComponent
 
         effect.transform.position = targetPoint;
         if (isChild)
-            effect.transform.parent = context.NCC.transform;
+            effect.transform.parent = context.Movement.transform;
 
         yield return new WaitForSeconds(duration);
 

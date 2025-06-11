@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Axe : MonoBehaviour, IProjectile
 {
-    public void Initialize(IPlayerContext context, Vector3 spawnPos, Vector3 direction, float execTime)
+    public void Initialize(IPlayerContext context, Vector3 spawnPos, Vector3 direction)
     {
         this.context = context;
 
@@ -16,10 +16,10 @@ public class Axe : MonoBehaviour, IProjectile
         model.SetActive(true);
         droppingModel.SetActive(false);
 
-        Launch(direction, execTime);
+        Launch(direction);
     }
 
-    private void Launch(Vector3 direction, float execTime)
+    private void Launch(Vector3 direction)
     {
         // 시간 차이 계산
         float timeInterval = 0.0f;/*Mathf.Max((float)PhotonNetwork.Time - execTime, 0.0f);*/
@@ -55,7 +55,7 @@ public class Axe : MonoBehaviour, IProjectile
 
     public void OnHit(Collider other)
     {
-        if (other.TryGetComponent<IDamageable>(out IDamageable damageable) && other.gameObject != context.NCC.gameObject)
+        if (other.TryGetComponent<IDamageable>(out IDamageable damageable) && other.gameObject != context.Movement.gameObject)
         {
             damageable.TakeDamage(context);
             moveTweenCore?.Complete();

@@ -4,144 +4,82 @@ using UnityEngine.InputSystem;
 using Fusion;
 
 [RequireComponent(typeof(NetworkCharacterController))]
-public class PlayerMovement : MonoBehaviour, IPlayerComponent, IPlayerAction, IUpdatedPlayerComponent
+public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] protected float moveSpeed = 5f;
-    [SerializeField] protected float rotateSpeed = 10f;
-    [SerializeField] protected float arrivalThreshold = 0.1f;
+    [SerializeField] private float rotateSpeed = 10f;
+    [SerializeField] private float arrivalThreshold = 0.1f;
 
-    protected Vector3? currentTargetPosition;
+    private Vector3 currentTargetPosition;
 
-    /// <summary>
-    /// 플레이어가 이동 중인지 확인하는 변수
-    /// </summary>
-    bool isMoving = false;
-
-    public bool IsMoving => isMoving;
+    public bool IsArrived { get { return Vector3.Distance(_cc.transform.position, currentTargetPosition) <= arrivalThreshold || currentTargetPosition == Vector3.zero; } }
 
     private NetworkCharacterController _cc;
 
-    private BaseNetworkMovementModule _movementModule;
+    private Ground ground;
 
-    public bool IsActionInProgress => isActionInProgress;
+    public void SetGround(Ground ground) { this.ground = ground; }
 
-    public bool CanExecuteAction => Controllable;
+    //public bool IsActionInProgress => isActionInProgress;
 
-    public event Action OnActionCompleted;
+    //public bool CanExecuteAction => Controllable;
+
+    //public event Action OnActionCompleted;
 
 
-    //public void MoveForDeltaTime(Vector3 targetPosition)
-    //{
-    //    targetPosition.y = 0.0f;
-    //    Vector3 direction = (targetPosition - transform.position).normalized;
-    //    _cc.Move(direction * moveSpeed * Runner.DeltaTime);
-    //}
 
-    //public void RotateForDeltaTime(Vector3 direction)
-    //{
-    //    if (!HasStateAuthority) return;
-    //    Quaternion targetRotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Runner.DeltaTime); 
-    //    transform.rotation = targetRotation;
-    //}
-
-    public void NetworkUpdated(float runnerDeltaTime)
-    {
-        if (isMoving)
-        {
-            if (Vector3.Distance(_cc.transform.position, currentTargetPosition.Value) > arrivalThreshold)
-            {
-                Vector3 normalizedDirection = (currentTargetPosition.Value - _cc.transform.position).normalized;
-                _movementModule.MoveForDeltaTime(normalizedDirection, runnerDeltaTime);
-            }
-            else
-            {
-                MoveComplete();
-            }
-        }
-    }
-
-    public void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
-    {
-        StopMove();
-
-        targetPosition.y = 0.0f;
-        currentTargetPosition = targetPosition;
-
-        isMoving = true;
-    }
-
-    private void MoveComplete()
-    {
-        _cc.Teleport(currentTargetPosition);
-        currentTargetPosition = null;
-        StopMove();
-
-        OnActionCompleted.Invoke();
-    }
-
-    public virtual void StopMove()
-    {
-        isMoving = false;
-    }
-    private IPlayerContext context;
-    private bool isActionInProgress;
-
-    public void Initialize(IPlayerContext context, bool isOfflineMode)
+    public void Initialize(IPlayerContext context)
     {
         this.context = context;
         _cc = GetComponent<NetworkCharacterController>();
-        _movementModule = new BaseNetworkMovementModule(_cc, moveSpeed, rotateSpeed);
     }
 
-    public void OnDisabled()
+    public void Teleport(Vector3 targetPosition)
     {
-        StopMove();
+        _cc.Teleport(targetPosition);
     }
 
-    public void OnEnabled()
+    public void MoveTowardTarget(float runnerDeltaTime)
     {
-        StopMove();
-    }
-
-    public void HandleInput(InputAction.CallbackContext context)
-    {
-        switch (context.action.name)
+        if (currentTargetPosition == Vector3.zero)
         {
-            case "Move":
-                break;
-            case "Click":
-                StopMove();
-                break;
-            case "F":                
-                StopMove();
-                break;
+            return;
+        }
+        Vector3 normalizedDirection = (currentTargetPosition - _cc.transform.position).normalized;
+        MoveForDeltaTime(normalizedDirection, runnerDeltaTime);
+    }
+
+    /// <summary>
+    /// 이동 지점 설정
+    /// </summary>
+    /// <param name="targetPosition"></param>
+    public void SetMovementTarget(Vector3 targetPosition)
+    {
+        _cc.Velocity = Vector3.zero;
+        targetPosition.y = 0.0f;
+        currentTargetPosition = targetPosition;
+
+        if (IngameController.Instance != null)
+        {
+            ground.GetAdjustedPoint(IngameController.Instance.GetPlayerIndex(context), context.Movement.transform.position, currentTargetPosition, out Vector3 adjustedPoint);
+            currentTargetPosition = adjustedPoint;
         }
     }
 
-    public void HandleInput(NetworkInputData data)
+    public void CompleteMove()
     {
+        _cc.Teleport(currentTargetPosition);
+        currentTargetPosition = Vector3.zero;
     }
 
-    public bool Controllable { get; set; } = true;
-
-
-    public void ExecuteAction()
+    public void RotateForDeltaTime(Quaternion currentRotation, Vector3 direction, float runnerDeltaTime)
     {
-        if (isActionInProgress)
-        {
-            StopMove();
-        }
-        isActionInProgress = true;
-        StartMoveToNewTarget(context.MousePositionGetter.ClickPoint.Value);
+        Quaternion targetRotation = Quaternion.Slerp(currentRotation, Quaternion.LookRotation(direction), rotateSpeed * runnerDeltaTime);
+        _cc.transform.rotation = targetRotation;
     }
 
-    public void StopAction()
+    private void MoveForDeltaTime(Vector3 normalizedDirection, float runnerDeltaTime)
     {
-        StopMove();
+        _cc.Move(context.Stats.GetMoveSpeed() * runnerDeltaTime * normalizedDirection);
     }
-
-    public void Updated()
-    {
-        throw new NotImplementedException();
-    }
+    private IPlayerContext context;
 }

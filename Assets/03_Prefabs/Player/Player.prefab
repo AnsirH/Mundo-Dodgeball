@@ -1296,7 +1296,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733a4ac905a373745984578e139fdafc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
   rotateSpeed: 1080
   arrivalThreshold: 0.1
 --- !u!114 &8439029551291699871
@@ -1311,7 +1310,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7a8ed01d0d9e3744b48ad710940ae6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackPower: 200
   axeShooter: {fileID: 5097637738017206974}
   axeObj: {fileID: 9042082356628863269}
 --- !u!114 &3562521471211086396
@@ -1485,7 +1483,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!114 &4716611926441708767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1501,9 +1499,9 @@ MonoBehaviour:
   _stateAuthorityChangeErrorCorrectionDelta: 0
   gravity: -20
   jumpImpulse: 8
-  acceleration: 10
-  braking: 10
-  maxSpeed: 2
+  acceleration: 100
+  braking: 100
+  maxSpeed: 3
   rotationSpeed: 15
 --- !u!114 &8658950931254880636
 MonoBehaviour:

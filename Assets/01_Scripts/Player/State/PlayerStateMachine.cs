@@ -14,18 +14,19 @@ namespace Mundo_dodgeball.Player.StateMachine
 
     public class PlayerStateMachine
     {
-        public PlayerStateMachine(IPlayerContext playerContext, IPlayerAction attack, IPlayerAction movement)
+        public PlayerStateMachine(IPlayerContext playerContext)
         {
             // 플레이어 상태 객체 생성 및 지정
             states[(int)EPlayerState.Idle] = new PlayerIdleState(playerContext);
-            states[(int)EPlayerState.Move] = new PlayerMoveState(playerContext, movement);
-            states[(int)EPlayerState.Attack] = new PlayerAttackState(playerContext, attack);
+            states[(int)EPlayerState.Move] = new PlayerMoveState(playerContext);
+            states[(int)EPlayerState.Attack] = new PlayerAttackState(playerContext);
             states[(int)EPlayerState.Die] = new PlayerDieState(playerContext);
+            
+            globalState = new PlayerGlobalState(playerContext);
+            //// 행동형 컴포넌트 행동 종료 이벤트 등록
+            //attack.OnActionCompleted += () => ChangeState(EPlayerState.Idle);
 
-            // 행동형 컴포넌트 행동 종료 이벤트 등록
-            attack.OnActionCompleted += () => ChangeState(EPlayerState.Idle);
-
-            movement.OnActionCompleted += () => ChangeState(EPlayerState.Idle);
+            //movement.OnActionCompleted += () => ChangeState(EPlayerState.Idle);
 
             // 현재 상태 Idle 상태로 초기화
             ChangeState(EPlayerState.Idle);
@@ -35,10 +36,17 @@ namespace Mundo_dodgeball.Player.StateMachine
         {
             if (newState == EPlayerState.None) return;
 
-            ChangeState(states[(int)newState]);
+            _ChangeState(states[(int)newState]);
+        }
+        
+        public void ChangeState(EPlayerState newState, StateTransitionInputData inputData)
+        {
+            if (newState == EPlayerState.None) return;
+
+            _ChangeState(states[(int)newState], inputData);
         }
 
-        public void ChangeState(PlayerStateBase newState)
+        private void _ChangeState(PlayerStateBase newState, StateTransitionInputData inputData = new())
         {
             if (currentState != null && currentState != newState)
             {
@@ -47,27 +55,33 @@ namespace Mundo_dodgeball.Player.StateMachine
             }
 
             currentState = newState;
-            currentState.EnterState();
+            currentState.EnterState(inputData);
         }
 
-        // ���� ���·� ��ȯ
-        public void UndoState()
+        public void RevertToPreviousState()
         {
             if (prevState != null)
             {
-                ChangeState(prevState);
+                _ChangeState(prevState);
             }
         }
 
-        public void UpdateCurrentState()
+        public void Updated()
         {
             currentState?.UpdateState();
+            globalState?.UpdateState();
+        }
+
+        public void NetworkUpdated(float runnerDeltaTime)
+        {
+            currentState?.NetworkUpdateState(runnerDeltaTime);
+            globalState?.NetworkUpdateState(runnerDeltaTime);
         }
 
         private PlayerStateBase[] states = new PlayerStateBase[4];
 
         PlayerStateBase currentState;
-
+        PlayerStateBase globalState;
         PlayerStateBase prevState;
 
         public PlayerStateBase CurrentState => currentState;

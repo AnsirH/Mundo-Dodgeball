@@ -5,12 +5,23 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
+public class PlayerAttack : NetworkBehaviour
 {
     private IPlayerContext context;
 
-    public float attackPower = 80.0f;
+
+    [Networked] private TickTimer coolTimer { get; set; }
+    [Networked] private TickTimer attackTimer { get; set; }
+    public bool CoolTiming { get {  return !coolTimer.ExpiredOrNotRunning(Runner); } }
+    public bool Attacking { get { return !attackTimer.ExpiredOrNotRunning(Runner); } }
+
+
+    private float rotationSpeed = 8.0f;
+
     private float attackDuration = 0.25f;
+
+    private Vector3 targetPoint = Vector3.zero;
+    private Quaternion? targetRotation = null;
 
     private Coroutine currentAttackRoutine;
 
@@ -113,6 +124,50 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
     }
     #endregion
 
+    public void StartAttack(Vector3 point)
+    {
+        SetTargetPoint(point);
+
+        attackTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+    }
+
+    private void SetTargetPoint(Vector3 point)
+    {
+        targetPoint = point;
+        targetRotation = Quaternion.LookRotation((point - transform.position).normalized);
+    }
+
+    public void RotateTowardsTarget()
+    {
+        if (targetRotation.HasValue)
+        {
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation.Value,
+                rotationSpeed * context.Runner.DeltaTime
+            );
+        }
+    }
+
+    public bool IsRotationComplete()
+    {
+        if (!targetRotation.HasValue) return false;
+
+        float angle = Quaternion.Angle(transform.rotation, targetRotation.Value);
+        if (angle < 1f) // 1도 이하일 때 완료로 간주
+        {
+            targetRotation = null;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void StartCoolDown(float coolTime)
+    {
+        coolTimer = TickTimer.CreateFromSeconds(Runner, coolTime);
+    }
+
     // 공격 코루틴. 시간 지나면 완료 이벤트 발행
     private IEnumerator AttackRoutine()
     {
@@ -120,7 +175,7 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
         if (!context.MousePositionGetter.ClickPoint.HasValue) yield break;
 
         // 공격 방향 계산
-        Vector3 direction = (context.MousePositionGetter.ClickPoint.Value - context.NCC.transform.position).normalized;
+        Vector3 direction = (targetPoint - context.Movement.transform.position).normalized;
         direction.y = 0.0f;
 
         // 공격 애니메이션
@@ -129,14 +184,10 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
         // 공격 방향으로 회전
         // 회전 종료 시 공격
         transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
-        {            
-            //float now = (float)PhotonNetwork.Time;
-            //float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
-            //axeObj.SetActive(false);
+        {
+            axeObj.SetActive(false);
 
-            //axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
-
-            //photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, now + expectedDelay);
+            ShootAxe_RPC(axeShooter.transform.position, direction);
         };
 
         // 공격 애니메이션 및 로직
@@ -150,7 +201,7 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
     // 도끼 궤적 활성화 메서드
     public void ActivateRange(bool active)
     {
-        if (!HasStateAuthority) { return; }
+        //if (!HasStateAuthority) { return; }
         if (active == true)
         {
             if (axeShooter.CanShoot)
@@ -175,9 +226,9 @@ public class PlayerAttack : NetworkBehaviour, IPlayerComponent, IPlayerAction
         }
     }
 
-    [Rpc]
-    private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction, float execTime)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction)
     {
-        axeShooter.SpawnProjectile(StartPos, direction, execTime);
+        axeShooter.SpawnProjectile(StartPos, direction);
     }
 }

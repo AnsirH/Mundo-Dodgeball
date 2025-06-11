@@ -2,24 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlayerCharacterControl.State
+namespace Mundo_dodgeball.Player.StateMachine
 {
     public class PlayerMoveState : PlayerStateBase
     {
-        public PlayerMoveState(IPlayerContext playerContext, IPlayerAction movement) : base(playerContext)
+        public PlayerMoveState(IPlayerContext playerContext) : base(playerContext)
         {
-            this.movement = movement;
+            movement = playerContext.Movement;
         }
 
-        public override void EnterState()
+        public override void EnterState(StateTransitionInputData inputData)
         {
-            context.Anim.SetBool("IsMove", true);
-            movement.ExecuteAction();
+            playerContext.Anim.SetBool("IsMove", true);
+
+            Vector3 targetPoint = inputData.mousePosition;
+            targetPoint.y = 0.0f;
+            
+            movement.SetMovementTarget(targetPoint);
         }
 
         public override void ExitState()
         {
-            context.Anim.SetBool("IsMove", false);
+            playerContext.Anim.SetBool("IsMove", false);
         }
 
         public override void UpdateState()
@@ -32,6 +36,19 @@ namespace PlayerCharacterControl.State
 
         }
 
-        private IPlayerAction movement;
+        public override void NetworkUpdateState(float runnerDeltaTime)
+        {
+            if (!movement.IsArrived)
+            {
+                movement.MoveTowardTarget(playerContext.Runner.DeltaTime);
+            }
+            else
+            {
+                movement.CompleteMove();
+                playerContext.ChangeState(EPlayerState.Idle);
+            }
+        }
+
+        private PlayerMovement movement;
     }
 }

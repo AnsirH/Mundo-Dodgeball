@@ -20,7 +20,6 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 
     [SerializeField] private NetworkPrefabRef characterPrefab;
 
-
     private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new();
     private HashSet<PlayerRef> playersCompletedSpawn = new();
 
@@ -33,6 +32,11 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     public int playerAmount = 2;
 
     public List<IPlayerContext> Players => playerControllers;
+    
+    public int GetPlayerIndex(IPlayerContext playerContext)
+    {
+        return playerControllers.IndexOf(playerContext);
+    }
 
     private void Awake()
     {

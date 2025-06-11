@@ -1,4 +1,4 @@
-using PlayerCharacterControl.State;
+using Mundo_dodgeball.Player.StateMachine;
 using System.Collections.Generic;
 using UnityEngine;
 using MyGame.Utils;
@@ -11,8 +11,8 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     // 플레이어 상태 머신
     private PlayerStateMachine stateMachine;
     // 플레이어 스크립트 리스트
-    private List<IPlayerComponent> components = new List<IPlayerComponent>();
-    private List<IUpdatedPlayerComponent> updatedComponents = new List<IUpdatedPlayerComponent>();
+    //private List<IPlayerComponent> components = new List<IPlayerComponent>();
+    //private List<IUpdatedPlayerComponent> updatedComponents = new List<IUpdatedPlayerComponent>();
 
     [SerializeField] private PlayerStats stats;
 
@@ -20,22 +20,20 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     [SerializeField] private AudioSource audioSource;
 
-    private NetworkCharacterController cc;
+
+    public PlayerStateMachine StateMachine => stateMachine;
+    public PlayerMovement Movement => movement;
+    public PlayerAttack Attack => attack;
+    public PlayerHealth Health => playerHealth;
 
     #region IPlayerContext Implementation
 
     public Animator Anim => anim;
     public AudioSource Audio => audioSource;
-    public NetworkCharacterController NCC => cc;
     public PlayerStats Stats => stats;
 
+    public PlayerStateBase CurrentState => stateMachine.CurrentState;
 
-    public void OnPlayerDeath()
-    {
-        // 플레이어 사망 처리
-        QuitAllAction();
-        stateMachine.ChangeState(EPlayerState.Die);
-    }
 
     public void InitGround(int sectionNum)
     {
@@ -63,14 +61,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     #endregion
 
-    public PlayerStateMachine StateMachine => stateMachine;
-
-    public PlayerMovement PM => movement;
-    public PlayerAttack Attack => attack;
-    public PlayerHealth Health => playerHealth;
-
-    public PlayerStateBase PlayerState => stateMachine.CurrentState;
-
     #region IMousePositionGetter Implementation
 
     public Vector3? ClickPoint { get; private set; }
@@ -82,105 +72,91 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     #endregion
 
 
+    public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
+    {
+        stateMachine.ChangeState(state, inputData);
+    }
+
     public override void Spawned()
     {
-        // 플레이어 컴포넌트들 초기화
-        InitializeComponents();
+        if (IngameController.Instance != null)
+            movement.SetGround(IngameController.Instance.ground);
+        else
+            movement.SetGround(FindAnyObjectByType<Ground>());
 
         // 상태 머신 초기화
-        stateMachine = new(this, attack, movement);
+        stateMachine = new(this);
+
+        movement.Initialize(this);
+        attack.Initialize(this, isOfflineMode);
     }
 
     public override void FixedUpdateNetwork()
     {
-        stateMachine.UpdateCurrentState();
-
-        // 모든 IPlayable 컴포넌트 업데이트
-        foreach (var component in updatedComponents)
-        {
-            component.NetworkUpdated(Runner.DeltaTime);
-        }
+        stateMachine.NetworkUpdated(Runner.DeltaTime);
 
         if (GetInput(out NetworkInputData data))
         {
-            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
-            {
-                Debug.Log("right click!");
-                // 마우스 위치 저장
-                ClickPoint = GetMousePosition();
-                if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
-
-                ClickPoint = adjustedPoint;
-                StartCoroutine(SpawnEffect("ClickPointer", ClickPoint.Value));
-
-                if (!attack.IsActionInProgress)
-                    stateMachine.ChangeState(EPlayerState.Move);
-            }
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
             {
-                Debug.Log("left click!");
+                if (attack.CoolTiming) return;
                 ClickPoint = GetMousePosition();
-                if (!attack.IsActionInProgress && attack.CanExecuteAction)
-                {
-                    stateMachine.ChangeState(EPlayerState.Attack);
-                }
+                ChangeState(EPlayerState.Attack, new(ClickPoint.Value));
+            }
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
+            {
+                if (CurrentState is PlayerAttackState) return;
+                ClickPoint = GetMousePosition();
+                if (!ClickPoint.HasValue) return;
+                ChangeState(EPlayerState.Move, new(ClickPoint.Value));
             }
             if (data.buttons.IsSet(NetworkInputData.BUTTONF))
             {
-                Debug.Log("F Button pressed!");
                 // 마우스 위치 저장
                 ClickPoint = GetMousePosition();
-                if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
+                if (!ClickPoint.HasValue) return;
 
-                ClickPoint = adjustedPoint;
+                ChangeState(EPlayerState.Idle);
+                // 플레쉬 실행 추가
             }
         }
     }
+
+    private void Update()
+    {
+        stateMachine.Updated();
+    }
+
     public void OnEnable()
     {
         stats = new PlayerStats();
-        foreach (var component in components)
-        {
-            component.OnEnabled();
-        }
     }
 
     public void OnDisable()
     {
-        foreach (var component in components)
-        {
-            component.OnDisabled();
-        }
     }
 
     // IPlayerComponent 컴포넌트들 초기화
     private void InitializeComponents()
     {
-        // 초기화 순서가 중요한 경우 순서 지정
-        var initializationOrder = new List<IPlayerComponent>
-        {
-            playerHealth,      // 체력은 가장 먼저 초기화
-            movement,  // 이동은 그 다음
-            attack,      // 공격은 이동 이후
-            playerSpell      // 스킬은 마지막
-        };
+        //// 초기화 순서가 중요한 경우 순서 지정
+        //var initializationOrder = new List<IPlayerComponent>
+        //{
+        //    playerHealth,      // 체력은 가장 먼저 초기화
+        //    movement,  // 이동은 그 다음
+        //    attack,      // 공격은 이동 이후
+        //    playerSpell      // 스킬은 마지막
+        //};
 
-        components = initializationOrder;
+        //components = initializationOrder;
 
 
-        foreach (var component in components)
-        {
-            component.Initialize(this, isOfflineMode);
-            if (component is IUpdatedPlayerComponent)
-                updatedComponents.Add(component as IUpdatedPlayerComponent);
-        }
-    }
-
-    private void QuitAllAction()
-    {
-        components.Where(comp => comp as IPlayerAction != null)
-            .ToList()
-            .ForEach(comp => (comp as IPlayerAction).StopAction());
+        //foreach (var component in components)
+        //{
+        //    component.Initialize(this, isOfflineMode);
+        //    if (component is IUpdatedPlayerComponent)
+        //        updatedComponents.Add(component as IUpdatedPlayerComponent);
+        //}
     }
 
     private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
