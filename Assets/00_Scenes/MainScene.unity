@@ -3997,7 +3997,8 @@ MonoBehaviour:
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 1116769603}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &346486660
 GameObject:
@@ -5529,6 +5530,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 510108563}
+  - component: {fileID: 510108565}
+  - component: {fileID: 510108564}
   m_Layer: 0
   m_Name: RoomController
   m_TagString: Untagged
@@ -5551,6 +5554,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 340730634}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &510108564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510108562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c3e34f9d6c94df4984565cefcf7f1b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &510108565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510108562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7d3049227537204282a74c7d852b2f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  model: {fileID: 510108564}
+  runnerPrefab: {fileID: 6566829178162231104, guid: e47fd7b615b80154eb28576c708343b8, type: 3}
 --- !u!1 &530259485
 GameObject:
   m_ObjectHideFlags: 0
@@ -10554,7 +10583,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1116769602
 Transform:
   m_ObjectHideFlags: 0
@@ -10577,7 +10606,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116769601}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 597c00b4477ab344fab3af99d43a4ce7, type: 3}
   m_Name: 
@@ -10585,8 +10614,6 @@ MonoBehaviour:
   runnerPrefab: {fileID: 6566829178162231104, guid: e47fd7b615b80154eb28576c708343b8, type: 3}
   gameSceneName: GeneralModeScene
   maxScore: 3
-  _PlayerReadyDict:
-    _items: []
   playerPrefab:
     RawGuidValue: 214ec664adeebee4eb1c7cbefdf5835a
 --- !u!1 &1120355542

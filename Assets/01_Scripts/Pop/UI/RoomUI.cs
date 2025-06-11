@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -16,10 +17,12 @@ public class RoomUI : MonoBehaviour
     public Image leftPlayerImage;
     public Image rightPlayerImage;
 
+    public event Action OnLeaveRoomRequested;
     private bool isReady = false;
     public void RoomExit()
     {
         ServerManager.Instance.roomManager.LeaveRoom();
+        OnLeaveRoomRequested?.Invoke();
     }
     public void ClickReady()
     {

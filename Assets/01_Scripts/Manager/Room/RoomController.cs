@@ -10,10 +10,8 @@ using System;
 
 public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [Header("References")]
-    [SerializeField] private RoomView view;
-
     [SerializeField] private RoomModel model;
+    public NetworkRunner runnerPrefab;
     private NetworkRunner runner;
     private const string lobbyName = "default_lobby";
     private Dictionary<string, int> GameModePlayerCount = new Dictionary<string, int>{
@@ -23,8 +21,8 @@ public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Awake()
     {
-        view.OnCreateRoomRequested += CreateOrJoinRoom;
-        view.OnLeaveRoomRequested += LeaveRoom;
+        PopManager.instance.gameSelectPop.OnCreateRoomRequested += CreateOrJoinRoom;
+        UIManager.instance.roomUI.OnLeaveRoomRequested += LeaveRoom;
     }
 
     private async void Start()
@@ -34,39 +32,63 @@ public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
 
     private async Task InitRunner()
     {
-        runner = gameObject.AddComponent<NetworkRunner>();
+        // 기존 Runner가 있다면 정리
+        await DestroyRunner();
+
+        // 새 Runner 인스턴스 생성
+        runner = Instantiate(runnerPrefab);
         runner.ProvideInput = false;
-        runner.AddCallbacks(this);
 
         await runner.StartGame(new StartGameArgs
         {
             GameMode = GameMode.Shared,
             SessionName = "LOBBY",
             Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = runner.GetComponent<NetworkSceneManagerDefault>()
         });
     }
 
-    private async void CreateOrJoinRoom(string roomName, string playerConut = "GeneralGameMode", string password = "")
+    private async void CreateOrJoinRoom(string roomName, string password = "", string playerCount = "GeneralGameMode")
     {
-        if (runner == null) return;
+        // 기존 Runner 정리 (Shutdown 및 Destroy 포함된 함수여야 함)
+        await DestroyRunner();
 
+        // 새 Runner 생성
+        runner = Instantiate(runnerPrefab);
+        runner.ProvideInput = false;
+        runner.AddCallbacks(this);
+
+        // 세션 프로퍼티 설정
         var properties = new Dictionary<string, SessionProperty>
     {
         { "pwd", password }
     };
 
-        await runner.StartGame(new StartGameArgs
+        // 씬 매니저 확보
+        var sceneManager = runner.GetComponent<NetworkSceneManagerDefault>()
+                          ?? runner.gameObject.AddComponent<NetworkSceneManagerDefault>();
+
+        // StartGame 실행
+        var result = await runner.StartGame(new StartGameArgs
         {
             GameMode = GameMode.AutoHostOrClient,
             SessionName = roomName,
-            PlayerCount = GameModePlayerCount[playerConut],
-            SceneManager = GetComponent<NetworkSceneManagerDefault>(),
+            PlayerCount = GameModePlayerCount[playerCount],
+            SceneManager = sceneManager,
             SessionProperties = properties,
             IsVisible = true,
             IsOpen = true
         });
+
+        if (!result.Ok)
+        {
+            Debug.LogError($"StartGame Failed: {result.ShutdownReason}");
+            return;
+        }
+
+        Debug.Log("RoomManager : 방 연결 시도 완료");
     }
+
 
 
     private async void LeaveRoom()
@@ -75,8 +97,6 @@ public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
         {
             await runner.Shutdown();
             model.ClearSessionInfo();
-            view.UpdateCurrentRoomText("");
-            view.UpdatePlayerCount(0);
             await InitRunner();
         }
     }
@@ -85,10 +105,12 @@ public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
     {
         Debug.Log($"플레이어 {player.PlayerId} 입장");
         int currentCount = runner.ActivePlayers.Count();
+        UIManager.instance.ChangeRoomUI();
 
-
-        view.UpdatePlayerCount(currentCount);
-        TryStartGameIfReady(currentCount);
+        if (runner.IsServer)
+        {
+            TryStartGameIfReady(currentCount);
+        }
     }
 
     private async void TryStartGameIfReady(int playerCount)
@@ -96,16 +118,30 @@ public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
         if (playerCount >= REQUIRED_PLAYERS)
         {
             Debug.Log("인원 충족! 인게임 씬으로 전환");
-            await runner.StartGame(new StartGameArgs
+            //await runner.StartGame(new StartGameArgs
+            //{
+            //    GameMode = GameMode.AutoHostOrClient,
+            //    SessionName = model.GetRoomName(),
+            //    Scene = SceneRef.FromIndex(1),
+            //    SceneManager = GetComponent<NetworkSceneManagerDefault>()
+            //});
+            if (runner.IsSceneAuthority)
             {
-                GameMode = GameMode.AutoHostOrClient,
-                SessionName = model.GetRoomName(),
-                Scene = SceneRef.FromIndex(1),
-                SceneManager = GetComponent<NetworkSceneManagerDefault>()
-            });
+                await runner.LoadScene(SceneRef.FromIndex(1), LoadSceneMode.Additive);
+            }
         }
     }
 
+    private async Task DestroyRunner()
+    {
+        Debug.Log("DestoroyRunner에서 Shutdown하겠음. ㅅㄱ링");
+        if (runner != null)
+        {
+            if (runner.IsRunning)
+                await runner.Shutdown();
+            Destroy(runner.gameObject);
+        }
+    }
     // ✅ 주요 콜백 요약
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { Debug.Log($"런너 종료됨: {shutdownReason}"); }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { Debug.Log($"플레이어 {player.PlayerId} 퇴장"); }
@@ -121,11 +157,9 @@ public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
                 if (session.Name == model.GetRoomName()) // 이름 매칭
                 {
                     model.SetSessionInfo(session);
-                    view.UpdatePlayerCount(session.PlayerCount);
                     break;
                 }
             }
-            view.UpdateCurrentRoomText(model.GetRoomName());
         }
     }
 
