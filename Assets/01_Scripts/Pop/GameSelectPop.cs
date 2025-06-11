@@ -57,11 +57,11 @@ public class GameSelectPop : PopBase
             Debug.Log("no selected room!");
             return;
         }
-        ServerManager.Instance.roomManager.JoinRoom("", ServerManager.Instance.roomManager.joinRoom.Name);
+        OnCreateRoomRequested?.Invoke(roomNameField.text, "", "GeneralGameMode");
     }
     public void PassWordJoinRoom()
     {
-        ServerManager.Instance.roomManager.JoinRoom(EnterPassWord.text, ServerManager.Instance.roomManager.joinRoom.Name);
+        OnCreateRoomRequested?.Invoke(roomNameField.text, EnterPassWord.text, "GeneralGameMode");
         EnterPassWord.text = null;
     }
     public void ButtonSwitch(bool on)

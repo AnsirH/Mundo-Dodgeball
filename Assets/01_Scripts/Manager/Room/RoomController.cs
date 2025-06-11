@@ -105,8 +105,12 @@ public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
     {
         Debug.Log($"플레이어 {player.PlayerId} 입장");
         int currentCount = runner.ActivePlayers.Count();
+        UIManager.instance.ChangeRoomUI();
 
-        TryStartGameIfReady(currentCount);
+        if (runner.IsServer)
+        {
+            TryStartGameIfReady(currentCount);
+        }
     }
 
     private async void TryStartGameIfReady(int playerCount)
@@ -114,13 +118,17 @@ public class RoomController : MonoBehaviour, INetworkRunnerCallbacks
         if (playerCount >= REQUIRED_PLAYERS)
         {
             Debug.Log("인원 충족! 인게임 씬으로 전환");
-            await runner.StartGame(new StartGameArgs
+            //await runner.StartGame(new StartGameArgs
+            //{
+            //    GameMode = GameMode.AutoHostOrClient,
+            //    SessionName = model.GetRoomName(),
+            //    Scene = SceneRef.FromIndex(1),
+            //    SceneManager = GetComponent<NetworkSceneManagerDefault>()
+            //});
+            if (runner.IsSceneAuthority)
             {
-                GameMode = GameMode.AutoHostOrClient,
-                SessionName = model.GetRoomName(),
-                Scene = SceneRef.FromIndex(1),
-                SceneManager = GetComponent<NetworkSceneManagerDefault>()
-            });
+                await runner.LoadScene(SceneRef.FromIndex(1), LoadSceneMode.Additive);
+            }
         }
     }
 
