@@ -168,6 +168,13 @@ public class PlayerAttack : NetworkBehaviour
         coolTimer = TickTimer.CreateFromSeconds(Runner, coolTime);
     }
 
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction)
+    {
+        axeShooter.SpawnProjectile(StartPos, direction);
+    }
+
     // 공격 코루틴. 시간 지나면 완료 이벤트 발행
     private IEnumerator AttackRoutine()
     {
@@ -226,9 +233,4 @@ public class PlayerAttack : NetworkBehaviour
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction)
-    {
-        axeShooter.SpawnProjectile(StartPos, direction);
-    }
 }
