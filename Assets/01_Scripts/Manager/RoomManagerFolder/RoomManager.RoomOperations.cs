@@ -110,13 +110,13 @@ public partial class RoomManager
         }
 
         // 닉네임 가져오기
-        string nick = np.NickName.Value;
+        //string nick = np.NickName.Value;
 
-        // UI에 반영
-        if (isHost)
-            UIManager.instance.roomUI.leftPlayerText.text = nick;
-        else
-            UIManager.instance.roomUI.rightPlayerText.text = nick;
+        //// UI에 반영
+        //if (isHost)
+        //    UIManager.instance.roomUI.leftPlayerText.text = nick;
+        //else
+        //    UIManager.instance.roomUI.rightPlayerText.text = nick;
     }
     // 방 떠나기
     public void LeaveRoom()

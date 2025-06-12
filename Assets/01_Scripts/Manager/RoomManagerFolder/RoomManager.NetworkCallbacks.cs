@@ -29,8 +29,8 @@ public partial class RoomManager : INetworkRunnerCallbacks
 
                 // ② 닉네임 세팅
                 int randomValue = UnityEngine.Random.Range(1, 101);
-                netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_" + randomValue);
-                Debug.Log($"[Spawn] NickName set to {netPlayer.NickName.Value}");
+                //netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_" + randomValue);
+                //Debug.Log($"[Spawn] NickName set to {netPlayer.NickName.Value}");
 
                 // ③ 스폰이 완전히 끝난 뒤 바로 UI 갱신
                 UpdateLobbyUI();

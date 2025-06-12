@@ -42,6 +42,7 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
     #endregion
 
     public RoomManager roomManager;
+    public RoomController roomController;
     [SerializeField] private string gameVersion = "1.0";
 
     private const float checkConstTime = 5f;
@@ -137,27 +138,27 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnDisconnectedFromServer(NetworkRunner runner) => Debug.Log("ServerManager : [Fusion] 서버 연결 끊김!!!!!!!!!!!!!!!!!!!!");
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) 
     {
-        Debug.Log($"[Fusion] 플레이어 입장: {player}");
+        Debug.Log($"ServerManager  - [Fusion] 플레이어 입장: {player}");
         // 로컬 플레이어가 아니라면 Host에서만 스폰
         // (AutoHostOrClient 모드의 Host 혹은 Shared 모드)
-        if (runner.GameMode != GameMode.Single)
-        {
-            // 스폰 위치를 정해둡니다 (예: Vector3.zero)
-            Vector3 spawnPos = Vector3.zero;
+        //if (runner.GameMode != GameMode.Single)
+        //{
+        //    // 스폰 위치를 정해둡니다 (예: Vector3.zero)
+        //    Vector3 spawnPos = Vector3.zero;
 
-            // Spawn overload 의 onBeforeSpawned 콜백을 이용해 NickName 세팅
-            runner.Spawn(roomManager.playerPrefab, spawnPos, Quaternion.identity, player, (r, obj) =>
-            {
-                var netPlayer = obj.GetComponent<NetworkPlayer>();
-                // PlayerPrefs에 저장해둔 닉네임을 할당
-                int randomValue = UnityEngine.Random.Range(1, 101);
-                netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_" + randomValue);
+        //    // Spawn overload 의 onBeforeSpawned 콜백을 이용해 NickName 세팅
+        //    runner.Spawn(roomManager.playerPrefab, spawnPos, Quaternion.identity, player, (r, obj) =>
+        //    {
+        //        var netPlayer = obj.GetComponent<NetworkPlayer>();
+        //        // PlayerPrefs에 저장해둔 닉네임을 할당
+        //        int randomValue = UnityEngine.Random.Range(1, 101);
+        //        netPlayer.NickName = PlayerPrefs.GetString("NickName", "Player_" + randomValue);
 
-                roomManager.UpdateLobbyUI();
+        //        roomManager.UpdateLobbyUI();
 
-            });
-            // 스폰이 끝나면 UI 갱신
-        }
+        //    });
+        //    // 스폰이 끝나면 UI 갱신
+        //}
     } 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => Debug.Log($"[Fusion] 플레이어 퇴장: {player}");
 
