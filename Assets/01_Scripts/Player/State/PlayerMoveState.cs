@@ -28,19 +28,13 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void UpdateState()
         {
-            //if (playerController.Attack.AttackTrigger)
-            //    playerController.StateMachine.ChangeState(EPlayerState.Attack);
-
-            //else if (PlayerController.PM.IsMoving == false)
-            //    PlayerController.StateMachine.ChangeState(EPlayerState.Idle);
-
         }
 
         public override void NetworkUpdateState(float runnerDeltaTime)
         {
             if (!movement.IsArrived)
             {
-                movement.MoveTowardTarget(playerContext.Runner.DeltaTime);
+                movement.MoveTowardTarget();
             }
             else
             {

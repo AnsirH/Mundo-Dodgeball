@@ -20,11 +20,6 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void UpdateState()
         {
-            if (_playerContext.CurrentState is not PlayerAttackState && 
-                _playerContext.CurrentState is not PlayerDieState)
-            {
-
-            }
         }
 
         public override void NetworkUpdateState(float runnerDeltaTime)

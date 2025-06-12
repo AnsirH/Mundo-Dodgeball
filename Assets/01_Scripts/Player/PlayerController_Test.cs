@@ -11,35 +11,14 @@ using System.Linq;
 public class PlayerController_Test : NetworkBehaviour
 {
     private NetworkTransform _nt;
-
-    // 플레이어 스크립트 리스트
-    private List<IPlayerComponent> components = new List<IPlayerComponent>();
-    private List<IUpdatedPlayerComponent> updatedComponents = new List<IUpdatedPlayerComponent>();
-
     private Action<NetworkInputData> OnInputAction;
 
     private void Awake()
     {
         _nt = GetComponent<NetworkTransform>();
-
-        components = GetComponents<IPlayerComponent>().ToList();
-
-        if (components.Count > 0)
-        {
-            foreach (IPlayerComponent component in components)
-            {
-                OnInputAction += component.HandleInput;
-                if (component is IUpdatedPlayerComponent)
-                    updatedComponents.Add(component as IUpdatedPlayerComponent);
-            }
-        }
     }
     public override void FixedUpdateNetwork()
     {
-        foreach (IUpdatedPlayerComponent component in updatedComponents)
-        {
-            component.Updated();
-        }
 
         if (GetInput(out NetworkInputData data))
         {

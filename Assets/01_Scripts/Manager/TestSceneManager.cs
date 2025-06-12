@@ -50,6 +50,8 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (inputHandler.RightClick)
             data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground")).Value;
+        if (inputHandler.LeftClick)
+            data.targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground")).Value;
         input.Set(data);
         inputHandler.ResetInputValue();
     }
@@ -118,7 +120,6 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
         _runner = gameObject.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;
 
-
         // Create the NetworkSceneInfo from the current scene
         var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
         var sceneInfo = new NetworkSceneInfo();
@@ -126,7 +127,6 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
         }
-
         // Start or join (depends on gamemode) a session with a specific name
         await _runner.StartGame(new StartGameArgs()
         {
