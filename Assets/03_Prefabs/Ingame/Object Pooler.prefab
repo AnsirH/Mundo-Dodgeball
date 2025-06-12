@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2154624196197186054}
   - component: {fileID: 6878850517177498434}
+  - component: {fileID: -8195632546724931427}
   m_Layer: 0
   m_Name: Object Pooler
   m_TagString: Untagged
@@ -44,19 +45,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0dea0ab9c41c10d42a253dc5947b41c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pools:
-  - tag: Axe
-    prefab: {fileID: 1904142371288617127, guid: 75f3bb5d178abc94a98711c3754614ef, type: 3}
-    size: 5
-  - tag: ClickPointer
+  localPools:
+  - tag: MoveClickEffect
     prefab: {fileID: 4444344020326820683, guid: 338f7866e87093a4cb8184529f6199ea, type: 3}
     size: 10
-  - tag: HitEffect
-    prefab: {fileID: 1834194341294532, guid: d5f26854a8904624c8073139cd2eb346, type: 3}
-    size: 10
-  - tag: FlashEffect
-    prefab: {fileID: 6669307902679017890, guid: 4e9617b2734167247a2d6491e821b27b, type: 3}
+  networkPools:
+  - tag: AxeProjectile
+    prefab:
+      RawGuidValue: 75f3bb5d178abc94a98711c3754614ef
     size: 5
-  - tag: HealEffect
-    prefab: {fileID: 5866191771531174370, guid: 9d06d67921087d34985e927eb29a284a, type: 3}
-    size: 5
+--- !u!114 &-8195632546724931427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064255200707408905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 366134121
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 6878850517177498434}
+  ForceRemoteRenderTimeframe: 0

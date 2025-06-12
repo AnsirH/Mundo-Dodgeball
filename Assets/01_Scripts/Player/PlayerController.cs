@@ -5,6 +5,7 @@ using MyGame.Utils;
 using System.Collections;
 using System.Linq;
 using Fusion;
+using Unity.VisualScripting;
 
 public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePositionGetter
 {
@@ -91,40 +92,46 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
         attack.Initialize(this, isOfflineMode);
     }
 
+    public override void Render()
+    {
+        stateMachine.Updated();
+    }
+
     public override void FixedUpdateNetwork()
     {
-        stateMachine.NetworkUpdated(Runner.DeltaTime);
-
+        if (!Object.HasStateAuthority) return;
         if (GetInput(out NetworkInputData data))
         {
-            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
             {
                 if (attack.CoolTiming) return;
-                ClickPoint = GetMousePosition();
+                ClickPoint = data.targetPoint;
                 ChangeState(EPlayerState.Attack, new(ClickPoint.Value));
             }
-            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1)) // 우클릭
             {
                 if (CurrentState is PlayerAttackState) return;
-                ClickPoint = GetMousePosition();
+                ClickPoint = data.movePoint;
                 if (!ClickPoint.HasValue) return;
                 ChangeState(EPlayerState.Move, new(ClickPoint.Value));
             }
             if (data.buttons.IsSet(NetworkInputData.BUTTONF))
             {
                 // 마우스 위치 저장
-                ClickPoint = GetMousePosition();
+                ClickPoint = data.targetPoint;
                 if (!ClickPoint.HasValue) return;
 
                 ChangeState(EPlayerState.Idle);
                 // 플레쉬 실행 추가
             }
         }
+
+        stateMachine.NetworkUpdated(Runner.DeltaTime);
+
     }
 
     private void Update()
     {
-        stateMachine.Updated();
     }
 
     public void OnEnable()

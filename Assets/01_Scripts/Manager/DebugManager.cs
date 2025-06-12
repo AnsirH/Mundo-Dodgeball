@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class DebugManager : MonoBehaviour
 {
-    [SerializeField] private bool showNetworkInfo = true;
-    [SerializeField] private bool showPlayerState = true;
-    private readonly Color debugTextColor = new Color(0f, 0.5f, 0f); // Â£Àº ÃÊ·Ï»ö
-    private GUIStyle debugStyle;
+    //[SerializeField] private bool showNetworkInfo = true;
+    //[SerializeField] private bool showPlayerState = true;
+    //private readonly Color debugTextColor = new Color(0f, 0.5f, 0f); // Â£Àº ÃÊ·Ï»ö
+    //private GUIStyle debugStyle;
 
     //private void OnGUI()
     //{

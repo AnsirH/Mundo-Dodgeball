@@ -1,3 +1,4 @@
+using Mundo_dodgeball.Projectile;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace Mundo_dodgeball.Player.StateMachine
         {
             Vector3 targetPoint = inputData.mousePosition;
             targetPoint.y = 0.0f;
+            direction = (targetPoint - attack.transform.position).normalized;
             attack.StartAttack(targetPoint);
         }
         public override void ExitState()
@@ -35,10 +37,12 @@ namespace Mundo_dodgeball.Player.StateMachine
             if (!attack.Attacking)
             {
                 attack.StartCoolDown(5.0f);
+                AxeProjectileManager.instance.SpawnProjectile(playerContext.Movement.transform.position, direction, attack.Object.InputAuthority);
                 playerContext.ChangeState(EPlayerState.Idle);
             }
         }
 
         private PlayerAttack attack;
+        Vector3 direction = Vector3.zero;
     }
 }

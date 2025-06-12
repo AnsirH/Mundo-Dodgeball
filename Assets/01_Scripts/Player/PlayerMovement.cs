@@ -3,13 +3,12 @@ using System;
 using UnityEngine.InputSystem;
 using Fusion;
 
-[RequireComponent(typeof(NetworkCharacterController))]
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     [SerializeField] private float rotateSpeed = 10f;
     [SerializeField] private float arrivalThreshold = 0.1f;
 
-    private Vector3 currentTargetPosition;
+    private Vector3 currentTargetPosition = Vector3.zero;
 
     public bool IsArrived { get { return Vector3.Distance(_cc.transform.position, currentTargetPosition) <= arrivalThreshold || currentTargetPosition == Vector3.zero; } }
 
@@ -38,14 +37,14 @@ public class PlayerMovement : MonoBehaviour
         _cc.Teleport(targetPosition);
     }
 
-    public void MoveTowardTarget(float runnerDeltaTime)
+    public void MoveTowardTarget()
     {
         if (currentTargetPosition == Vector3.zero)
         {
             return;
         }
         Vector3 normalizedDirection = (currentTargetPosition - _cc.transform.position).normalized;
-        MoveForDeltaTime(normalizedDirection, runnerDeltaTime);
+        MoveForDeltaTime(normalizedDirection, Runner.DeltaTime);
     }
 
     /// <summary>
