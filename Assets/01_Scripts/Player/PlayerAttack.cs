@@ -54,38 +54,29 @@ public class PlayerAttack : NetworkBehaviour
 
     public void Fire(Vector3 direction)
     {
-        if (HasInputAuthority)
+        if (HasStateAuthority)
+        {
+            SpawnProjectile(transform.position, direction);
+        }
+        else if (HasInputAuthority)
         {
             SpawnAxe_RPC(transform.position, direction);
         }
-
-        
-        //SpawnProjectile(transform.position, direction);
-        //if (Object.HasStateAuthority)
-        //{
-        //}
-        //else if (Object.HasInputAuthority)
-        //{
-        //    SpawnAxe_RPC(transform.position, direction);
-        //}
-        //if (!Object.HasStateAuthority) return;
-        //ShootAxe_RPC(transform.position, direction);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void SpawnAxe_RPC(Vector3 startPos, Vector3 direction)
     {
-        Debug.Log($"서버 {startPos}{direction}");
         SpawnProjectile(startPos, direction);
     }
 
     private void SpawnProjectile(Vector3 startPos, Vector3 direction)
     {
         //AxeProjectileManager.instance.SpawnProjectile(transform.position, direction, Object);
-        //ProjectileManager.Instance.SpawnProjectile("TestProjectile", startPos, direction, Object.InputAuthority);
+        ProjectileManager.Instance.SpawnProjectile("TestProjectile", startPos, direction, Object.InputAuthority);
 
-        ProjectileBase projectile = Runner.Spawn(axePrefab, startPos, Quaternion.LookRotation(direction)).GetComponent<ProjectileBase>();
-        projectile.Init(transform.position, direction, Object.InputAuthority);
+        //ProjectileBase projectile = Runner.Spawn(axePrefab, startPos, Quaternion.LookRotation(direction)).GetComponent<ProjectileBase>();
+        //projectile.Init(transform.position, direction, Object.InputAuthority);
     }
 
     // 도끼 궤적 활성화 메서드

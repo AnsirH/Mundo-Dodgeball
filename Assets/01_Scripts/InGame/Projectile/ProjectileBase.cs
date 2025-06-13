@@ -93,8 +93,7 @@ public abstract class ProjectileBase : NetworkBehaviour
 
     protected virtual void OnMaxDistanceReached()
     {
-        Runner.Despawn(Object);
-        //SetActive(false);
+        SetActive(false);
     }
 
     public override void Render()

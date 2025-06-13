@@ -112,7 +112,7 @@ public class ProjectileManager : NetworkBehaviour
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void SpawnProjectile_RPC(string type, Vector3 position, Vector3 direction, PlayerRef owner)
     {
         _SpawnProjectile(type, position, direction, owner);
