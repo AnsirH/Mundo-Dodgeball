@@ -1,6 +1,3 @@
-using Mundo_dodgeball.Projectile;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Mundo_dodgeball.Player.StateMachine
@@ -29,11 +26,11 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void NetworkUpdateState(float runnerDeltaTime)
         {
-            if (!attack.IsRotationComplete())
-            {
-                attack.RotateTowardsTarget();
-            }
-
+            //if (!attack.IsRotationComplete())
+            //{
+            //    attack.RotateTowardsTarget();
+            //}
+            playerContext.Movement.RotateForDeltaTime(playerContext.Movement.transform.rotation, direction, attack.RotationSpeed);
             if (!attack.Attacking)
             {
                 attack.StartCoolDown(5.0f);

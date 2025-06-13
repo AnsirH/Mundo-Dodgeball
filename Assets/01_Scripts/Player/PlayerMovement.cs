@@ -2,7 +2,6 @@
 using System;
 using UnityEngine.InputSystem;
 using Fusion;
-
 public class PlayerMovement : NetworkBehaviour
 {
     [SerializeField] private float rotateSpeed = 10f;
@@ -20,13 +19,6 @@ public class PlayerMovement : NetworkBehaviour
     private Ground ground;
 
     public void SetGround(Ground ground) { this.ground = ground; }
-
-    //public bool IsActionInProgress => isActionInProgress;
-
-    //public bool CanExecuteAction => Controllable;
-
-    //public event Action OnActionCompleted;
-
 
 
     public void Initialize(IPlayerContext context)
@@ -85,20 +77,22 @@ public class PlayerMovement : NetworkBehaviour
         _cc.transform.rotation = CurrentRotation;
     }
 
+    public override void Render()
+    {
+        //if (!Object.HasStateAuthority)
+        //{
+        //    _cc.transform.rotation = Quaternion.Slerp(_cc.transform.rotation, CurrentRotation, rotateSpeed * Runner.DeltaTime);
+        //    transform.position = CurrentPosition;
+        //}
+    }
+
+    //--- PRIVATE METHOD ---
     private void MoveForDeltaTime(Vector3 normalizedDirection, float runnerDeltaTime)
     {
-        if (!Object.HasStateAuthority) return;
+        //if (!Object.HasStateAuthority) return;
         _cc.Move(context.Stats.GetMoveSpeed() * runnerDeltaTime * normalizedDirection);
         CurrentPosition = _cc.transform.position;
         CurrentRotation = _cc.transform.rotation;
-    }
-
-    public override void Render()
-    {
-        if (!Object.HasStateAuthority)
-        {
-            _cc.transform.rotation = Quaternion.Slerp(_cc.transform.rotation, CurrentRotation, rotateSpeed * Runner.DeltaTime);
-        }
     }
 
     private IPlayerContext context;

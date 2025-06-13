@@ -2,7 +2,6 @@ using Fusion;
 using Mundo_dodgeball.Projectile;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct AxeProjectileData : INetworkStruct
@@ -24,7 +23,7 @@ public class AxeProjectile : NetworkBehaviour
     public LayerMask CollisionMask;
 
     [Networked] private AxeProjectileData _data { get; set; }
-    [Networked] private PlayerRef _owner { get; set; }
+    private PlayerRef _owner { get; set; }
 
     private float _traveledDistance;
     private Vector3 _lastPosition;
@@ -83,7 +82,7 @@ public class AxeProjectile : NetworkBehaviour
         }
     }
 
-    [Rpc(sources:RpcSources.All, targets:RpcTargets.All)]
+    //[Rpc(sources:RpcSources.All, targets:RpcTargets.All)]
     void OnFinished_RPC()
     {
         if (AxeProjectileManager.instance != null)

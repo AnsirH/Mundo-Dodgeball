@@ -1,130 +1,39 @@
-﻿using DG.Tweening;
-using Fusion;
+﻿using Fusion;
 using Mundo_dodgeball.Projectile;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerAttack : NetworkBehaviour
 {
     private IPlayerContext context;
-
-
     [Networked] public TickTimer coolTimer { get; set; }
     [Networked] public TickTimer attackTimer { get; set; }
     public bool CoolTiming { get {  return !coolTimer.ExpiredOrNotRunning(Runner); } }
     public bool Attacking { get { return !attackTimer.ExpiredOrNotRunning(Runner); } }
 
 
-    private float rotationSpeed = 8.0f;
-
-    private float attackDuration = 0.25f;
-
-    private Vector3 targetPoint = Vector3.zero;
-    private Vector3 direction = Vector3.zero;
-
-    private Coroutine currentAttackRoutine;
-
     [Header("References")]
     // 도끼 발사체
     [SerializeField] private AxeShooter axeShooter;
 
+    [SerializeField] private NetworkPrefabRef axePrefab;
+
     // 캐릭터 도끼 모델링
     [SerializeField] private GameObject axeObj;
 
-    #region IPlayerAction Implementation
-    public event Action OnActionCompleted;
+    [SerializeField] private float rotationSpeed = 8.0f;
 
-    public bool IsActionInProgress { get; private set; } = false;
+    [SerializeField] private float attackDuration = 0.25f;
+    public float RotationSpeed => rotationSpeed;
+    public float AttackDuration => attackDuration;
 
-    public bool CanExecuteAction => axeShooter.CanShoot && axeShooter.IsRangeActive;
+    private Vector3 targetPoint;
 
-    public bool Controllable { get; set; } = true;
 
-    public void ExecuteAction()
-    {
-        if (IsActionInProgress || !axeShooter.IsRangeActive) return;
-
-        // 공격 범위 디스플레이 비활성화
-        ActivateRange(false);
-
-        // 공격 로직 실행
-        currentAttackRoutine = StartCoroutine(AttackRoutine());
-
-        // 공격 실행 활성화
-        IsActionInProgress = true;
-    }
-
-    public void StopAction()
-    {
-    }
-    #endregion
-
-    #region IPlayerComponent Implementation
-    public void Initialize(IPlayerContext context, bool isOfflineMode)
+    public void Initialize(IPlayerContext context)
     {
         this.context = context;
-        axeShooter.Initialize(context, isOfflineMode);
     }
 
-    public void Updated()
-    {
-    }
-
-    public void OnEnabled()
-    {
-    }
-
-    public void OnDisabled()
-    {
-        CancelAttack();
-    }
-
-    public void HandleInput(NetworkInputData data)
-    {
-    }
-
-    public void HandleInput(InputAction.CallbackContext context)
-    {
-        switch (context.action.name)
-        {
-            case "Move":
-                ActivateRange(false);
-                break;
-
-            case "Attack":
-                ActivateRange(!CanExecuteAction);
-                break;
-
-            case "Click":
-                if (CanExecuteAction)
-                {
-                    ExecuteAction();
-                }
-                break;
-            case "F":
-                if (IsActionInProgress)
-                {
-                    //CancelAttack();
-
-                    //float now = (float)PhotonNetwork.Time;
-                    //float expectedDelay = PhotonNetwork.GetPing() * 0.001f * 0.5f;
-
-                    //Vector3 direction = this.context.Trf.forward.normalized;
-                    //direction.y = 0.0f;
-
-                    //axeShooter.SpawnProjectile(axeShooter.transform.position, direction, now);
-
-                    //photonView.RPC("ShootAxe_RPC", RpcTarget.Others, axeShooter.transform.position, direction, now + expectedDelay);
-                }
-                break;
-        }
-
-        
-    }
-    #endregion
 
     public void StartAttack(Vector3 point)
     {
@@ -136,27 +45,6 @@ public class PlayerAttack : NetworkBehaviour
     private void SetTargetPoint(Vector3 point)
     {
         targetPoint = point;
-        direction = (point - transform.position).normalized;
-    }
-
-    public void RotateTowardsTarget()
-    {
-        if (direction == Vector3.zero) return;
-        context.Movement.RotateForDeltaTime(transform.rotation, direction, 5.0f);
-    }
-
-    public bool IsRotationComplete()
-    {
-        if (direction == Vector3.zero) return false;
-
-        float angle = Quaternion.Angle(transform.rotation, Quaternion.LookRotation(direction));
-        if (angle < 1f) // 1도 이하일 때 완료로 간주
-        {
-            direction = Vector3.zero;
-            return true;
-        }
-
-        return false;
     }
 
     public void StartCoolDown(float coolTime)
@@ -166,49 +54,38 @@ public class PlayerAttack : NetworkBehaviour
 
     public void Fire(Vector3 direction)
     {
-        if (!Object.HasStateAuthority) return;
-        ShootAxe_RPC(transform.position, direction);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction)
-    {
-        if (AxeProjectileManager.instance != null)
+        if (HasInputAuthority)
         {
-            AxeProjectileManager.instance.SpawnProjectile(StartPos, direction, Object.InputAuthority);
+            SpawnAxe_RPC(transform.position, direction);
         }
+
+        
+        //SpawnProjectile(transform.position, direction);
+        //if (Object.HasStateAuthority)
+        //{
+        //}
+        //else if (Object.HasInputAuthority)
+        //{
+        //    SpawnAxe_RPC(transform.position, direction);
+        //}
+        //if (!Object.HasStateAuthority) return;
+        //ShootAxe_RPC(transform.position, direction);
     }
 
-    // 공격 코루틴. 시간 지나면 완료 이벤트 발행
-    private IEnumerator AttackRoutine()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void SpawnAxe_RPC(Vector3 startPos, Vector3 direction)
     {
-        // 마우스 위치 확인
-        if (!context.MousePositionGetter.ClickPoint.HasValue) yield break;
+        Debug.Log($"서버 {startPos}{direction}");
+        SpawnProjectile(startPos, direction);
+    }
 
-        // 공격 방향 계산
-        Vector3 direction = (targetPoint - context.Movement.transform.position).normalized;
-        direction.y = 0.0f;
+    private void SpawnProjectile(Vector3 startPos, Vector3 direction)
+    {
+        //AxeProjectileManager.instance.SpawnProjectile(transform.position, direction, Object);
+        //ProjectileManager.Instance.SpawnProjectile("TestProjectile", startPos, direction, Object.InputAuthority);
 
-        // 공격 애니메이션
-        context.Anim.SetTrigger("Attack");
-
-        // 공격 방향으로 회전
-        // 회전 종료 시 공격
-        transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
-        {
-            axeObj.SetActive(false);
-            if (Object.HasStateAuthority)
-            {
-                ShootAxe_RPC(axeShooter.transform.position, direction);
-            }
-        };
-
-        // 공격 애니메이션 및 로직
-        yield return new WaitForSeconds(attackDuration);
-
-        IsActionInProgress = false;
-        axeObj.SetActive(true);
-        OnActionCompleted?.Invoke();
+        ProjectileBase projectile = Runner.Spawn(axePrefab, startPos, Quaternion.LookRotation(direction)).GetComponent<ProjectileBase>();
+        projectile.Init(transform.position, direction, Object.InputAuthority);
     }
 
     // 도끼 궤적 활성화 메서드
@@ -223,20 +100,4 @@ public class PlayerAttack : NetworkBehaviour
         else
             axeShooter.ActivateRange(false);
     }
-
-    public void CancelAttack()
-    {
-        ActivateRange(false);
-
-        // 회전 종료
-        transform.DOKill();
-
-        if (currentAttackRoutine != null)
-        {
-            StopCoroutine(currentAttackRoutine);
-            IsActionInProgress = false;
-            axeObj.SetActive(true);
-        }
-    }
-
 }

@@ -67,7 +67,7 @@ public class PlayerSpellActuator : NetworkBehaviour, IPlayerComponent
 
     private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild=false)
     {
-        GameObject effect = ObjectPooler.Get(effectTag);
+        GameObject effect = ObjectPooler.GetLocal(effectTag);
 
         if (effect == null)
         {
@@ -81,7 +81,7 @@ public class PlayerSpellActuator : NetworkBehaviour, IPlayerComponent
 
         yield return new WaitForSeconds(duration);
 
-        ObjectPooler.Release(effectTag, effect);
+        ObjectPooler.ReleaseLocal(effectTag, effect);
     }
 
     [Rpc]

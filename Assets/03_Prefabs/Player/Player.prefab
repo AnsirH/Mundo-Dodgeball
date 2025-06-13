@@ -1373,7 +1373,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   axeShooter: {fileID: 5097637738017206974}
+  axePrefab:
+    RawGuidValue: 03a0ec1b364435543a5747519c654f15
   axeObj: {fileID: 9042082356628863269}
+  rotationSpeed: 8
+  attackDuration: 0.25
 --- !u!114 &3562521471211086396
 MonoBehaviour:
   m_ObjectHideFlags: 0

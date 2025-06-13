@@ -6,6 +6,8 @@ namespace Mundo_dodgeball.Projectile
 {    
     public class AxeProjectileManager : NetworkBehaviour
     {
+        public NetworkPrefabRef axePrefab;
+
         private List<AxeProjectile> _activeProjectiles = new();
         public static AxeProjectileManager instance;
 
@@ -17,10 +19,8 @@ namespace Mundo_dodgeball.Projectile
             }
         }
 
-        public void SpawnProjectile(Vector3 startPosition, Vector3 direction, PlayerRef owner)
+        public void SpawnProjectile(Vector3 startPosition, Vector3 direction, NetworkObject sender)
         {
-            if (!Object.HasStateAuthority) return;
-
             var data = new AxeProjectileData
             {
                 StartPosition = startPosition,
@@ -29,13 +29,14 @@ namespace Mundo_dodgeball.Projectile
                 IsFinished = false
             };
 
-            var instance = ObjectPooler.Get("AxeProjectile");
-            if (instance != null)
+            //var instance = ObjectPooler.GetNetwork("AxeProjectile", startPosition, Quaternion.LookRotation(direction));
+            var projectile = Runner.Spawn(axePrefab, position: startPosition, rotation: Quaternion.LookRotation(direction), sender.InputAuthority);
+            if (projectile != null)
             {
-                var axeProjectile = instance.GetComponent<AxeProjectile>();
+                var axeProjectile = projectile.GetComponent<AxeProjectile>();
                 if (axeProjectile != null)
                 {
-                    axeProjectile.Init(data, owner);
+                    axeProjectile.Init(data, sender.InputAuthority);
                     _activeProjectiles.Add(axeProjectile);
                 }
             }
@@ -43,10 +44,9 @@ namespace Mundo_dodgeball.Projectile
 
         public void OnProjectileFinished(AxeProjectile proj)
         {
-            // if (!Object.HasStateAuthority) return;
-
             _activeProjectiles.Remove(proj);
-            ObjectPooler.Release("AxeProjectile", proj.gameObject);
+            Runner.Despawn(proj.Object);
+            //ObjectPooler.ReleaseNetwork("AxeProjectile", proj.Object);
         }
     }
 }

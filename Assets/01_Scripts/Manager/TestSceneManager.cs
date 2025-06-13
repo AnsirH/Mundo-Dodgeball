@@ -14,6 +14,8 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private PlayerInputHandler inputHandler;
 
+    private Dictionary<PlayerRef, NetworkObject> players = new();
+
     public void OnConnectedToServer(NetworkRunner runner)
     {
     }
@@ -82,6 +84,11 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
+        if (_runner.IsServer)
+        {
+            runner.Despawn(players[player]);
+            players.Remove(player);
+        }
     }
 
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
@@ -148,7 +155,7 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             NetworkObject spawned_player = _runner.Spawn(playerPrefab, position: ground.sections[i].position, rotation: Quaternion.identity, player);
 
-
+            players[player] = spawned_player;
             // 각 플레이어에 고유한 이름 할당
             spawned_player.name = $"TestPlayer_{i}";
         }

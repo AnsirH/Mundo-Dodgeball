@@ -98,7 +98,7 @@ public class AxeShooter : MonoBehaviour, IShooter
 
         direction.y = 0.0f;
 
-        GameObject axeObj = ObjectPooler.Get("Axe");
+        GameObject axeObj = ObjectPooler.GetLocal("Axe");
 
         IProjectile axe = axeObj.GetComponent<IProjectile>();
         axe.Initialize(context, transform.position, direction);

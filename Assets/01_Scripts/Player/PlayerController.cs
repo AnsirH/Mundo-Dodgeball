@@ -89,7 +89,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
         stateMachine = new(this);
 
         movement.Initialize(this);
-        attack.Initialize(this, isOfflineMode);
+        attack.Initialize(this);
     }
 
     public override void Render()
@@ -167,7 +167,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
     {
-        GameObject effect = ObjectPooler.Get(effectTag);
+        GameObject effect = ObjectPooler.GetLocal(effectTag);
 
         if (effect == null)
         {
@@ -180,6 +180,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
         yield return new WaitForSeconds(1.0f);
 
-        ObjectPooler.Release(effectTag, effect);
+        ObjectPooler.ReleaseLocal(effectTag, effect);
     }
 }

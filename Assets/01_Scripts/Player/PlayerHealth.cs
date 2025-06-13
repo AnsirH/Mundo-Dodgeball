@@ -117,11 +117,11 @@ public class PlayerHealth : NetworkBehaviour, IDamageable, IPlayerComponent
 
     IEnumerator ActiveHitEffect()
     {
-        GameObject hitEffect = ObjectPooler.Get("HitEffect");
+        GameObject hitEffect = ObjectPooler.GetLocal("HitEffect");
         hitEffect.transform.position = transform.position;
         yield return new WaitForSeconds(0.5f);
 
-        ObjectPooler.Release("HitEffect", hitEffect);
+        ObjectPooler.ReleaseLocal("HitEffect", hitEffect);
     }
 }
 
