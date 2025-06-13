@@ -1,9 +1,9 @@
-using Fusion;
+ï»¿using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-// µµ³¢, ÀÌÆåÆ®¿Í °°ÀÌ ÀÏ½ÃÀûÀ¸·Î »ý¼ºµÇ´Â ¿ÀºêÁ§Æ®¸¦ °ü¸®
+// ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 public class ObjectPooler : NetworkBehaviour
 {
     public static ObjectPooler Instance { get; private set; }
@@ -24,13 +24,13 @@ public class ObjectPooler : NetworkBehaviour
         public int size;
     }
 
-    // ¿ÀºêÁ§Æ® Ç®·¯·Î °ü¸®µÇ´Â ¿ÀºêÁ§Æ®µéÀº ÀÎ½ºÆåÅÍ Ã¢¿¡¼­ Á¤º¸¸¦ ³Ö¾îÁà¾ß ÇÔ.
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Ç®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½Î½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¢ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½.
     public LocalPool[] localPools;
     private Dictionary<string, ObjectPool<GameObject>> localPoolDictionary;
 
 
     public NetworkPool[] networkPools;
-    private Dictionary<string, ObjectPool<GameObject>> networkPoolDictionary;
+    private Dictionary<string, ObjectPool<GameObject>> networkPoolDictionary { get; set; }
 
     private void Awake()
     {
@@ -45,10 +45,10 @@ public class ObjectPooler : NetworkBehaviour
         }
     }
 
-    // ¿ÀºêÁ§Æ® Ç®·¯ ÃÊ±âÈ­
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Ç®ï¿½ï¿½ ï¿½Ê±ï¿½È­
     private void InitializePools()
     {
-        // Ç® µñ¼Å³Ê¸® »ý¼º ¹× ÃÊ±âÈ­
+        // Ç® ï¿½ï¿½Å³Ê¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ê±ï¿½È­
         localPoolDictionary = new Dictionary<string, ObjectPool<GameObject>>();
 
         foreach (LocalPool pool in localPools)
@@ -79,11 +79,11 @@ public class ObjectPooler : NetworkBehaviour
                 maxSize: pool.size
             );
 
-            localPoolDictionary.Add(pool.tag, objectPool);
+            networkPoolDictionary.Add(pool.tag, objectPool);
         }
     }
 
-    /// <summary> ·ÎÄÃ ¿ÀºêÁ§Æ® ÃÊ±â »ý¼º /// </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ê±ï¿½ ï¿½ï¿½ï¿½ï¿½ /// </summary>
     private GameObject CreatePooledObject(GameObject prefab)
     {
         var obj = Instantiate(prefab, transform);
@@ -98,19 +98,19 @@ public class ObjectPooler : NetworkBehaviour
         return obj;
     }
 
-    /// <summary> ¿ÀºêÁ§Æ® Get ÇÒ ¶§ È£Ãâ /// </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Get ï¿½ï¿½ ï¿½ï¿½ È£ï¿½ï¿½ /// </summary>
     private void OnGetObject(GameObject obj)
     {
         obj.SetActive(true);
     }
 
-    /// <summary> ¿ÀºêÁ§Æ® Release ÇÒ ¶§ È£Ãâ /// </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Release ï¿½ï¿½ ï¿½ï¿½ È£ï¿½ï¿½ /// </summary>
     private void OnReleaseObject(GameObject obj)
     {
         obj.SetActive(false);
     }
 
-    /// <summary> ¿ÀºêÁ§Æ® Ç®¿¡¼­ °¡Á®¿À±â /// </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Ç®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ /// </summary>
     public static GameObject Get(string tag)
     {
         if (Instance.localPoolDictionary.TryGetValue(tag, out var localPool))
@@ -128,7 +128,7 @@ public class ObjectPooler : NetworkBehaviour
         }
     }
 
-    /// <summary> ¿ÀºêÁ§Æ® Ç®·Î ¹ÝÈ¯ /// </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Ç®ï¿½ï¿½ ï¿½ï¿½È¯ /// </summary>
     public static void Release(string tag, GameObject obj)
     {
         if (Instance.localPoolDictionary.TryGetValue(tag, out var localPool))

@@ -8,7 +8,10 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float rotateSpeed = 10f;
     [SerializeField] private float arrivalThreshold = 0.1f;
 
-    private Vector3 currentTargetPosition = Vector3.zero;
+    private Vector3 currentTargetPosition;
+    [Networked] private Vector3 CurrentPosition { get; set; }
+    [Networked] private Quaternion CurrentRotation { get; set; }
+    [Networked] private Vector3 TargetDirection { get; set; }
 
     public bool IsArrived { get { return Vector3.Distance(_cc.transform.position, currentTargetPosition) <= arrivalThreshold || currentTargetPosition == Vector3.zero; } }
 
@@ -30,6 +33,8 @@ public class PlayerMovement : NetworkBehaviour
     {
         this.context = context;
         _cc = GetComponent<NetworkCharacterController>();
+        CurrentPosition = _cc.transform.position;
+        CurrentRotation = _cc.transform.rotation;
     }
 
     public void Teleport(Vector3 targetPosition)
@@ -70,15 +75,31 @@ public class PlayerMovement : NetworkBehaviour
         currentTargetPosition = Vector3.zero;
     }
 
-    public void RotateForDeltaTime(Quaternion currentRotation, Vector3 direction, float runnerDeltaTime)
+    public void RotateForDeltaTime(Quaternion currentRotation, Vector3 direction, float rotateSpeed)
     {
-        Quaternion targetRotation = Quaternion.Slerp(currentRotation, Quaternion.LookRotation(direction), rotateSpeed * runnerDeltaTime);
-        _cc.transform.rotation = targetRotation;
+        if (!Object.HasStateAuthority) return;
+        
+        TargetDirection = direction;
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        CurrentRotation = Quaternion.Slerp(currentRotation, targetRotation, rotateSpeed * Runner.DeltaTime);
+        _cc.transform.rotation = CurrentRotation;
     }
 
     private void MoveForDeltaTime(Vector3 normalizedDirection, float runnerDeltaTime)
     {
+        if (!Object.HasStateAuthority) return;
         _cc.Move(context.Stats.GetMoveSpeed() * runnerDeltaTime * normalizedDirection);
+        CurrentPosition = _cc.transform.position;
+        CurrentRotation = _cc.transform.rotation;
     }
+
+    public override void Render()
+    {
+        if (!Object.HasStateAuthority)
+        {
+            _cc.transform.rotation = Quaternion.Slerp(_cc.transform.rotation, CurrentRotation, rotateSpeed * Runner.DeltaTime);
+        }
+    }
+
     private IPlayerContext context;
 }

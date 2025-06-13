@@ -266,7 +266,8 @@ MonoBehaviour:
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 199360699}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &199360699
 MonoBehaviour:
@@ -280,8 +281,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82d8bbd38bc20764bbad31d67edaf67e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectilePrefab:
-    RawGuidValue: 75f3bb5d178abc94a98711c3754614ef
 --- !u!4 &199360700
 Transform:
   m_ObjectHideFlags: 0
@@ -444,6 +443,7 @@ GameObject:
   m_Component:
   - component: {fileID: 721314735}
   - component: {fileID: 721314734}
+  - component: {fileID: 721314736}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -531,6 +531,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &721314736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721314733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d73b0a95be81246699cf0d9ecdc01863, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PreferredRunner: 0
+  Components:
+  - {fileID: 721314734}
+  _guid: c0e1b639-05ff-4dea-
 --- !u!1 &958085781
 GameObject:
   m_ObjectHideFlags: 0
@@ -578,6 +594,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Object Pooler
       objectReference: {fileID: 0}
+    - target: {fileID: 2064255200707408905, guid: d52f5d228649e7f469a352c15434b99d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2154624196197186054, guid: d52f5d228649e7f469a352c15434b99d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -617,6 +637,26 @@ PrefabInstance:
     - target: {fileID: 2154624196197186054, guid: d52f5d228649e7f469a352c15434b99d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6878850517177498434, guid: d52f5d228649e7f469a352c15434b99d, type: 3}
+      propertyPath: pools.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6878850517177498434, guid: d52f5d228649e7f469a352c15434b99d, type: 3}
+      propertyPath: pools.Array.data[0].tag
+      value: AxeProjectile
+      objectReference: {fileID: 0}
+    - target: {fileID: 6878850517177498434, guid: d52f5d228649e7f469a352c15434b99d, type: 3}
+      propertyPath: pools.Array.data[0].size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6878850517177498434, guid: d52f5d228649e7f469a352c15434b99d, type: 3}
+      propertyPath: pools.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 1904142371288617127, guid: 75f3bb5d178abc94a98711c3754614ef, type: 3}
+    - target: {fileID: 6878850517177498434, guid: d52f5d228649e7f469a352c15434b99d, type: 3}
+      propertyPath: pools.Array.data[0].isNetworkObject
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1047,6 +1087,7 @@ GameObject:
   - component: {fileID: 2012040065}
   - component: {fileID: 2012040064}
   - component: {fileID: 2012040063}
+  - component: {fileID: 2012040066}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1128,6 +1169,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &2012040066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2012040062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d73b0a95be81246699cf0d9ecdc01863, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PreferredRunner: 0
+  Components:
+  - {fileID: 2012040063}
+  _guid: 078dcd7e-7c97-46be-
 --- !u!1 &2078103529
 GameObject:
   m_ObjectHideFlags: 0

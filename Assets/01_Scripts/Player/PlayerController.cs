@@ -99,12 +99,11 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasStateAuthority) return;
         if (GetInput(out NetworkInputData data))
         {
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
             {
-                if (attack.CoolTiming) return;
+                if (CurrentState is PlayerAttackState || attack.CoolTiming) return;
                 ClickPoint = data.targetPoint;
                 ChangeState(EPlayerState.Attack, new(ClickPoint.Value));
             }

@@ -37,7 +37,7 @@ namespace Mundo_dodgeball.Player.StateMachine
             if (!attack.Attacking)
             {
                 attack.StartCoolDown(5.0f);
-                AxeProjectileManager.instance.SpawnProjectile(playerContext.Movement.transform.position, direction, attack.Object.InputAuthority);
+                attack.Fire(direction);
                 playerContext.ChangeState(EPlayerState.Idle);
             }
         }

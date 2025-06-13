@@ -1,7 +1,9 @@
 ﻿using DG.Tweening;
 using Fusion;
+using Mundo_dodgeball.Projectile;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,8 +12,8 @@ public class PlayerAttack : NetworkBehaviour
     private IPlayerContext context;
 
 
-    [Networked] private TickTimer coolTimer { get; set; }
-    [Networked] private TickTimer attackTimer { get; set; }
+    [Networked] public TickTimer coolTimer { get; set; }
+    [Networked] public TickTimer attackTimer { get; set; }
     public bool CoolTiming { get {  return !coolTimer.ExpiredOrNotRunning(Runner); } }
     public bool Attacking { get { return !attackTimer.ExpiredOrNotRunning(Runner); } }
 
@@ -21,7 +23,7 @@ public class PlayerAttack : NetworkBehaviour
     private float attackDuration = 0.25f;
 
     private Vector3 targetPoint = Vector3.zero;
-    private Quaternion? targetRotation = null;
+    private Vector3 direction = Vector3.zero;
 
     private Coroutine currentAttackRoutine;
 
@@ -134,29 +136,23 @@ public class PlayerAttack : NetworkBehaviour
     private void SetTargetPoint(Vector3 point)
     {
         targetPoint = point;
-        targetRotation = Quaternion.LookRotation((point - transform.position).normalized);
+        direction = (point - transform.position).normalized;
     }
 
     public void RotateTowardsTarget()
     {
-        if (targetRotation.HasValue)
-        {
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation.Value,
-                rotationSpeed * context.Runner.DeltaTime
-            );
-        }
+        if (direction == Vector3.zero) return;
+        context.Movement.RotateForDeltaTime(transform.rotation, direction, 5.0f);
     }
 
     public bool IsRotationComplete()
     {
-        if (!targetRotation.HasValue) return false;
+        if (direction == Vector3.zero) return false;
 
-        float angle = Quaternion.Angle(transform.rotation, targetRotation.Value);
+        float angle = Quaternion.Angle(transform.rotation, Quaternion.LookRotation(direction));
         if (angle < 1f) // 1도 이하일 때 완료로 간주
         {
-            targetRotation = null;
+            direction = Vector3.zero;
             return true;
         }
 
@@ -168,11 +164,19 @@ public class PlayerAttack : NetworkBehaviour
         coolTimer = TickTimer.CreateFromSeconds(Runner, coolTime);
     }
 
+    public void Fire(Vector3 direction)
+    {
+        if (!Object.HasStateAuthority) return;
+        ShootAxe_RPC(transform.position, direction);
+    }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void ShootAxe_RPC(Vector3 StartPos, Vector3 direction)
     {
-        axeShooter.SpawnProjectile(StartPos, direction);
+        if (AxeProjectileManager.instance != null)
+        {
+            AxeProjectileManager.instance.SpawnProjectile(StartPos, direction, Object.InputAuthority);
+        }
     }
 
     // 공격 코루틴. 시간 지나면 완료 이벤트 발행
@@ -193,8 +197,10 @@ public class PlayerAttack : NetworkBehaviour
         transform.DORotateQuaternion(Quaternion.LookRotation(direction), 0.25f).onComplete += () => 
         {
             axeObj.SetActive(false);
-
-            ShootAxe_RPC(axeShooter.transform.position, direction);
+            if (Object.HasStateAuthority)
+            {
+                ShootAxe_RPC(axeShooter.transform.position, direction);
+            }
         };
 
         // 공격 애니메이션 및 로직

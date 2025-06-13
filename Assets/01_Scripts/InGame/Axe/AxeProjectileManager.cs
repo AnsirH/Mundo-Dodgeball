@@ -4,10 +4,8 @@ using System.Collections.Generic;
 
 namespace Mundo_dodgeball.Projectile
 {    
-    public class AxeProjectileManager : MonoBehaviour
+    public class AxeProjectileManager : NetworkBehaviour
     {
-        [SerializeField] private NetworkPrefabRef projectilePrefab;
-
         private List<AxeProjectile> _activeProjectiles = new();
         public static AxeProjectileManager instance;
 
@@ -21,6 +19,8 @@ namespace Mundo_dodgeball.Projectile
 
         public void SpawnProjectile(Vector3 startPosition, Vector3 direction, PlayerRef owner)
         {
+            if (!Object.HasStateAuthority) return;
+
             var data = new AxeProjectileData
             {
                 StartPosition = startPosition,
@@ -29,16 +29,22 @@ namespace Mundo_dodgeball.Projectile
                 IsFinished = false
             };
 
-            var instance = ObjectPooler.Get("AxeProjectile").GetComponent<AxeProjectile>();
-
-            //AxeProjectile instance = Runner.Spawn(projectilePrefab, startPosition, Quaternion.identity).GetComponent<AxeProjectile>();
-            instance.Init(data, owner);
-
-            _activeProjectiles.Add(instance);
+            var instance = ObjectPooler.Get("AxeProjectile");
+            if (instance != null)
+            {
+                var axeProjectile = instance.GetComponent<AxeProjectile>();
+                if (axeProjectile != null)
+                {
+                    axeProjectile.Init(data, owner);
+                    _activeProjectiles.Add(axeProjectile);
+                }
+            }
         }
 
         public void OnProjectileFinished(AxeProjectile proj)
         {
+            // if (!Object.HasStateAuthority) return;
+
             _activeProjectiles.Remove(proj);
             ObjectPooler.Release("AxeProjectile", proj.gameObject);
         }
