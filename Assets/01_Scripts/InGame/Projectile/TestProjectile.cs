@@ -60,30 +60,29 @@ public class TestProjectile : ProjectileBase
     {
         base.FixedUpdateNetwork();
 
-        // 투사체 회전
-        if (IsActive)
-        {
-            transform.Rotate(Vector3.forward, rotationSpeed * Runner.DeltaTime);
-        }
+        //if (!IsMaxDistanceReached)
+        //{
+        //    transform.Rotate(Vector3.forward, rotationSpeed * Runner.DeltaTime);
+        //}        
     }
 
-    protected override bool CheckCollision(float distance, out Vector3 hitPoint)
-    {
-        if (base.CheckCollision(distance, out hitPoint))
-        {
-            // 충돌한 오브젝트가 플레이어인 경우 데미지 처리
-            if (Runner.LagCompensation.Raycast(
-                origin: transform.position,
-                direction: Direction,
-                length: distance,
-                player: Owner,
-                out var hit,
-                layerMask: collisionMask))
-            {
-                Debug.Log("Hit");
-            }
-            return true;
-        }
-        return false;
-    }
+    //protected override bool CheckCollision(float distance, out LagCompensatedHit lagCompensatedHit)
+    //{
+    //    if (base.CheckCollision(distance, out lagCompensatedHit))
+    //    {
+    //        // 충돌한 오브젝트가 플레이어인 경우 데미지 처리
+    //        if (Runner.LagCompensation.Raycast(
+    //            origin: transform.position,
+    //            direction: Direction,
+    //            length: distance,
+    //            player: Owner,
+    //            out var hit,
+    //            layerMask: collisionMask))
+    //        {
+    //            Debug.Log("Hit");
+    //        }
+    //        return true;
+    //    }
+    //    return false;
+    //}
 } 

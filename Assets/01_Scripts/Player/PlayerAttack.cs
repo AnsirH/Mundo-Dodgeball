@@ -58,10 +58,10 @@ public class PlayerAttack : NetworkBehaviour
         {
             SpawnProjectile(transform.position, direction);
         }
-        else if (HasInputAuthority)
-        {
-            SpawnAxe_RPC(transform.position, direction);
-        }
+        //else if (HasInputAuthority)
+        //{
+        //    SpawnAxe_RPC(transform.position, direction);
+        //}
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -73,10 +73,16 @@ public class PlayerAttack : NetworkBehaviour
     private void SpawnProjectile(Vector3 startPos, Vector3 direction)
     {
         //AxeProjectileManager.instance.SpawnProjectile(transform.position, direction, Object);
-        ProjectileManager.Instance.SpawnProjectile("TestProjectile", startPos, direction, Object.InputAuthority);
+        //ProjectileManager.Instance.SpawnProjectile("TestProjectile", startPos, direction, Object.InputAuthority);
 
-        //ProjectileBase projectile = Runner.Spawn(axePrefab, startPos, Quaternion.LookRotation(direction)).GetComponent<ProjectileBase>();
-        //projectile.Init(transform.position, direction, Object.InputAuthority);
+        Runner.Spawn(axePrefab, 
+            startPos, 
+            Quaternion.LookRotation(direction), 
+            Object.InputAuthority, 
+            (runner, o) => 
+            {
+                o.GetComponent<ProjectileBase>().Init(startPos, direction, Object.InputAuthority);
+            });
     }
 
     // 도끼 궤적 활성화 메서드

@@ -9,57 +9,59 @@ public abstract class ProjectileBase : NetworkBehaviour
     [SerializeField] protected LayerMask collisionMask;
     [SerializeField] protected float damage = 10f;
 
-    [Networked] public bool IsActive { get; set; }
     [Networked] protected Vector3 Direction { get; set; }
     [Networked] protected Vector3 StartPosition { get; set; }
     [Networked] protected float DistanceTraveled { get; set; }
     [Networked] protected PlayerRef Owner { get; set; }
+    [Networked] protected NetworkBool IsFinished { get; set; }
 
     protected ChangeDetector _changeDetector;
     protected float _currentDistance;
 
+    public bool IsMaxDistanceReached { get { return DistanceTraveled >= maxDistance; } }
+
     public override void Spawned()
     {
         _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
-        SetActive(false);
     }
 
     public virtual void Init(Vector3 startPos, Vector3 direction, PlayerRef owner)
     {
-        if (Object.HasStateAuthority)
-        {
-            StartPosition = startPos;
-            Direction = direction.normalized;
-            Owner = owner;
-            DistanceTraveled = 0f;
-            _currentDistance = 0f;
-            transform.position = startPos;
-            SetActive(true);
-        }
-    }
+        StartPosition = startPos;
+        Direction = direction.normalized;
+        Owner = owner;
+        DistanceTraveled = 0f;
+        IsFinished = true;
 
-    public void SetActive(bool active)
-    {
-        gameObject.SetActive(active);
-        IsActive = active;
+        _currentDistance = 0f;
+        transform.position = startPos;
     }
 
     public override void FixedUpdateNetwork()
     {
-        if (!IsActive) return;
-
         float moveDistance = speed * Runner.DeltaTime;
         Vector3 nextPosition = transform.position + Direction * moveDistance;
 
-        if (CheckCollision(moveDistance, out Vector3 hitPoint))
+        if (CheckCollision(moveDistance, out LagCompensatedHit hit))
         {
-            nextPosition = hitPoint;
-            OnHit();
+            if (Object.HasStateAuthority)
+            {
+                Debug.Log($"[HOST] {Object.Name} is hit the {hit.GameObject.name}!!!");
+            }
+            else
+            {
+                Debug.Log($"[CLIENT] {Object.Name} is hit the {hit.GameObject.name}!!!");
+            }
+                OnHit();
         }
         else
         {
-            _currentDistance += moveDistance;
-            if (_currentDistance >= maxDistance)
+            if (HasStateAuthority)
+            {
+                _currentDistance += moveDistance;
+                DistanceTraveled = _currentDistance;
+            }
+            if (IsMaxDistanceReached)
             {
                 nextPosition = StartPosition + Direction * maxDistance;
                 OnMaxDistanceReached();
@@ -69,9 +71,9 @@ public abstract class ProjectileBase : NetworkBehaviour
         transform.position = nextPosition;
     }
 
-    protected virtual bool CheckCollision(float distance, out Vector3 hitPoint)
+    protected virtual bool CheckCollision(float distance, out LagCompensatedHit lagCompensatedHit)
     {
-        hitPoint = Vector3.zero;
+        lagCompensatedHit = new();
         if (Runner.LagCompensation.Raycast(
             origin: transform.position,
             direction: Direction,
@@ -80,7 +82,7 @@ public abstract class ProjectileBase : NetworkBehaviour
             out var hit,
             layerMask: collisionMask))
         {
-            hitPoint = hit.Point;
+            lagCompensatedHit = hit;
             return true;
         }
         return false;
@@ -88,24 +90,17 @@ public abstract class ProjectileBase : NetworkBehaviour
 
     protected virtual void OnHit()
     {
-        SetActive(false);
+        IsFinished = false;
+        Runner.Despawn(Object);
     }
 
     protected virtual void OnMaxDistanceReached()
     {
-        SetActive(false);
+        IsFinished = false;
+        Runner.Despawn(Object);
     }
 
     public override void Render()
     {
-        foreach (var change in _changeDetector.DetectChanges(this))
-        {
-            switch (change)
-            {
-                case nameof(IsActive):
-                    SetActive(IsActive);
-                    break;
-            }
-        }
     }
 }
