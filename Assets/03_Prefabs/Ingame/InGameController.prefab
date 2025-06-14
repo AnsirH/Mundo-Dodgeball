@@ -51,7 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterPrefab:
     RawGuidValue: 06f8e0e61fc7b154c9bc6dd0ededc809
-  ExpectedPlayerCount: 2
+  ExpectedPlayerCount: 1
   playerAmount: 2
   ingameUIController: {fileID: 0}
   playerSpawnPoints:

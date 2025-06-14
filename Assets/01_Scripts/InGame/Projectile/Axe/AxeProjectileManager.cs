@@ -36,7 +36,7 @@ namespace Mundo_dodgeball.Projectile
                 var axeProjectile = projectile.GetComponent<AxeProjectile>();
                 if (axeProjectile != null)
                 {
-                    axeProjectile.Init(data, sender.InputAuthority);
+                    //axeProjectile.Init(data, sender.InputAuthority);
                     _activeProjectiles.Add(axeProjectile);
                 }
             }

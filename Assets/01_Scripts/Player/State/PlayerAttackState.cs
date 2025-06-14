@@ -22,18 +22,20 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void UpdateState()
         {
+            attack.SetTestText("[Networked] attack count: ", attack.AttackCount, "current attack count: ", _visibleAttackCount);
+            if (_visibleAttackCount < attack.AttackCount)
+            {
+                playerContext.Anim.SetTrigger("Attack");
+
+                _visibleAttackCount = attack.AttackCount;
+            }
         }
 
         public override void NetworkUpdateState(float runnerDeltaTime)
         {
-            //if (!attack.IsRotationComplete())
-            //{
-            //    attack.RotateTowardsTarget();
-            //}
             playerContext.Movement.RotateForDeltaTime(playerContext.Movement.transform.rotation, direction, attack.RotationSpeed);
             if (!attack.Attacking)
             {
-                attack.StartCoolDown(5.0f);
                 attack.Fire(direction);
                 playerContext.ChangeState(EPlayerState.Idle);
             }
@@ -41,5 +43,6 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         private PlayerAttack attack;
         Vector3 direction = Vector3.zero;
+        int _visibleAttackCount = 0;
     }
 }

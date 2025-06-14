@@ -1,21 +1,22 @@
 ﻿using Fusion;
 using Mundo_dodgeball.Projectile;
+using TMPro;
 using UnityEngine;
 
 public class PlayerAttack : NetworkBehaviour
 {
     private IPlayerContext context;
-    [Networked] public TickTimer coolTimer { get; set; }
-    [Networked] public TickTimer attackTimer { get; set; }
-    public bool CoolTiming { get {  return !coolTimer.ExpiredOrNotRunning(Runner); } }
-    public bool Attacking { get { return !attackTimer.ExpiredOrNotRunning(Runner); } }
+    [Networked] public TickTimer CoolTimer { get; set; }
+    [Networked] public TickTimer AttackTimer { get; set; }
+    [Networked] public int AttackCount { get; set; } = 0;
+    public bool CoolTiming { get {  return !CoolTimer.ExpiredOrNotRunning(Runner); } }
+    public bool Attacking { get { return !AttackTimer.ExpiredOrNotRunning(Runner); } }
 
 
     [Header("References")]
-    // 도끼 발사체
-    [SerializeField] private AxeShooter axeShooter;
-
     [SerializeField] private NetworkPrefabRef axePrefab;
+    [SerializeField] Transform shotPosition;
+    public TextMeshProUGUI testText;
 
     // 캐릭터 도끼 모델링
     [SerializeField] private GameObject axeObj;
@@ -38,43 +39,44 @@ public class PlayerAttack : NetworkBehaviour
     public void StartAttack(Vector3 point)
     {
         SetTargetPoint(point);
-
-        attackTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+        if(Object.HasStateAuthority)
+            AttackCount++;
+        AttackTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+        axeObj.SetActive(false);
     }
+
+    public  void SetTestText(string firstStr, int firstValue, string secondStr, int secondValue)
+    {
+        string result = firstStr + firstValue + "\n" + secondStr + secondValue;
+
+        testText.text = result;
+    }
+
 
     private void SetTargetPoint(Vector3 point)
     {
         targetPoint = point;
     }
 
-    public void StartCoolDown(float coolTime)
+    private void StartCoolDown(float coolTime)
     {
-        coolTimer = TickTimer.CreateFromSeconds(Runner, coolTime);
+        CoolTimer = TickTimer.CreateFromSeconds(Runner, coolTime);
     }
 
+    /// <summary>
+    /// 투사체 발사
+    /// </summary>
+    /// <param name="direction"></param>
     public void Fire(Vector3 direction)
     {
         if (HasStateAuthority)
         {
-            SpawnProjectile(transform.position, direction);
+            SpawnProjectile(shotPosition.position, direction);
+            StartCoolDown(5.0f);
         }
-        //else if (HasInputAuthority)
-        //{
-        //    SpawnAxe_RPC(transform.position, direction);
-        //}
     }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void SpawnAxe_RPC(Vector3 startPos, Vector3 direction)
-    {
-        SpawnProjectile(startPos, direction);
-    }
-
     private void SpawnProjectile(Vector3 startPos, Vector3 direction)
     {
-        //AxeProjectileManager.instance.SpawnProjectile(transform.position, direction, Object);
-        //ProjectileManager.Instance.SpawnProjectile("TestProjectile", startPos, direction, Object.InputAuthority);
-
         Runner.Spawn(axePrefab, 
             startPos, 
             Quaternion.LookRotation(direction), 
@@ -85,16 +87,11 @@ public class PlayerAttack : NetworkBehaviour
             });
     }
 
-    // 도끼 궤적 활성화 메서드
-    public void ActivateRange(bool active)
+    public override void FixedUpdateNetwork()
     {
-        //if (!HasStateAuthority) { return; }
-        if (active == true)
+        if (!axeObj.activeSelf && CoolTimer.ExpiredOrNotRunning(Runner))
         {
-            if (axeShooter.CanShoot)
-                axeShooter.ActivateRange(true);
+            axeObj.SetActive(true);
         }
-        else
-            axeShooter.ActivateRange(false);
     }
 }

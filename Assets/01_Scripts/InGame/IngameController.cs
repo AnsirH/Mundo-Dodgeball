@@ -7,11 +7,7 @@ using Fusion.Sockets;
 using System;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
-
-interface IIngameController
-{
-
-}
+using MyGame.Utils;
 
 
 public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
@@ -28,8 +24,6 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     public int ExpectedPlayerCount = 2;
 
     public static IngameController Instance { get; private set; }
-
-    public int playerAmount = 2;
 
     public List<IPlayerContext> Players => playerControllers;
     
@@ -206,7 +200,6 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        Debug.Log("Keeping get input");
         var data = new NetworkInputData();
 
         data.buttons.Set(NetworkInputData.MOUSEBUTTON0, inputHandler.LeftClick);
@@ -215,9 +208,15 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         data.buttons.Set(NetworkInputData.BUTTOND, inputHandler.ButtonD);
         data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
 
-        inputHandler.ResetInputValue();
+        if (inputHandler.RightClick)
+        {
 
+            data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+        }
+        if (inputHandler.LeftClick)
+            data.targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
         input.Set(data);
+        inputHandler.ResetInputValue();
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)

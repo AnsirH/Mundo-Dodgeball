@@ -1,8 +1,6 @@
 using Fusion;
-using Mundo_dodgeball.Projectile;
 using System.Runtime.InteropServices;
 using UnityEngine;
-
 [StructLayout(LayoutKind.Sequential)]
 public struct AxeProjectileData : INetworkStruct
 {
@@ -15,75 +13,46 @@ public struct AxeProjectileData : INetworkStruct
 public class AxeProjectile : ProjectileBase
 {
     [Header("References")]
-    public GameObject model;
-    public GameObject droppingModel;
+    public NetworkMecanimAnimator animator;
 
-    [Networked] private AxeProjectileData _data { get; set; }
-    private PlayerRef _owner { get; set; }
+    [Networked] TickTimer DroppingTimer { get; set; }
 
-    private float _traveledDistance;
-    private Vector3 _lastPosition;
+    private bool _isDropping = false;
 
-    public void Init(AxeProjectileData data, PlayerRef owner)
+    public override void Init(Vector3 startPos, Vector3 direction, PlayerRef owner)
     {
-        if (Object.HasStateAuthority)
+        base.Init(startPos, direction, owner);
+    }
+
+    protected override void OnMaxDistanceReached()
+    {
+        IsFinished = true;
+
+        DroppingTimer = TickTimer.CreateFromSeconds(Runner, 1.0f);
+    }
+
+    public override void Render()
+    {
+        if (IsFinished && !_isDropping)
         {
-            _data = data;
-            _owner = owner;
-            transform.position = data.StartPosition;
-            _traveledDistance = 0f;
-            _lastPosition = data.StartPosition;
+            animator.Animator.SetTrigger("Drop");
+            _isDropping = true;
         }
     }
 
-    //public override void FixedUpdateNetwork()
-    //{
-    //    if (_data.IsFinished || !gameObject.activeSelf)
-    //        return;
-
-    //    float moveDistance = Speed * Runner.DeltaTime;
-    //    Vector3 nextPosition = transform.position + _data.Direction * moveDistance;
-
-    //    if (Runner.LagCompensation.Raycast(
-    //        origin: transform.position,
-    //        direction: _data.Direction,
-    //        length: moveDistance,
-    //        player: _owner,
-    //        out var hit,
-    //        layerMask: CollisionMask
-    //        ))
-    //    {
-    //        nextPosition = hit.Point;
-    //        var newData = _data;
-    //        newData.IsFinished = true;
-    //        _data = newData;
-    //    }
-    //    else
-    //    {
-    //        _traveledDistance += moveDistance;
-    //        if (_traveledDistance >= MaxDistance)
-    //        {
-    //            nextPosition = _data.StartPosition + _data.Direction * MaxDistance;
-    //            var newData = _data;
-    //            newData.IsFinished = true;
-    //            _data = newData;
-    //        }
-    //    }
-
-    //    transform.position = nextPosition;
-
-    //    if (_data.IsFinished)
-    //    {
-    //        OnFinished_RPC();
-    //    }
-    //}
-
-    ////[Rpc(sources:RpcSources.All, targets:RpcTargets.All)]
-    //void OnFinished_RPC()
-    //{
-    //    if (AxeProjectileManager.instance != null)
-    //    {
-    //        AxeProjectileManager.instance.OnProjectileFinished(this);
-    //    }
-    //}
+    public override void FixedUpdateNetwork()
+    {
+        if (!IsFinished)
+        {
+            base.FixedUpdateNetwork();
+        }
+        else
+        {
+            transform.position = new Vector3(transform.position.x, 0.0f, transform.position.z);
+            if (HasStateAuthority && DroppingTimer.ExpiredOrNotRunning(Runner))
+            {
+                Runner.Despawn(Object);
+            }
+        }        
+    }
 }
