@@ -22,7 +22,6 @@ public class RoomUI : MonoBehaviour
     private bool isReady = false;
     public void RoomExit()
     {
-        ServerManager.Instance.roomManager.LeaveRoom();
         OnLeaveRoomRequested?.Invoke();
     }
     //public void ClickReady()

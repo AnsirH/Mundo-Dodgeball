@@ -5584,8 +5584,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   model: {fileID: 510108564}
   runnerPrefab: {fileID: 6566829178162231104, guid: e47fd7b615b80154eb28576c708343b8, type: 3}
+  runner: {fileID: 0}
   playerPrefab: {fileID: 6894791198747873329, guid: 214ec664adeebee4eb1c7cbefdf5835a, type: 3}
   matchManagerPrefab: {fileID: 811709748278777957, guid: 073241eece1416c4cb839b68da746744, type: 3}
+  Round: 0
 --- !u!114 &510108566
 MonoBehaviour:
   m_ObjectHideFlags: 0

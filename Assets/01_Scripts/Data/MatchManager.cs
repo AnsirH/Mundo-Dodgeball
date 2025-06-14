@@ -20,12 +20,13 @@ public class MatchManager : NetworkBehaviour
     {
         get;
     }
-
+    public static event System.Action<MatchManager> OnSpawned;
     [Networked] public int Round { get; set; }
     public override void Spawned()
     {
         ServerManager.Instance.matchManager = this;
         Debug.Log("[MatchManager] 서버에서 matchManager 등록 완료");
+        OnSpawned?.Invoke(this);
     }
     public override void Despawned(NetworkRunner runner, bool hasState)
     {

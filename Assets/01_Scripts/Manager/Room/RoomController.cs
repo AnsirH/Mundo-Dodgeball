@@ -31,7 +31,11 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     private void Awake()
     {
         PopManager.instance.gameSelectPop.OnCreateRoomRequested += CreateOrJoinRoom;
-        UIManager.instance.roomUI.OnLeaveRoomRequested += LeaveRoom;
+        UIManager.instance.roomUI.OnLeaveRoomRequested += async () =>
+        {
+            await Task.Yield(); // 씬 로딩 충돌 방지용 한 틱 대기
+            LeaveRoom();
+        };
     }
 
     private async void Start()
@@ -54,8 +58,8 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
             SceneManager = runner.GetComponent<NetworkSceneManagerDefault>()
         });
     }
-
-    private async void CreateOrJoinRoom(string roomName, string password = "", string playerCount = "GeneralGameMode")
+    
+private async void CreateOrJoinRoom(string roomName, string password = "", string playerCount = "GeneralGameMode")
     {
         await DestroyRunner();
 
@@ -94,9 +98,14 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     {
         if (runner != null)
         {
-            await runner.Shutdown();
+            Debug.Log("[LeaveRoom] 러너 종료 시작");
+            await runner.Shutdown(); // 반드시 기다리게
+            Debug.Log("[LeaveRoom] 러너 종료 완료");
+
             model.ClearSessionInfo();
-            await InitRunner();
+            await InitRunner(); // 새로 시작
+            await runner.LoadScene(SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex), LoadSceneMode.Single);
+            Debug.Log("[LeaveRoom] InitRunner 완료");
         }
     }
 
@@ -211,26 +220,35 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     {
         if (!runner.IsServer) return;
 
-        MatchManager existing = null;
-        bool isCreated = false;
-        // 최대 1000ms 동안 기다림 (10번 x 100ms)
-        if (!isCreated)
+        MatchManager result = null;
+        var tcs = new TaskCompletionSource<MatchManager>();
+
+        // 1. 스폰 콜백 등록
+        void OnMatchSpawned(MatchManager mgr)
         {
-            isCreated = true;
-            Debug.Log("[MatchManager] 못찾음, 스폰 시작");
-            existing = runner.Spawn(matchManagerPrefab, Vector3.zero, Quaternion.identity);
+            result = mgr;
+            MatchManager.OnSpawned -= OnMatchSpawned;
+            tcs.SetResult(mgr);
         }
-        for (int i = 0; i < 100; i++)
+        MatchManager.OnSpawned += OnMatchSpawned;
+
+        // 2. 씬에서 찾기 → 없으면 스폰
+        MatchManager existing = FindObjectOfType<MatchManager>();
+        if (existing == null)
         {
-            if (existing != null)
-            {
-                Debug.Log("[MatchManager] 씬에서 찾음");
-                break;
-            }
-            await Task.Delay(100); // 0.1초 대기
+            runner.Spawn(matchManagerPrefab, Vector3.zero, Quaternion.identity);
+            result = await tcs.Task; // ✅ 여기서 Spawned까지 기다림
         }
-        existing.Init(runner.ActivePlayers.ToList());
+        else
+        {
+            MatchManager.OnSpawned -= OnMatchSpawned;
+            result = existing;
+        }
+
+        // 3. 안전하게 초기화
+        result.Init(runner.ActivePlayers.ToList());
     }
+
     public void OnSceneLoadStart(NetworkRunner runner) { Debug.Log("씬 로딩 시작"); }
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
