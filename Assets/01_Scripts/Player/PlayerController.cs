@@ -21,6 +21,14 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     [SerializeField] private AudioSource audioSource;
 
+    // 이동
+    [SerializeField] private PlayerMovement movement;
+    // 공격
+    [SerializeField] private PlayerAttack attack;
+    // 체력
+    [SerializeField] private PlayerHealth playerHealth;
+    // 스펠
+    [SerializeField] private PlayerSpellActuator playerSpell;
 
     public PlayerStateMachine StateMachine => stateMachine;
     public PlayerMovement Movement => movement;
@@ -46,22 +54,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     #endregion
 
-    #region IPlayerComponents
-    // 이동
-    [SerializeField] private PlayerMovement movement;
-    // 공격
-    [SerializeField] private PlayerAttack attack;
-    // 체력
-    [SerializeField] private PlayerHealth playerHealth;
-    // 스펠
-    [SerializeField] private PlayerSpellActuator playerSpell;
-
-    public bool isOfflineMode;
-
-    // 스킬
-
-    #endregion
-
     #region IMousePositionGetter Implementation
 
     public Vector3? ClickPoint { get; private set; }
@@ -74,6 +66,19 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
 
     public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
+    {
+        if (Object.HasStateAuthority)
+        {
+            RPC_ChangeState(state, inputData);
+        }
+        else
+        {
+            stateMachine.ChangeState(state, inputData);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
     {
         stateMachine.ChangeState(state, inputData);
     }
@@ -90,6 +95,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
         movement.Initialize(this);
         attack.Initialize(this);
+        stats = new PlayerStats();
     }
 
     public override void Render()
@@ -127,42 +133,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
         stateMachine.NetworkUpdated(Runner.DeltaTime);
 
-    }
-
-    private void Update()
-    {
-    }
-
-    public void OnEnable()
-    {
-        stats = new PlayerStats();
-    }
-
-    public void OnDisable()
-    {
-    }
-
-    // IPlayerComponent 컴포넌트들 초기화
-    private void InitializeComponents()
-    {
-        //// 초기화 순서가 중요한 경우 순서 지정
-        //var initializationOrder = new List<IPlayerComponent>
-        //{
-        //    playerHealth,      // 체력은 가장 먼저 초기화
-        //    movement,  // 이동은 그 다음
-        //    attack,      // 공격은 이동 이후
-        //    playerSpell      // 스킬은 마지막
-        //};
-
-        //components = initializationOrder;
-
-
-        //foreach (var component in components)
-        //{
-        //    component.Initialize(this, isOfflineMode);
-        //    if (component is IUpdatedPlayerComponent)
-        //        updatedComponents.Add(component as IUpdatedPlayerComponent);
-        //}
     }
 
     private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)

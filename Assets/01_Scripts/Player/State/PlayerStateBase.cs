@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace Mundo_dodgeball.Player.StateMachine
 {
-    public struct StateTransitionInputData
+    public struct StateTransitionInputData : INetworkStruct
     {
         public Vector3 mousePosition;
 
