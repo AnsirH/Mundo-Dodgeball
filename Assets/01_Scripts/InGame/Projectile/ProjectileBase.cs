@@ -31,7 +31,7 @@ public abstract class ProjectileBase : NetworkBehaviour
         Direction = direction.normalized;
         Owner = owner;
         DistanceTraveled = 0f;
-        IsFinished = true;
+        IsFinished = false;
 
         _currentDistance = 0f;
         transform.position = startPos;
@@ -44,15 +44,7 @@ public abstract class ProjectileBase : NetworkBehaviour
 
         if (CheckCollision(moveDistance, out LagCompensatedHit hit))
         {
-            if (Object.HasStateAuthority)
-            {
-                Debug.Log($"[HOST] {Object.Name} is hit the {hit.GameObject.name}!!!");
-            }
-            else
-            {
-                Debug.Log($"[CLIENT] {Object.Name} is hit the {hit.GameObject.name}!!!");
-            }
-                OnHit();
+            OnHit();
         }
         else
         {
@@ -90,13 +82,13 @@ public abstract class ProjectileBase : NetworkBehaviour
 
     protected virtual void OnHit()
     {
-        IsFinished = false;
+        IsFinished = true;
         Runner.Despawn(Object);
     }
 
     protected virtual void OnMaxDistanceReached()
     {
-        IsFinished = false;
+        IsFinished = true;
         Runner.Despawn(Object);
     }
 
