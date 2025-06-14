@@ -3963,6 +3963,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomManager: {fileID: 1116769603}
+  roomController: {fileID: 510108565}
   gameVersion: 1.0
 --- !u!4 &340730634
 Transform:
@@ -5580,6 +5581,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   model: {fileID: 510108564}
   runnerPrefab: {fileID: 6566829178162231104, guid: e47fd7b615b80154eb28576c708343b8, type: 3}
+  playerPrefab: {fileID: 6894791198747873329, guid: 214ec664adeebee4eb1c7cbefdf5835a, type: 3}
 --- !u!1 &530259485
 GameObject:
   m_ObjectHideFlags: 0
@@ -18654,7 +18656,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5286749209937773325, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
       propertyPath: m_text
-      value: "\uB300\uAE30\uC911.."
+      value: New Text
       objectReference: {fileID: 0}
     - target: {fileID: 5467987194831980326, guid: b77795c718b736a499e1a3a6625ffabc, type: 3}
       propertyPath: m_Name

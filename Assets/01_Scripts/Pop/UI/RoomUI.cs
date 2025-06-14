@@ -1,3 +1,4 @@
+ï»¿using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
 using System.Collections;
@@ -24,12 +25,24 @@ public class RoomUI : MonoBehaviour
         ServerManager.Instance.roomManager.LeaveRoom();
         OnLeaveRoomRequested?.Invoke();
     }
-    public void ClickReady()
+    //public void ClickReady()
+    //{
+    //    var player = ServerManager.Instance.roomController.FindMyPlayerInfo();
+    //    player.ToggleReady();
+    //    noneReadyBtn.gameObject.SetActive(!player.IsReady);
+    //    readyBtn.gameObject.SetActive(player.IsReady);
+    //}
+    public async void ClickReady()
     {
-        isReady = !isReady;
-        noneReadyBtn.gameObject.SetActive(!isReady);
-        readyBtn.gameObject.SetActive(isReady);
-        //ServerManager.Instance.roomManager.RPC_Ready(ServerManager.Instance.roomManager.RunnerInstance.LocalPlayer);
+        var player = ServerManager.Instance.roomController.FindMyPlayerInfo();
+        bool before = player.IsReady;
+
+        player.ToggleReady(); // ì„œë²„ì— ë³€ê²½ ìš”ì²­
+
+        await UniTask.WaitUntil(() => player.IsReady != before); // âœ… ê°’ ë°”ë€” ë•Œê¹Œì§€ ëŒ€ê¸°
+
+        noneReadyBtn.gameObject.SetActive(!player.IsReady);
+        readyBtn.gameObject.SetActive(player.IsReady);
     }
     public void OnEnable()
     {
@@ -46,13 +59,13 @@ public class RoomUI : MonoBehaviour
         float currentHeight = targetRect.sizeDelta.y;
         float targetHeight = _isReady ? 60f : 0f;
 
-        // ÇöÀç ³ôÀÌ¿Í ¸ñÇ¥ ³ôÀÌ°¡ °ÅÀÇ °°À¸¸é Æ®À© »ı·«
+        // í˜„ì¬ ë†’ì´ì™€ ëª©í‘œ ë†’ì´ê°€ ê±°ì˜ ê°™ìœ¼ë©´ íŠ¸ìœˆ ìƒëµ
         if (Mathf.Approximately(currentHeight, targetHeight))
         {
             return;
         }
 
-        // Æ®À© ½ÇÇà
+        // íŠ¸ìœˆ ì‹¤í–‰
         targetRect.DOSizeDelta(new Vector2(targetRect.sizeDelta.x, targetHeight), 0.3f)
                   .SetEase(_isReady ? Ease.OutCubic : Ease.InCubic);
     }
