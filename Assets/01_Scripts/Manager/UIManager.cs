@@ -27,10 +27,10 @@ public class UIManager : ManagerBase<UIManager>
     }
     public void SetLoadingUI(bool on)
     {
-        LoadingUI.SetActive(on);
+        LoadingUI?.SetActive(on);
     }
     public void ChangeGame(bool on)
     {
-        outGameUI.SetActive(on);
+        outGameUI?.SetActive(on);
     }
 }

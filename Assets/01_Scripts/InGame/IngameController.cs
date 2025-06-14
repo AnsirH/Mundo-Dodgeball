@@ -53,19 +53,19 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         }
 
 
-        if (FindFirstObjectByType<ObjectPooler>() == null)
-        {
-            Debug.LogError("There is no ObjectPooler in scene");
-            return;
-        }
+        //if (FindFirstObjectByType<ObjectPooler>() == null)
+        //{
+        //    Debug.LogError("There is no ObjectPooler in scene");
+        //    return;
+        //}
 
-        UIManager.instance.ChangeGame(false);
+        //UIManager.instance.ChangeGame(false);
 
 
-        if (Object.HasStateAuthority)
-        {
-            _ = StartGameProcessAsync();
-        }
+        //if (Object.HasStateAuthority)
+        //{
+        //    _ = StartGameProcessAsync();
+        //}
     }
 
     public override void Spawned()

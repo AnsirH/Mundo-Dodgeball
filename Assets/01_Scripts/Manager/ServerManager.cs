@@ -43,6 +43,7 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public RoomManager roomManager;
     public RoomController roomController;
+    public MatchManager matchManager;
     [SerializeField] private string gameVersion = "1.0";
 
     private const float checkConstTime = 5f;
@@ -170,7 +171,7 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         Debug.Log("ServerManager : update Session!");
-        PopManager.instance.gameSelectPop.regularGamePop.SetRoomListSlot(sessionList);
+        PopManager.instance?.gameSelectPop?.regularGamePop?.SetRoomListSlot(sessionList);
     }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Fusion;
 using UnityEngine;
 
 public class IngameUIController : MonoBehaviour
@@ -45,8 +46,9 @@ public class IngameUIController : MonoBehaviour
 
             // 초기화 된 상태로 설정
             isInitialized = true;
-            topPanelUI.InitScore(score.masterScore, score.otherScore);
         }
+        Debug.Log($"스코어 연동 호스트 :  {score.masterScore} 클라이언트 : {score.otherScore}");
+        topPanelUI.InitScore(score.masterScore, score.otherScore);
     }
     public void addScore(int idx)
     {
@@ -65,5 +67,14 @@ public class IngameUIController : MonoBehaviour
     public void OnEndGameResult(bool iswin)
     {
         resultUI.ShowResultAnimPlay(iswin);
+    }
+    public void TestAddScore()
+    {
+        var playerRef = ServerManager.Instance.roomController.runner.LocalPlayer;
+        ServerManager.Instance.matchManager.RPC_RequestAddScore(playerRef, 1);
+        //if (ServerManager.Instance.roomController.runner.IsServer)
+        //{
+        //    ServerManager.Instance.matchManager.RPC_RequestAddScore(PlayerRef.None, 1);
+        //}
     }
 }
