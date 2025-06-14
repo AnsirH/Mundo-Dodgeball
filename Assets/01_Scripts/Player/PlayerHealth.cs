@@ -58,7 +58,7 @@ public class PlayerHealth : NetworkBehaviour, IDamageable, IPlayerComponent
             Debug.Log("check LOG : isDead!");
             if (HasStateAuthority)
             {
-                context.OnPlayerDeath();
+                //context.OnPlayerDeath();
 
                 // 죽을 때 이긴 사람 점수 올리기;
                 sendAddScore(attackerActorNumber, 1);
@@ -117,11 +117,11 @@ public class PlayerHealth : NetworkBehaviour, IDamageable, IPlayerComponent
 
     IEnumerator ActiveHitEffect()
     {
-        GameObject hitEffect = ObjectPooler.Get("HitEffect");
+        GameObject hitEffect = ObjectPooler.GetLocal("HitEffect");
         hitEffect.transform.position = transform.position;
         yield return new WaitForSeconds(0.5f);
 
-        ObjectPooler.Release("HitEffect", hitEffect);
+        ObjectPooler.ReleaseLocal("HitEffect", hitEffect);
     }
 }
 

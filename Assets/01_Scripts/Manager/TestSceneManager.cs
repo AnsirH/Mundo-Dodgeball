@@ -14,6 +14,8 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private PlayerInputHandler inputHandler;
 
+    private Dictionary<PlayerRef, NetworkObject> players = new();
+
     public void OnConnectedToServer(NetworkRunner runner)
     {
     }
@@ -49,7 +51,12 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
         data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
 
         if (inputHandler.RightClick)
-            data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground")).Value;
+        {
+
+            data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+        }
+        if (inputHandler.LeftClick)
+            data.targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
         input.Set(data);
         inputHandler.ResetInputValue();
     }
@@ -77,6 +84,11 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
+        if (_runner.IsServer)
+        {
+            runner.Despawn(players[player]);
+            players.Remove(player);
+        }
     }
 
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
@@ -118,7 +130,6 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
         _runner = gameObject.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;
 
-
         // Create the NetworkSceneInfo from the current scene
         var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
         var sceneInfo = new NetworkSceneInfo();
@@ -126,7 +137,6 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
         }
-
         // Start or join (depends on gamemode) a session with a specific name
         await _runner.StartGame(new StartGameArgs()
         {
@@ -141,15 +151,13 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void SpawnTestPlayers(PlayerRef player)
     {
-        Debug.Log("spawn function is called!");
         for (int i = 0; i < testPlayerCount; i++)
         {
             NetworkObject spawned_player = _runner.Spawn(playerPrefab, position: ground.sections[i].position, rotation: Quaternion.identity, player);
 
-
+            players[player] = spawned_player;
             // 각 플레이어에 고유한 이름 할당
             spawned_player.name = $"TestPlayer_{i}";
-            spawned_player.GetComponent<IPlayerContext>().InitGround(i);
         }
     }
 

@@ -4,7 +4,7 @@ public interface IShooter
 {
     void Initialize(IPlayerContext context, bool isOfflineMode = false);
     void ActivateRange(bool isActive);
-    void SpawnProjectile(Vector3 startPos, Vector3 direction, float execTime);
+    void SpawnProjectile(Vector3 startPos, Vector3 direction);
     bool IsRangeActive { get; }
     bool CanShoot { get; }
 }
@@ -21,7 +21,7 @@ public interface IRangeIndicator
 // IProjectile.cs
 public interface IProjectile
 {
-    void Initialize(IPlayerContext context, Vector3 spawnPos, Vector3 direction, float execTime);
+    void Initialize(IPlayerContext context, Vector3 spawnPos, Vector3 direction);
     void OnHit(Collider other);
 }
 
@@ -92,16 +92,16 @@ public class AxeShooter : MonoBehaviour, IShooter
         return currentCooldown / cooldownTime;
     }
 
-    public void SpawnProjectile(Vector3 startPos, Vector3 direction, float execTime)
+    public void SpawnProjectile(Vector3 startPos, Vector3 direction)
     {
         if (!CanShoot) return;
 
         direction.y = 0.0f;
 
-        GameObject axeObj = ObjectPooler.Get("Axe");
+        GameObject axeObj = ObjectPooler.GetLocal("Axe");
 
         IProjectile axe = axeObj.GetComponent<IProjectile>();
-        axe.Initialize(context, transform.position, direction, execTime);
+        axe.Initialize(context, transform.position, direction);
 
         // 소리 출력
         SoundManager.instance.PlayOneShot(context.Audio, sounds[Random.Range(0, sounds.Length)]);

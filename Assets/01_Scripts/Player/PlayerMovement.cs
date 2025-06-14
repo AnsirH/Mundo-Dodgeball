@@ -2,135 +2,98 @@
 using System;
 using UnityEngine.InputSystem;
 using Fusion;
-
-[RequireComponent(typeof(NetworkCharacterController))]
-public class PlayerMovement : NetworkBehaviour, IPlayerComponent, IPlayerAction
+public class PlayerMovement : NetworkBehaviour
 {
-    [SerializeField] protected bool isOfflineMode = false;
-    [SerializeField] protected float moveSpeed = 5f;
-    [SerializeField] protected float rotateSpeed = 10f;
-    [SerializeField] protected float arrivalThreshold = 0.1f;
+    [SerializeField] private float rotateSpeed = 10f;
+    [SerializeField] private float arrivalThreshold = 0.1f;
 
-    protected Vector3? currentTargetPosition;
+    private Vector3 currentTargetPosition;
+    [Networked] private Vector3 CurrentPosition { get; set; }
+    [Networked] private Quaternion CurrentRotation { get; set; }
+    [Networked] private Vector3 TargetDirection { get; set; }
 
-    /// <summary>
-    /// 플레이어가 이동 중인지 확인하는 변수
-    /// </summary>
-    bool isMoving = false;
-
-    public bool IsMoving => isMoving;
+    public bool IsArrived { get { return Vector3.Distance(_cc.transform.position, currentTargetPosition) <= arrivalThreshold || currentTargetPosition == Vector3.zero; } }
 
     private NetworkCharacterController _cc;
 
-    public bool IsActionInProgress => isActionInProgress;
+    private Ground ground;
 
-    public bool CanExecuteAction => Controllable;
+    public void SetGround(Ground ground) { this.ground = ground; }
 
-    public event Action OnActionCompleted;
 
-    public void MoveForDeltaTime(Vector3 targetPosition)
+    public void Initialize(IPlayerContext context)
     {
-        targetPosition.y = 0.0f;
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        _cc.Move(direction * moveSpeed * Runner.DeltaTime);
+        this.context = context;
+        _cc = GetComponent<NetworkCharacterController>();
+        CurrentPosition = _cc.transform.position;
+        CurrentRotation = _cc.transform.rotation;
     }
 
-    public void RotateForDeltaTime(Vector3 direction)
+    public void Teleport(Vector3 targetPosition)
     {
-        if (!HasStateAuthority) return;
-        Quaternion targetRotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotateSpeed * Runner.DeltaTime); 
-        transform.rotation = targetRotation;
+        _cc.Teleport(targetPosition);
     }
 
-    public void StartMoveToNewTarget(Vector3 targetPosition, bool rotateTowardTarget = true)
+    public void MoveTowardTarget()
     {
-        StopMove();
+        if (currentTargetPosition == Vector3.zero)
+        {
+            return;
+        }
+        Vector3 normalizedDirection = (currentTargetPosition - _cc.transform.position).normalized;
+        MoveForDeltaTime(normalizedDirection, Runner.DeltaTime);
+    }
 
+    /// <summary>
+    /// 이동 지점 설정
+    /// </summary>
+    /// <param name="targetPosition"></param>
+    public void SetMovementTarget(Vector3 targetPosition)
+    {
+        _cc.Velocity = Vector3.zero;
         targetPosition.y = 0.0f;
         currentTargetPosition = targetPosition;
 
-        isMoving = true;
+        if (IngameController.Instance != null)
+        {
+            ground.GetAdjustedPoint(IngameController.Instance.GetPlayerIndex(context), context.Movement.transform.position, currentTargetPosition, out Vector3 adjustedPoint);
+            currentTargetPosition = adjustedPoint;
+        }
     }
 
-    private void MoveComplete()
+    public void CompleteMove()
     {
         _cc.Teleport(currentTargetPosition);
-        currentTargetPosition = null;
-        StopMove();
-
-        OnActionCompleted.Invoke();
+        currentTargetPosition = Vector3.zero;
     }
 
-    public virtual void StopMove()
+    public void RotateForDeltaTime(Quaternion currentRotation, Vector3 direction, float rotateSpeed)
     {
-        isMoving = false;
+        if (!Object.HasStateAuthority) return;
+        
+        TargetDirection = direction;
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        CurrentRotation = Quaternion.Slerp(currentRotation, targetRotation, rotateSpeed * Runner.DeltaTime);
+        _cc.transform.rotation = CurrentRotation;
     }
+
+    public override void Render()
+    {
+        //if (!Object.HasStateAuthority)
+        //{
+        //    _cc.transform.rotation = Quaternion.Slerp(_cc.transform.rotation, CurrentRotation, rotateSpeed * Runner.DeltaTime);
+        //    transform.position = CurrentPosition;
+        //}
+    }
+
+    //--- PRIVATE METHOD ---
+    private void MoveForDeltaTime(Vector3 normalizedDirection, float runnerDeltaTime)
+    {
+        //if (!Object.HasStateAuthority) return;
+        _cc.Move(context.Stats.GetMoveSpeed() * runnerDeltaTime * normalizedDirection);
+        CurrentPosition = _cc.transform.position;
+        CurrentRotation = _cc.transform.rotation;
+    }
+
     private IPlayerContext context;
-    private bool isActionInProgress;
-
-    public void Initialize(IPlayerContext context, bool isOfflineMode)
-    {
-        this.context = context;
-        this.isOfflineMode = isOfflineMode;
-    }
-
-    public void Updated()
-    {
-        if (isMoving)
-        {
-            if (Vector3.Distance(_cc.transform.position, currentTargetPosition.Value) > arrivalThreshold)
-                MoveForDeltaTime(currentTargetPosition.Value);
-            else
-            {
-                MoveComplete();
-            }
-        }
-    }
-
-    public void OnDisabled()
-    {
-        StopMove();
-    }
-
-    public void OnEnabled()
-    {
-        StopMove();
-    }
-
-    public void HandleInput(InputAction.CallbackContext context)
-    {
-        switch (context.action.name)
-        {
-            case "Move":
-                break;
-            case "Click":
-                StopMove();
-                break;
-            case "F":                
-                StopMove();
-                break;
-        }
-    }
-
-    public void HandleInput(NetworkInputData data)
-    {
-    }
-
-    public bool Controllable { get; set; } = true;
-
-
-    public void ExecuteAction()
-    {
-        if (isActionInProgress)
-        {
-            StopMove();
-        }
-        isActionInProgress = true;
-        StartMoveToNewTarget(context.MousePositionGetter.ClickPoint.Value);
-    }
-
-    public void StopAction()
-    {
-        StopMove();
-    }
 }

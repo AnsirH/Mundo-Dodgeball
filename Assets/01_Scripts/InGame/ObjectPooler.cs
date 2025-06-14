@@ -1,30 +1,41 @@
+ï»¿using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-// µµ³¢, ÀÌÆåÆ®¿Í °°ÀÌ ÀÏ½ÃÀûÀ¸·Î »ı¼ºµÇ´Â ¿ÀºêÁ§Æ®¸¦ °ü¸®
-public class ObjectPooler : MonoBehaviour
+public class ObjectPooler : NetworkBehaviour
 {
     public static ObjectPooler Instance { get; private set; }
 
+    // ë¹„ë™ê¸°í™” ì˜¤ë¸Œì íŠ¸ í’€ ì •ë³´
     [System.Serializable]
-    public class Pool
+    public class LocalPool
     {
         public string tag;
         public GameObject prefab;
         public int size;
     }
 
-    // ¿ÀºêÁ§Æ® Ç®·¯·Î °ü¸®µÇ´Â ¿ÀºêÁ§Æ®µéÀº ÀÎ½ºÆåÅÍ Ã¢¿¡¼­ Á¤º¸¸¦ ³Ö¾îÁà¾ß ÇÔ.
-    public Pool[] pools;
-    private Dictionary<string, ObjectPool<GameObject>> poolDictionary;
+    // ë™ê¸°í™” ì˜¤ë¸Œì íŠ¸ í’€ ì •ë³´
+    [System.Serializable]
+    public class NetworkPool
+    {
+        public string tag;
+        public NetworkPrefabRef prefab;
+        public int size;
+    }
+
+    public LocalPool[] localPools;
+    private Dictionary<string, ObjectPool<GameObject>> localPoolDictionary;
+
+    public NetworkPool[] networkPools;
+    private Dictionary<string, Queue<NetworkObject>> networkPoolDictionary;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            InitializePools();
         }
         else
         {
@@ -32,13 +43,51 @@ public class ObjectPooler : MonoBehaviour
         }
     }
 
-    // ¿ÀºêÁ§Æ® Ç®·¯ ÃÊ±âÈ­
-    private void InitializePools()
+    public void InitializePools()
     {
-        // Ç® µñ¼Å³Ê¸® »ı¼º ¹× ÃÊ±âÈ­
-        poolDictionary = new Dictionary<string, ObjectPool<GameObject>>();
+        // ê¸°ì¡´ ë¡œì»¬ í’€ ì˜¤ë¸Œì íŠ¸ ëª¨ë‘ ì‚­ì œ
+        if (localPoolDictionary != null)
+        {
+            foreach (var pool in localPoolDictionary.Values)
+            {
+                // ObjectPoolì—ëŠ” ì§ì ‘ ì˜¤ë¸Œì íŠ¸ ëª©ë¡ì´ ì—†ìœ¼ë¯€ë¡œ, í’€ì—ì„œ ëª¨ë‘ êº¼ë‚´ì„œ ì‚­ì œ
+                var tempList = new List<GameObject>();
+                while (pool.CountActive > 0)
+                {
+                    var obj = pool.Get();
+                    tempList.Add(obj);
+                }
+                foreach (var obj in tempList)
+                {
+                    Destroy(obj);
+                }
+            }
+            localPoolDictionary.Clear();
+        }
 
-        foreach (Pool pool in pools)
+        // ê¸°ì¡´ ë„¤íŠ¸ì›Œí¬ í’€ ì˜¤ë¸Œì íŠ¸ ëª¨ë‘ ì‚­ì œ
+        if (networkPoolDictionary != null)
+        {
+            foreach (var queue in networkPoolDictionary.Values)
+            {
+                while (queue.Count > 0)
+                {
+                    var netObj = queue.Dequeue();
+                    if (netObj != null && Runner != null)
+                    {
+                        Runner.Despawn(netObj);
+                    }
+                    else if (netObj != null)
+                    {
+                        Destroy(netObj.gameObject);
+                    }
+                }
+            }
+            networkPoolDictionary.Clear();
+        }
+        // ë¡œì»¬ í’€ ì´ˆê¸°í™”
+        localPoolDictionary = new Dictionary<string, ObjectPool<GameObject>>();
+        foreach (LocalPool pool in localPools)
         {
             ObjectPool<GameObject> objectPool = new ObjectPool<GameObject>(
                 createFunc: () => CreatePooledObject(pool.prefab),
@@ -48,12 +97,23 @@ public class ObjectPooler : MonoBehaviour
                 collectionCheck: false,
                 maxSize: pool.size
             );
+            localPoolDictionary.Add(pool.tag, objectPool);
+        }
 
-            poolDictionary.Add(pool.tag, objectPool);
+        // ë„¤íŠ¸ì›Œí¬ í’€ ì´ˆê¸°í™” (Queue ì‚¬ìš©)
+        networkPoolDictionary = new Dictionary<string, Queue<NetworkObject>>();
+        foreach (NetworkPool pool in networkPools)
+        {
+            var queue = new Queue<NetworkObject>();
+            for (int i = 0; i < pool.size; i++)
+            {
+                var netObj = Runner.Spawn(pool.prefab, Vector3.zero, Quaternion.identity);
+                netObj.gameObject.SetActive(false);
+                queue.Enqueue(netObj);
+            }
+            networkPoolDictionary.Add(pool.tag, queue);
         }
     }
-
-    /// <summary> ¿ÀºêÁ§Æ® ÃÊ±â »ı¼º /// </summary>
     private GameObject CreatePooledObject(GameObject prefab)
     {
         var obj = Instantiate(prefab, transform);
@@ -61,43 +121,74 @@ public class ObjectPooler : MonoBehaviour
         return obj;
     }
 
-    /// <summary> ¿ÀºêÁ§Æ® Get ÇÒ ¶§ È£Ãâ /// </summary>
     private void OnGetObject(GameObject obj)
     {
         obj.SetActive(true);
     }
 
-    /// <summary> ¿ÀºêÁ§Æ® Release ÇÒ ¶§ È£Ãâ /// </summary>
     private void OnReleaseObject(GameObject obj)
     {
         obj.SetActive(false);
     }
 
-    /// <summary> ¿ÀºêÁ§Æ® Ç®¿¡¼­ °¡Á®¿À±â /// </summary>
-    public static GameObject Get(string tag)
+    // ë„¤íŠ¸ì›Œí¬ ì˜¤ë¸Œì íŠ¸ Get
+    public static NetworkObject GetNetwork(string tag, Vector3 position, Quaternion rotation)
     {
-        if (Instance.poolDictionary.TryGetValue(tag, out var pool))
+        if (Instance.networkPoolDictionary.TryGetValue(tag, out var queue))
         {
-            return pool.Get();
+            if (queue.Count > 0)
+            {
+                var obj = queue.Dequeue();
+                obj.transform.SetPositionAndRotation(position, rotation);
+                obj.gameObject.SetActive(true);
+                return obj;
+            }
+            else
+            {
+                Debug.LogWarning($"Network pool with tag {tag} is empty.");
+                return null;
+            }
         }
         else
         {
-            Debug.LogWarning($"Pool with tag {tag} doesn't exist.");
+            Debug.LogWarning($"Network pool with tag {tag} doesn't exist.");
             return null;
         }
     }
 
-    /// <summary> ¿ÀºêÁ§Æ® Ç®·Î ¹İÈ¯ /// </summary>
-    public static void Release(string tag, GameObject obj)
+    // ë„¤íŠ¸ì›Œí¬ ì˜¤ë¸Œì íŠ¸ Release
+    public static void ReleaseNetwork(string tag, NetworkObject obj)
     {
-        if (Instance.poolDictionary.TryGetValue(tag, out var pool))
+        obj.gameObject.SetActive(false);
+        if (Instance.networkPoolDictionary.TryGetValue(tag, out var queue))
         {
-            pool.Release(obj);
+            queue.Enqueue(obj);
         }
         else
         {
-            Debug.LogWarning($"Pool with tag {tag} doesn't exist.");
+            Debug.LogWarning($"Network pool with tag {tag} doesn't exist.");
+            Instance.Runner.Despawn(obj);
+        }
+    }
+
+    // ê¸°ì¡´ ë¡œì»¬ ì˜¤ë¸Œì íŠ¸ Get/ReleaseëŠ” ê·¸ëŒ€ë¡œ ìœ ì§€
+    public static GameObject GetLocal(string tag)
+    {
+        if (Instance.localPoolDictionary.TryGetValue(tag, out var pool))
+            return pool.Get();
+        Debug.LogWarning($"Local pool with tag {tag} doesn't exist.");
+        return null;
+    }
+
+    public static void ReleaseLocal(string tag, GameObject obj)
+    {
+        if (Instance.localPoolDictionary.TryGetValue(tag, out var pool))
+            pool.Release(obj);
+        else
+        {
+            Debug.LogWarning($"Local pool with tag {tag} doesn't exist.");
             Destroy(obj);
         }
     }
 }
+

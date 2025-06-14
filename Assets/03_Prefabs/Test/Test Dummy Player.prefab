@@ -120,7 +120,7 @@ GameObject:
   - component: {fileID: 8927856816511765099}
   - component: {fileID: 428245270301861472}
   - component: {fileID: 2795530776063821389}
-  - component: {fileID: 9222626259700094529}
+  - component: {fileID: -4839453952478269733}
   m_Layer: 0
   m_Name: Test Dummy Player
   m_TagString: Untagged
@@ -174,9 +174,9 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 428245270301861472}
-  - {fileID: 9222626259700094529}
+  - {fileID: -4839453952478269733}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &9222626259700094529
+--- !u!114 &-4839453952478269733
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

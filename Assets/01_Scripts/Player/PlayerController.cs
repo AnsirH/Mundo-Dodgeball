@@ -1,18 +1,19 @@
-using PlayerCharacterControl.State;
+using Mundo_dodgeball.Player.StateMachine;
 using System.Collections.Generic;
 using UnityEngine;
 using MyGame.Utils;
 using System.Collections;
 using System.Linq;
 using Fusion;
+using Unity.VisualScripting;
 
 public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePositionGetter
 {
     // 플레이어 상태 머신
     private PlayerStateMachine stateMachine;
     // 플레이어 스크립트 리스트
-    private List<IPlayerComponent> components = new List<IPlayerComponent>();
-    private List<IUpdatedPlayerComponent> updatedComponents = new List<IUpdatedPlayerComponent>();
+    //private List<IPlayerComponent> components = new List<IPlayerComponent>();
+    //private List<IUpdatedPlayerComponent> updatedComponents = new List<IUpdatedPlayerComponent>();
 
     [SerializeField] private PlayerStats stats;
 
@@ -20,24 +21,20 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     [SerializeField] private AudioSource audioSource;
 
-    private NetworkTransform ntrf;
 
-    private Vector3 previousPosition;
+    public PlayerStateMachine StateMachine => stateMachine;
+    public PlayerMovement Movement => movement;
+    public PlayerAttack Attack => attack;
+    public PlayerHealth Health => playerHealth;
 
     #region IPlayerContext Implementation
 
     public Animator Anim => anim;
     public AudioSource Audio => audioSource;
-    public NetworkTransform Trf => ntrf;
     public PlayerStats Stats => stats;
 
+    public PlayerStateBase CurrentState => stateMachine.CurrentState;
 
-    public void OnPlayerDeath()
-    {
-        // 플레이어 사망 처리
-        QuitAllAction();
-        stateMachine.ChangeState(EPlayerState.Die);
-    }
 
     public void InitGround(int sectionNum)
     {
@@ -65,16 +62,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
     #endregion
 
-    #region properties
-    public PlayerStateMachine StateMachine => stateMachine;
-
-    public PlayerMovement PM => movement;
-    public PlayerAttack Attack => attack;
-    public PlayerHealth Health => playerHealth;
-
-    public PlayerStateBase PlayerState => stateMachine.CurrentState;
-    #endregion
-
     #region IMousePositionGetter Implementation
 
     public Vector3? ClickPoint { get; private set; }
@@ -86,112 +73,101 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     #endregion
 
 
+    public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
+    {
+        stateMachine.ChangeState(state, inputData);
+    }
+
     public override void Spawned()
     {
-        // 플레이어 컴포넌트들 초기화
-        InitializeComponents();
+        if (IngameController.Instance != null)
+            movement.SetGround(IngameController.Instance.ground);
+        else
+            movement.SetGround(FindAnyObjectByType<Ground>());
 
         // 상태 머신 초기화
-        stateMachine = new(this, attack, movement);
+        stateMachine = new(this);
 
-        previousPosition = transform.position;
+        movement.Initialize(this);
+        attack.Initialize(this);
+    }
+
+    public override void Render()
+    {
+        stateMachine.Updated();
     }
 
     public override void FixedUpdateNetwork()
     {
-        stateMachine.UpdateCurrentState();
-
-        // 모든 IPlayable 컴포넌트 업데이트
-        foreach (var component in updatedComponents)
-        {
-            component.Updated();
-        }
-
         if (GetInput(out NetworkInputData data))
         {
-            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
             {
-                Debug.Log("right click!");
-                // 마우스 위치 저장
-                ClickPoint = GetMousePosition();
-                if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
-
-                ClickPoint = adjustedPoint;
-                StartCoroutine(SpawnEffect("ClickPointer", ClickPoint.Value));
-
-                if (!attack.IsActionInProgress)
-                    stateMachine.ChangeState(EPlayerState.Move);
+                if (CurrentState is PlayerAttackState || attack.CoolTiming) return;
+                ClickPoint = data.targetPoint;
+                ChangeState(EPlayerState.Attack, new(ClickPoint.Value));
             }
-            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1)) // 우클릭
             {
-                Debug.Log("left click!");
-                ClickPoint = GetMousePosition();
-                if (!attack.IsActionInProgress && attack.CanExecuteAction)
-                {
-                    stateMachine.ChangeState(EPlayerState.Attack);
-                }
+                if (CurrentState is PlayerAttackState) return;
+                ClickPoint = data.movePoint;
+                if (!ClickPoint.HasValue) return;
+                ChangeState(EPlayerState.Move, new(ClickPoint.Value));
             }
             if (data.buttons.IsSet(NetworkInputData.BUTTONF))
             {
-                Debug.Log("F Button pressed!");
                 // 마우스 위치 저장
-                ClickPoint = GetMousePosition();
-                if (!ClickPoint.HasValue || !IngameController.Instance.ground.GetAdjustedPoint(GroundSectionNum, transform.position, ClickPoint.Value, out Vector3 adjustedPoint)) return;
+                ClickPoint = data.targetPoint;
+                if (!ClickPoint.HasValue) return;
 
-                ClickPoint = adjustedPoint;
+                ChangeState(EPlayerState.Idle);
+                // 플레쉬 실행 추가
             }
         }
+
+        stateMachine.NetworkUpdated(Runner.DeltaTime);
+
     }
+
+    private void Update()
+    {
+    }
+
     public void OnEnable()
     {
         stats = new PlayerStats();
-        foreach (var component in components)
-        {
-            component.OnEnabled();
-        }
     }
 
     public void OnDisable()
     {
-        foreach (var component in components)
-        {
-            component.OnDisabled();
-        }
     }
 
     // IPlayerComponent 컴포넌트들 초기화
     private void InitializeComponents()
     {
-        // 초기화 순서가 중요한 경우 순서 지정
-        var initializationOrder = new List<IPlayerComponent>
-        {
-            playerHealth,      // 체력은 가장 먼저 초기화
-            movement,  // 이동은 그 다음
-            attack,      // 공격은 이동 이후
-            playerSpell      // 스킬은 마지막
-        };
+        //// 초기화 순서가 중요한 경우 순서 지정
+        //var initializationOrder = new List<IPlayerComponent>
+        //{
+        //    playerHealth,      // 체력은 가장 먼저 초기화
+        //    movement,  // 이동은 그 다음
+        //    attack,      // 공격은 이동 이후
+        //    playerSpell      // 스킬은 마지막
+        //};
 
-        components = initializationOrder;
+        //components = initializationOrder;
 
 
-        foreach (var component in components)
-        {
-            component.Initialize(this, isOfflineMode);
-            if (component is IUpdatedPlayerComponent)
-                updatedComponents.Add(component as IUpdatedPlayerComponent);
-        }
-    }
-
-    private void QuitAllAction()
-    {
-        components.Where(comp => comp as IPlayerAction != null)
-            .ToList()
-            .ForEach(comp => (comp as IPlayerAction).StopAction());
+        //foreach (var component in components)
+        //{
+        //    component.Initialize(this, isOfflineMode);
+        //    if (component is IUpdatedPlayerComponent)
+        //        updatedComponents.Add(component as IUpdatedPlayerComponent);
+        //}
     }
 
     private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
     {
-        GameObject effect = ObjectPooler.Get(effectTag);
+        GameObject effect = ObjectPooler.GetLocal(effectTag);
 
         if (effect == null)
         {
@@ -204,6 +180,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
         yield return new WaitForSeconds(1.0f);
 
-        ObjectPooler.Release(effectTag, effect);
+        ObjectPooler.ReleaseLocal(effectTag, effect);
     }
 }

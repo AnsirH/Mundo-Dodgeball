@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlayerCharacterControl.State
+namespace Mundo_dodgeball.Player.StateMachine
 {
     public class PlayerIdleState : PlayerStateBase
     {
@@ -10,12 +10,16 @@ namespace PlayerCharacterControl.State
         {
         }
 
-        public override void EnterState()
+        public override void EnterState(StateTransitionInputData inputData)
         {
             Debug.Log($"{GetType().Name} 상태 진입");
         }
 
         public override void ExitState()
+        {
+        }
+
+        public override void NetworkUpdateState(float runnerDeltaTime)
         {
         }
 

@@ -9,7 +9,7 @@ public class HpBar : MonoBehaviour
     public void Init(IPlayerContext context)
     {
         playerContext = context;
-        targetTrf = context.Trf.transform;
+        targetTrf = context.Movement.transform;
     }
     /// <summary> 체력값 반영 </summary>
     public void UpdateDisplay()

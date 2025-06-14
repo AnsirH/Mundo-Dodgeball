@@ -2,22 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlayerCharacterControl.State
+namespace Mundo_dodgeball.Player.StateMachine
 {
     public class PlayerDieState : PlayerStateBase
     {
         public PlayerDieState(IPlayerContext playerContext) : base(playerContext)
         {
-            context = playerContext;
+            base.playerContext = playerContext;
         }
 
-        public override void EnterState()
+        public override void EnterState(StateTransitionInputData inputData)
         {
-            context.Anim.SetTrigger("Die");
+            playerContext.Anim.SetTrigger("Die");
         }
 
         public override void ExitState()
         {
+        }
+
+        public override void NetworkUpdateState(float runnerDeltaTime)
+        {
+            throw new System.NotImplementedException();
         }
 
         public override void UpdateState()

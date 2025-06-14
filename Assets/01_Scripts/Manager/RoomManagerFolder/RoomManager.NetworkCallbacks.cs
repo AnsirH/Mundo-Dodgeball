@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using Fusion.Sockets;
 using System;
-using UnityEditor.EditorTools;
 // 방 생성, 참가, 퇴장, 씬 전환 로직
 public partial class RoomManager : INetworkRunnerCallbacks
 {
