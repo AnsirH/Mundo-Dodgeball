@@ -1,3 +1,4 @@
+using DG.Tweening.Core.Easing;
 using UnityEngine;
 
 namespace Mundo_dodgeball.Player.StateMachine
@@ -24,9 +25,18 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void NetworkUpdateState(float runnerDeltaTime)
         {
+            if (!_playerContext.Health.IsDead)
+                //_playerContext.Stats.HandleHealthRegen(runnerDeltaTime);
+
+            if (!isDie && _playerContext.CurrentStatData.Health <= 0.0f)
+            {
+                isDie = true;
+                _playerContext.ChangeState(EPlayerState.Die);
+            }
+            Debug.Log(_playerContext.CurrentStatData.Health);
         }
 
+        private bool isDie = false;
         private IPlayerContext _playerContext;
-
     }
 }

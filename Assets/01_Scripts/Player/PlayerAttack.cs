@@ -16,7 +16,6 @@ public class PlayerAttack : NetworkBehaviour
     [Header("References")]
     [SerializeField] private NetworkPrefabRef axePrefab;
     [SerializeField] Transform shotPosition;
-    public TextMeshProUGUI testText;
 
     // 캐릭터 도끼 모델링
     [SerializeField] private GameObject axeObj;
@@ -44,14 +43,6 @@ public class PlayerAttack : NetworkBehaviour
         AttackTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
         axeObj.SetActive(false);
     }
-
-    public  void SetTestText(string firstStr, int firstValue, string secondStr, int secondValue)
-    {
-        string result = firstStr + firstValue + "\n" + secondStr + secondValue;
-
-        testText.text = result;
-    }
-
 
     private void SetTargetPoint(Vector3 point)
     {
@@ -83,7 +74,7 @@ public class PlayerAttack : NetworkBehaviour
             Object.InputAuthority, 
             (runner, o) => 
             {
-                o.GetComponent<ProjectileBase>().Init(startPos, direction, Object.InputAuthority);
+                o.GetComponent<ProjectileBase>().Init(startPos, direction, context.Stats.GetAttackPower(), Object.InputAuthority);
             });
     }
 

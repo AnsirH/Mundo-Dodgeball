@@ -16,9 +16,9 @@ public class TestProjectile : ProjectileBase
         }
     }
 
-    public override void Init(Vector3 startPos, Vector3 direction, PlayerRef owner)
+    public override void Init(Vector3 startPos, Vector3 direction, float damage, PlayerRef owner)
     {
-        base.Init(startPos, direction, owner);
+        base.Init(startPos, direction, damage, owner);
         
         if (trailRenderer != null)
         {

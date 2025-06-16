@@ -10,6 +10,7 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private Ground ground;
     [SerializeField] private NetworkPrefabRef playerPrefab;
+    [SerializeField] private NetworkPrefabRef dummyPrefab;
     [SerializeField] private int testPlayerCount = 2;  // 테스트할 플레이어 수
 
     private PlayerInputHandler inputHandler;
@@ -172,6 +173,13 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
             if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
             {
                 StartGame(GameMode.Client);
+            }
+        }
+        else
+        {
+            if (GUI.Button(new Rect(0, 1000, 200, 40), "Dummy"))
+            {
+                _runner.Spawn(dummyPrefab, transform.position, transform.rotation);
             }
         }
     }

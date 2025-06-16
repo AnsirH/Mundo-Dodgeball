@@ -22,7 +22,6 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void NetworkUpdateState(float runnerDeltaTime)
         {
-            throw new System.NotImplementedException();
         }
 
         public override void UpdateState()

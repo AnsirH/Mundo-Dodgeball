@@ -22,7 +22,6 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void UpdateState()
         {
-            attack.SetTestText("[Networked] attack count: ", attack.AttackCount, "current attack count: ", _visibleAttackCount);
             if (_visibleAttackCount < attack.AttackCount)
             {
                 playerContext.Anim.SetTrigger("Attack");

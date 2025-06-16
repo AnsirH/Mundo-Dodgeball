@@ -1,3 +1,4 @@
+using MyGame.Utils;
 using UnityEngine;
 
 public interface IShooter
@@ -59,7 +60,7 @@ public class AxeShooter : MonoBehaviour, IShooter
 
         if (IsRangeActive)
         {
-            Vector3? mousePoint = context.MousePositionGetter.GetMousePosition();
+            Vector3? mousePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
             if (mousePoint.HasValue)
                 rangeIndicator.UpdatePosition(mousePoint.Value, 10.0f);
         }

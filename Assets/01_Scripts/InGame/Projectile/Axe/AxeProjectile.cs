@@ -1,14 +1,5 @@
 using Fusion;
-using System.Runtime.InteropServices;
 using UnityEngine;
-[StructLayout(LayoutKind.Sequential)]
-public struct AxeProjectileData : INetworkStruct
-{
-    public float DistanceTraveled;
-    public NetworkBool IsFinished;
-    public Vector3 StartPosition;
-    public Vector3 Direction;
-}
 
 public class AxeProjectile : ProjectileBase
 {
@@ -19,9 +10,9 @@ public class AxeProjectile : ProjectileBase
 
     private bool _isDropping = false;
 
-    public override void Init(Vector3 startPos, Vector3 direction, PlayerRef owner)
+    public override void Init(Vector3 startPos, Vector3 direction, float damage, PlayerRef owner)
     {
-        base.Init(startPos, direction, owner);
+        base.Init(startPos, direction, damage, owner);
     }
 
     protected override void OnMaxDistanceReached()
@@ -44,7 +35,33 @@ public class AxeProjectile : ProjectileBase
     {
         if (!IsFinished)
         {
-            base.FixedUpdateNetwork();
+            float moveDistance = speed * Runner.DeltaTime;
+            Vector3 nextPosition = transform.position + Direction * moveDistance;
+
+            if (Object.HasStateAuthority && CheckCollision(moveDistance, out LagCompensatedHit hit))
+            {
+                if (hit.Hitbox.Root.gameObject.TryGetComponent(out IDamageable target))
+                {
+                    target.TakeDamage(damage);
+                }                
+
+                OnHit();
+            }
+            else
+            {
+                if (HasStateAuthority)
+                {
+                    _currentDistance += moveDistance;
+                    DistanceTraveled = _currentDistance;
+                }
+                if (DistanceTraveled > maxDistance)
+                {
+                    nextPosition = StartPosition + Direction * maxDistance;
+                    OnMaxDistanceReached();
+                }
+            }
+
+            transform.position = nextPosition;
         }
         else
         {

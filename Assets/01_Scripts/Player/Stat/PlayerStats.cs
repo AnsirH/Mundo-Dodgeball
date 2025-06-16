@@ -1,11 +1,22 @@
+using Fusion;
+using System.Runtime.InteropServices;
 using UnityEngine;
+
+[StructLayout(LayoutKind.Sequential)]
+public struct PlayerStatData : INetworkStruct
+{
+    public float AttackPower;
+    public float Health;
+    public float MoveSpeed;
+    public float HealthRegen;
+}
 
 [System.Serializable]
 public class PlayerStats
 {
     [Header("Primary Stats")]
     public ModifiableStat AttackPower = new ModifiableStat(30f);
-    public ModifiableStat MaxHealth = new ModifiableStat(100f);
+    public ModifiableStat MaxHealth = new ModifiableStat(100);
     public ModifiableStat MoveSpeed = new ModifiableStat(5f);
     public ModifiableStat AttackCooldown = new ModifiableStat(1f);
     public ModifiableStat HealthRegen = new ModifiableStat(2f);
@@ -13,13 +24,22 @@ public class PlayerStats
     private float _currentHealth;
     private float _regenAccumulator = 0f;
 
+    public PlayerStatData CurrentStatData =>
+        new PlayerStatData
+        {
+            AttackPower = GetAttackPower(),
+            Health = GetCurrentHealth(),
+            MoveSpeed = GetMoveSpeed(),
+            HealthRegen = GetHealthRegen()
+        };
+
     public PlayerStats()
     {
         _currentHealth = GetMaxHealth();
     }
-    public void HandleHealthRegen()
+    public void HandleHealthRegen(float deltaTime)
     {
-        _regenAccumulator += Time.deltaTime;
+        _regenAccumulator += deltaTime;
         if (_regenAccumulator >= 1f)
         {
             if(!IsDead())
@@ -61,7 +81,7 @@ public class PlayerStats
     // ===== Health Control =====
     public void ModifyCurrentHealth(float delta)
     {
-        _currentHealth = Mathf.Clamp(_currentHealth + delta, 0f, GetMaxHealth());
+        _currentHealth = Mathf.Clamp(_currentHealth + delta, 0f, GetMaxHealth());        
     }
     /// <summary>직접 현재 체력을 설정합니다 (0~MaxHealth 범위로 클램프)</summary>
     public void SetCurrentHealth(float health)

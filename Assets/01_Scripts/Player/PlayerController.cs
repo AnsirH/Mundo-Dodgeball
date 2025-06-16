@@ -5,9 +5,8 @@ using MyGame.Utils;
 using System.Collections;
 using System.Linq;
 using Fusion;
-using Unity.VisualScripting;
 
-public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePositionGetter
+public class PlayerController : NetworkBehaviour, IPlayerContext
 {
     // 플레이어 상태 머신
     private PlayerStateMachine stateMachine;
@@ -26,44 +25,26 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
     // 공격
     [SerializeField] private PlayerAttack attack;
     // 체력
-    [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private PlayerHealth health;
     // 스펠
     [SerializeField] private PlayerSpellActuator playerSpell;
 
+    public PlayerStateBase CurrentState => stateMachine.CurrentState;
     public PlayerStateMachine StateMachine => stateMachine;
-    public PlayerMovement Movement => movement;
-    public PlayerAttack Attack => attack;
-    public PlayerHealth Health => playerHealth;
-
-    #region IPlayerContext Implementation
-
-    public Animator Anim => anim;
-    public AudioSource Audio => audioSource;
     public PlayerStats Stats => stats;
 
-    public PlayerStateBase CurrentState => stateMachine.CurrentState;
+    // NetworkBehaviours
+    public PlayerMovement Movement => movement;
+    public PlayerAttack Attack => attack;
+    public PlayerHealth Health => health;
 
+    // Unity Components
+    public Animator Anim => anim;
+    public AudioSource Audio => audioSource;
 
-    public void InitGround(int sectionNum)
-    {
-        GroundSectionNum = sectionNum;
-    }
-    public int GroundSectionNum { get; private set; }
+    public PlayerStatData CurrentStatData => _currentStatData;
 
-    public IMousePositionGetter MousePositionGetter => this;
-
-    #endregion
-
-    #region IMousePositionGetter Implementation
-
-    public Vector3? ClickPoint { get; private set; }
-
-    public Vector3? GetMousePosition() 
-    {
-        return GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
-    }
-    #endregion
-
+    [Networked] private PlayerStatData _currentStatData { get; set; }
 
     public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
     {
@@ -95,12 +76,16 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
 
         movement.Initialize(this);
         attack.Initialize(this);
+        health.Initialize(this);
         stats = new PlayerStats();
+        _currentStatData = stats.CurrentStatData;
     }
 
     public override void Render()
     {
         stateMachine.Updated();
+
+        _currentStatData = stats.CurrentStatData;
     }
 
     public override void FixedUpdateNetwork()
@@ -110,21 +95,19 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
             {
                 if (CurrentState is PlayerAttackState || attack.CoolTiming) return;
-                ClickPoint = data.targetPoint;
-                ChangeState(EPlayerState.Attack, new(ClickPoint.Value));
+                if (data.targetPoint == Vector3.zero) return;
+                ChangeState(EPlayerState.Attack, new(data.targetPoint));
             }
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1)) // 우클릭
             {
                 if (CurrentState is PlayerAttackState) return;
-                ClickPoint = data.movePoint;
-                if (!ClickPoint.HasValue) return;
-                ChangeState(EPlayerState.Move, new(ClickPoint.Value));
+                if (data.movePoint == Vector3.zero) return;
+                ChangeState(EPlayerState.Move, new(data.movePoint));
             }
             if (data.buttons.IsSet(NetworkInputData.BUTTONF))
             {
                 // 마우스 위치 저장
-                ClickPoint = data.targetPoint;
-                if (!ClickPoint.HasValue) return;
+                if (data.targetPoint == Vector3.zero) return;
 
                 ChangeState(EPlayerState.Idle);
                 // 플레쉬 실행 추가
@@ -132,24 +115,15 @@ public class PlayerController : NetworkBehaviour, IPlayerContext, IMousePosition
         }
 
         stateMachine.NetworkUpdated(Runner.DeltaTime);
-
     }
 
-    private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint)
+    private void OnGUI()
     {
-        GameObject effect = ObjectPooler.GetLocal(effectTag);
+        GUI.Label(new Rect(0, 10, 300, 200), "Current Health" + _currentStatData.Health);
 
-        if (effect == null)
+        if (GUI.Button(new Rect(0, 200, 300, 200), "Set HP 0"))
         {
-            Debug.LogError($"Effect with tag {effectTag} not found in ObjectPooler.");
-            yield break;
+            stats.SetCurrentHealth(0.0f);
         }
-
-        targetPoint.y = IngameController.Instance.ground.transform.position.y;
-        effect.transform.position = targetPoint;
-
-        yield return new WaitForSeconds(1.0f);
-
-        ObjectPooler.ReleaseLocal(effectTag, effect);
     }
 }

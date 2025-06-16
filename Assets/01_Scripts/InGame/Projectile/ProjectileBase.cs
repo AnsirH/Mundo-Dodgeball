@@ -1,6 +1,5 @@
 using Fusion;
 using UnityEngine;
-
 public abstract class ProjectileBase : NetworkBehaviour
 {
     [Header("Projectile Settings")]
@@ -9,31 +8,31 @@ public abstract class ProjectileBase : NetworkBehaviour
     [SerializeField] protected LayerMask collisionMask;
     [SerializeField] protected float damage = 10f;
 
+    [Networked] protected PlayerRef Owner { get; set; }
     [Networked] protected Vector3 Direction { get; set; }
     [Networked] protected Vector3 StartPosition { get; set; }
     [Networked] protected float DistanceTraveled { get; set; }
-    [Networked] protected PlayerRef Owner { get; set; }
     [Networked] protected NetworkBool IsFinished { get; set; }
 
-    protected ChangeDetector _changeDetector;
+    //protected ChangeDetector _changeDetector;
     protected float _currentDistance;
-
-    public bool IsMaxDistanceReached { get { return DistanceTraveled >= maxDistance; } }
 
     public override void Spawned()
     {
-        _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        //_changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
     }
 
-    public virtual void Init(Vector3 startPos, Vector3 direction, PlayerRef owner)
+    public virtual void Init(Vector3 startPos, Vector3 direction, float damage, PlayerRef owner)
     {
+        Owner = owner;
+
         StartPosition = startPos;
         Direction = direction.normalized;
-        Owner = owner;
         DistanceTraveled = 0f;
         IsFinished = false;
 
         _currentDistance = 0f;
+        this.damage = damage;
         transform.position = startPos;
     }
 
@@ -53,7 +52,7 @@ public abstract class ProjectileBase : NetworkBehaviour
                 _currentDistance += moveDistance;
                 DistanceTraveled = _currentDistance;
             }
-            if (IsMaxDistanceReached)
+            if (DistanceTraveled > maxDistance)
             {
                 nextPosition = StartPosition + Direction * maxDistance;
                 OnMaxDistanceReached();

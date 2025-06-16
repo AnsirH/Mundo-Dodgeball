@@ -2,16 +2,15 @@
 using MoreMountains.Feedbacks;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class PlayerHealth : NetworkBehaviour, IDamageable, IPlayerComponent
+public class PlayerHealth : NetworkBehaviour, IDamageable
 {
     private IPlayerContext context;
-    private bool isOfflineMode;
     [SerializeField] MMF_Player damageTestController;
     private MMF_FloatingText mMF_FloatingText;
-
-    public bool Controllable { get; set; } = true;
+    public bool IsDead => context.Stats.CurrentStatData.Health <= 0.0f;
+    public float HealthPercentage => context.Stats.CurrentStatData.Health / context.Stats.GetMaxHealth();
+    public RectTransform testHpBar;
 
     private void Start()
     {
@@ -24,47 +23,36 @@ public class PlayerHealth : NetworkBehaviour, IDamageable, IPlayerComponent
             }
         }
     }
-    public void Initialize(IPlayerContext context, bool isOfflineMode = false)
+
+    public void Initialize(IPlayerContext context)
     {
         this.context = context;
-        this.isOfflineMode = isOfflineMode;
         context.Stats.ResetHealth();
     }
 
-    public void HandleInput(NetworkInputData data)
+    public void TakeDamage(float damage)
     {
+        if (damage <= 0.0f) return;
+
+        context.Stats.ModifyCurrentHealth(-damage);
     }
-    // 실제 Damage 호출할 때 (senderContext 가지고 있을 때)
-    public void TakeDamage(IPlayerContext senderContext)
-    {
-        //if (photonView.IsMine || context.Stats.IsDead())
-        //    return; // 내 것만 호출하게 막기
 
-        //float attackPower = senderContext.Stats.GetAttackPower();
-        //int whoAttacker = context.p_PhotonView.ViewID;
-        //photonView.RPC(nameof(Damage), RpcTarget.All, whoAttacker, attackPower);
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void Damage_RPC(float damage)
+    {
+        context.Stats.ModifyCurrentHealth(-damage);
+        //mMF_FloatingText.Value = attackPower.ToString();
+        //damageTestController.PlayFeedbacks(this.transform.position);
     }
-    [Rpc]
-    public void Rpc_Damage(int attackerActorNumber, float attackPower)
+
+    public override void FixedUpdateNetwork()
     {
-        StartCoroutine(ActiveHitEffect());
-        context.Stats.ModifyCurrentHealth(-attackPower);
-
-        mMF_FloatingText.Value = attackPower.ToString();
-        damageTestController.PlayFeedbacks(this.transform.position);
-
-        if (context.Stats.IsDead())
+        if (testHpBar != null)
         {
-            Debug.Log("check LOG : isDead!");
-            if (HasStateAuthority)
-            {
-                //context.OnPlayerDeath();
-
-                // 죽을 때 이긴 사람 점수 올리기;
-                sendAddScore(attackerActorNumber, 1);
-            }
+            testHpBar.localScale = new Vector3(HealthPercentage, 1.0f, 1.0f);
         }
     }
+
     private void sendAddScore(int idx, int vaule)
     {
         object[] content = new object[] { idx, vaule};
@@ -80,6 +68,7 @@ public class PlayerHealth : NetworkBehaviour, IDamageable, IPlayerComponent
         //};
         //PhotonNetwork.RaiseEvent(NetworkEventCodes.AddScoreEvent, content, options, sendOptions);
     }
+
     //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     //{
     //    if (stream.IsWriting)
@@ -95,25 +84,6 @@ public class PlayerHealth : NetworkBehaviour, IDamageable, IPlayerComponent
     //    }
     //}
 
-    public float GetHealthPercentage()
-    {
-        return context.Stats.GetCurrentHealth() / context.Stats.GetMaxHealth();
-    }
-
-    public void OnEnabled()
-    {
-        //throw new System.NotImplementedException();
-    }
-
-    public void OnDisabled()
-    {
-        //throw new System.NotImplementedException();
-    }
-
-    public void Updated()
-    {
-        context.Stats.HandleHealthRegen();
-    }
 
     IEnumerator ActiveHitEffect()
     {

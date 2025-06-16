@@ -28,11 +28,9 @@ public interface IPlayerContext
 
     PlayerAttack Attack { get; }
 
-    void InitGround(int sectionNum);
+    PlayerHealth Health { get; }
 
-    IMousePositionGetter MousePositionGetter { get; }
-
-    int GroundSectionNum { get; }
+    PlayerStatData CurrentStatData { get; }
 }
 
 /// <summary>
