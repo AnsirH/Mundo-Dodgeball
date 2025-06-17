@@ -17,8 +17,10 @@ namespace Mundo_dodgeball.Player.StateMachine
 
             Vector3 targetPoint = inputData.mousePosition;
             targetPoint.y = 0.0f;
-            
-            movement.SetMovementTarget(targetPoint);
+
+            if (!movement.SetMovementTarget(targetPoint))
+                playerContext.ChangeState(EPlayerState.Idle);
+
         }
 
         public override void ExitState()

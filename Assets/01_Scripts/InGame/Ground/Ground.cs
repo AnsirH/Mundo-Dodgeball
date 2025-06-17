@@ -60,10 +60,11 @@ public class Ground : MonoBehaviour
             }
             adjustedPoint = hit;
 
-//#if UNITY_EDITOR
-//            //StartCoroutine(SpawnStartEndAdjustedPoint(ray.origin, targetPoint, hit));
-//#endif
-            return true;
+#if UNITY_EDITOR
+            //StartCoroutine(SpawnStartEndAdjustedPoint(ray.origin, targetPoint, hit));
+#endif
+            if (adjustedPoint == Vector3.zero) return false;
+            else return true;
         }
         else
             return false;
@@ -135,14 +136,17 @@ public class Ground : MonoBehaviour
         GameObject[] points = new GameObject[3];
 
         points[0] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        points[0].GetComponent<BoxCollider>().enabled = false;
         points[0].GetComponent<MeshRenderer>().material.color = Color.red;
         points[0].transform.position = start;
 
         points[1] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        points[1].GetComponent<BoxCollider>().enabled = false;
         points[1].GetComponent<MeshRenderer>().material.color = Color.black;
         points[1].transform.position = end;
 
         points[2] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        points[2].GetComponent<BoxCollider>().enabled = false;
         points[2].GetComponent<MeshRenderer>().material.color = Color.yellow;
         points[2].transform.position = adjusted;
 

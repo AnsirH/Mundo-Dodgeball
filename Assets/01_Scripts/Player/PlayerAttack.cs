@@ -78,8 +78,9 @@ public class PlayerAttack : NetworkBehaviour
             });
     }
 
-    public override void FixedUpdateNetwork()
+    public override void Render()
     {
+        if (context == null) return;
         if (!axeObj.activeSelf && CoolTimer.ExpiredOrNotRunning(Runner))
         {
             axeObj.SetActive(true);

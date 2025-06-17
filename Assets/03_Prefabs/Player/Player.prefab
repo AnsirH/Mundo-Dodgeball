@@ -1400,11 +1400,11 @@ PrefabInstance:
       addedObject: {fileID: 8516374324364501919}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: -3530418416223767504}
+      insertIndex: 1
+      addedObject: {fileID: 1089014353931383088}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1089014353931383088}
+      addedObject: {fileID: -3530418416223767504}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7700144322300401899}
@@ -1534,24 +1534,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
   m_PrefabInstance: {fileID: 961008935505192235}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &-3530418416223767504
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 114658553885513850}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Animator: {fileID: 6646368711127324858}
-  ApplyTiming: 2
-  SyncSettings: 79
-  StateHashes: 000000002afa8626a8b5caa3bbe784188854a12f2b1a167c794069556522a3afc06644108f65e24bacd5e1ed
-  TriggerHashes: 000000000d286c4037b93501
-  TotalWords: 1
 --- !u!114 &1089014353931383088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1559,7 +1541,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 114658553885513850}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a81442b606c73e647abb041030fd7359, type: 3}
   m_Name: 
@@ -1581,6 +1563,24 @@ MonoBehaviour:
   attack: {fileID: 8439029551291699871}
   health: {fileID: 1822853794646474301}
   playerSpell: {fileID: 3562521471211086396}
+--- !u!114 &-3530418416223767504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114658553885513850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 6646368711127324858}
+  ApplyTiming: 2
+  SyncSettings: 79
+  StateHashes: 000000002afa8626a8b5caa3bbe784188854a12f2b1a167c794069556522a3afc06644108f65e24bacd5e1ed
+  TriggerHashes: 000000000d286c4037b93501
+  TotalWords: 1
 --- !u!114 &7700144322300401899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1640,7 +1640,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fe56715cda9d194595ad954e57d7c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageTestController: {fileID: 2111329040807826123}
   testHpBar: {fileID: 415272827683858994}
 --- !u!82 &7047994121653018947
 AudioSource:
@@ -1781,8 +1780,8 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: -3530418416223767504}
   - {fileID: 1089014353931383088}
+  - {fileID: -3530418416223767504}
   - {fileID: 7700144322300401899}
   - {fileID: 8439029551291699871}
   - {fileID: 3562521471211086396}

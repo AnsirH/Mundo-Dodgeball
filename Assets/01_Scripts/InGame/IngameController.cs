@@ -1,35 +1,34 @@
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using Fusion;
 using Fusion.Sockets;
-using System;
-using Cysharp.Threading.Tasks;
-using System.Threading.Tasks;
 using MyGame.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 {
+    public static IngameController Instance { get; private set; }
+    [SerializeField] private NetworkPrefabRef characterPrefab;
+
+    public int ExpectedPlayerCount = 2;
+
     private PlayerInputHandler inputHandler;
 
-    [SerializeField] private NetworkPrefabRef characterPrefab;
+    public Ground Ground { get; private set; }
 
     private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new();
     private HashSet<PlayerRef> playersCompletedSpawn = new();
 
-    private List<IPlayerContext> playerControllers = new();
+    public Dictionary<PlayerRef, NetworkObject> PlayerCharacters => spawnedCharacters;
 
-    public int ExpectedPlayerCount = 2;
 
-    public static IngameController Instance { get; private set; }
-
-    public List<IPlayerContext> Players => playerControllers;
-    
-    public int GetPlayerIndex(IPlayerContext playerContext)
+    public int GetPlayerIndex(PlayerRef player)
     {
-        return playerControllers.IndexOf(playerContext);
+        return player.PlayerId;
     }
 
     private void Awake()
@@ -46,12 +45,9 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
             Instance = this;
         }
 
+        inputHandler = GetComponent<PlayerInputHandler>();
 
-        //if (FindFirstObjectByType<ObjectPooler>() == null)
-        //{
-        //    Debug.LogError("There is no ObjectPooler in scene");
-        //    return;
-        //}
+        Ground = FindFirstObjectByType<Ground>();
 
         //UIManager.instance.ChangeGame(false);
 
@@ -75,12 +71,12 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         // 2. 캐릭터 생성 요청
         foreach (var player in Runner.ActivePlayers)
         {
-            RPC_CreatePlayerCharacter(player);
+            CreatePlayerCharacter(player);
         }
 
         await WaitForAllPlayersCharacterSpawned();
 
-        SoundManager.instance.SetPlayerAudioGroup(playerControllers);
+        //SoundManager.instance.SetPlayerAudioGroup(playerControllers);
 
         StartGame();
     }
@@ -93,34 +89,18 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    private async Task WaitForAllPlayersCharacterSpawned()
+    private void CreatePlayerCharacter(PlayerRef targetPlayer)
     {
-        while (playersCompletedSpawn.Count < ExpectedPlayerCount)
-        {
-            await Task.Yield();
-        }
-        playerControllers = spawnedCharacters.Values
-        .Select(no => no.GetComponent<IPlayerContext>())
-        .Where(pc => pc != null)
-        .ToList();
-    }
+        Transform spawnPoint = GetSpawnPoint(targetPlayer);
 
-    // 캐릭터 생성 RPC (StateAuthority → InputAuthority)
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.InputAuthority)]
-    private void RPC_CreatePlayerCharacter([RpcTarget] PlayerRef targetPlayer, RpcInfo info = default)
-    {
-        if (Runner.LocalPlayer != targetPlayer) return;
-
-        Transform spawnPoint = GetSpawnPoint(Runner.LocalPlayer);
-
-        var character = Runner.Spawn(characterPrefab, spawnPoint.position, spawnPoint.rotation, Runner.LocalPlayer);
+        var character = Runner.Spawn(characterPrefab, spawnPoint.position, spawnPoint.rotation, targetPlayer);
 
         // 생성 완료 알림
-        RPC_NotifyCharacterSpawned(Runner.LocalPlayer, character);
+        RPC_NotifyCharacterSpawned(targetPlayer, character);
     }
 
-    // 생성 완료 알림 RPC (InputAuthority → StateAuthority)
-    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    // 생성 완료 알림 RPC (StateAuthority → InputAuthority)
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
     private void RPC_NotifyCharacterSpawned(PlayerRef player, NetworkObject character)
     {
         if (!playersCompletedSpawn.Contains(player))
@@ -130,10 +110,18 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         }
     }
 
+    private async Task WaitForAllPlayersCharacterSpawned()
+    {
+        while (playersCompletedSpawn.Count < Runner.ActivePlayers.Count())
+        {
+            await Task.Yield();
+        }
+    }
+
     private Transform GetSpawnPoint(PlayerRef playerRef)
     {
-        int index = playerRef.PlayerId;
-        return playerSpawnPoints[index];
+        int index = playerRef.PlayerId - 1;
+        return Ground.sections[index];
     }
 
     /// <summary>
@@ -141,13 +129,22 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     /// </summary>
     public void StartGame()
     {
+        StartGame_RPC();
+        //ingameUIController.Init(ServerManager.Instance.roomManager.GetScore());
+        //ingameUIController.OnRoundPanel(ServerManager.Instance.roomManager.GetCurrentRound());
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void StartGame_RPC()
+    {
+        Runner.AddCallbacks(this);
+
         foreach (var player in spawnedCharacters.Values)
         {
             player.GetComponent<PlayerController>().enabled = true;
         }
-        //ingameUIController.Init(ServerManager.Instance.roomManager.GetScore());
-        //ingameUIController.OnRoundPanel(ServerManager.Instance.roomManager.GetCurrentRound());
     }
+
     void ReloadSceneRPC()
     {
         // Photon 연결 유지한 채 현재 씬 리로드
@@ -210,10 +207,9 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 
         if (inputHandler.RightClick)
         {
-
             data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
         }
-        if (inputHandler.LeftClick)
+        if (inputHandler.LeftClick || inputHandler.ButtonD || inputHandler.ButtonF)
             data.targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
         input.Set(data);
         inputHandler.ResetInputValue();
@@ -253,4 +249,21 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     public Transform[] playerSpawnPoints = new Transform[2];
 
     public Ground ground;
+
+    public void OnGUI()
+    {
+        if (Runner == null) return;
+        if (HasStateAuthority)
+        {
+            if (spawnedCharacters.Count > 0) return;
+            if (GUI.Button(new Rect(500, 500, 200, 100), "Start Game"))
+            {
+                _ = StartGameProcessAsync();
+            }
+        }
+        foreach (var player in Runner.ActivePlayers)
+        {
+            GUI.Label(new Rect(500, player.PlayerId * 100, 500, 100), player.PlayerId + " player is in");
+        }
+    }
 }

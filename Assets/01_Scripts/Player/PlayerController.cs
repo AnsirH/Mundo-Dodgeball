@@ -62,11 +62,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
 
     public override void Spawned()
     {
-        if (IngameController.Instance != null)
-            movement.SetGround(IngameController.Instance.ground);
-        else
-            movement.SetGround(FindAnyObjectByType<Ground>());
-
         // 상태 머신 초기화
         stateMachine = new(this);
 

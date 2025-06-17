@@ -55,6 +55,7 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 
     public override void Render()
     {
+        if (context == null) return;
         if (testHpBar != null)
         {
             testHpBar.localScale = new Vector3(HealthPercentage, 1.0f, 1.0f);
@@ -63,6 +64,7 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 
     private void OnGUI()
     {
+        if (context == null) return;
         GUI.Label(new Rect(0 + Object.InputAuthority.PlayerId * 200, 10, 300, 100), "Current Health" + CurrentHealth);
 
         if (GUI.Button(new Rect(0, 200, 300, 100), "Die"))

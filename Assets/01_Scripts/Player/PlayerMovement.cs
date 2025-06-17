@@ -16,11 +16,6 @@ public class PlayerMovement : NetworkBehaviour
 
     private NetworkCharacterController _cc;
 
-    private Ground ground;
-
-    public void SetGround(Ground ground) { this.ground = ground; }
-
-
     public void Initialize(IPlayerContext context)
     {
         this.context = context;
@@ -48,17 +43,24 @@ public class PlayerMovement : NetworkBehaviour
     /// 이동 지점 설정
     /// </summary>
     /// <param name="targetPosition"></param>
-    public void SetMovementTarget(Vector3 targetPosition)
+    public bool SetMovementTarget(Vector3 targetPosition)
     {
         _cc.Velocity = Vector3.zero;
         targetPosition.y = 0.0f;
         currentTargetPosition = targetPosition;
 
-        if (IngameController.Instance != null)
+        if (IngameController.Instance != null && IngameController.Instance.Ground != null)
         {
-            ground.GetAdjustedPoint(IngameController.Instance.GetPlayerIndex(context), context.Movement.transform.position, currentTargetPosition, out Vector3 adjustedPoint);
-            currentTargetPosition = adjustedPoint;
+            if (IngameController.Instance.Ground.GetAdjustedPoint(IngameController.Instance.GetPlayerIndex(Object.InputAuthority) - 1, context.Movement.transform.position, currentTargetPosition, out Vector3 adjustedPoint))
+                currentTargetPosition = adjustedPoint;
+            else
+            {
+                currentTargetPosition = Vector3.zero;
+            }
         }
+
+        if (currentTargetPosition == Vector3.zero) return false;
+        else return true;
     }
 
     public void CompleteMove()
@@ -75,15 +77,6 @@ public class PlayerMovement : NetworkBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(direction);
         CurrentRotation = Quaternion.Slerp(currentRotation, targetRotation, rotateSpeed * Runner.DeltaTime);
         _cc.transform.rotation = CurrentRotation;
-    }
-
-    public override void Render()
-    {
-        //if (!Object.HasStateAuthority)
-        //{
-        //    _cc.transform.rotation = Quaternion.Slerp(_cc.transform.rotation, CurrentRotation, rotateSpeed * Runner.DeltaTime);
-        //    transform.position = CurrentPosition;
-        //}
     }
 
     //--- PRIVATE METHOD ---

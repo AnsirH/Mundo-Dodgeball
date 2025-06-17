@@ -43,22 +43,22 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var data = new NetworkInputData();
+        //var data = new NetworkInputData();
 
-        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, inputHandler.LeftClick);
-        data.buttons.Set(NetworkInputData.MOUSEBUTTON1, inputHandler.RightClick);
-        data.buttons.Set(NetworkInputData.BUTTONQ, inputHandler.ButtonQ);
-        data.buttons.Set(NetworkInputData.BUTTOND, inputHandler.ButtonD);
-        data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
+        //data.buttons.Set(NetworkInputData.MOUSEBUTTON0, inputHandler.LeftClick);
+        //data.buttons.Set(NetworkInputData.MOUSEBUTTON1, inputHandler.RightClick);
+        //data.buttons.Set(NetworkInputData.BUTTONQ, inputHandler.ButtonQ);
+        //data.buttons.Set(NetworkInputData.BUTTOND, inputHandler.ButtonD);
+        //data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
 
-        if (inputHandler.RightClick)
-        {
-            data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
-        }
-        if (inputHandler.LeftClick || inputHandler.ButtonD || inputHandler.ButtonF)
-            data.targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
-        input.Set(data);
-        inputHandler.ResetInputValue();
+        //if (inputHandler.RightClick)
+        //{
+        //    data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+        //}
+        //if (inputHandler.LeftClick || inputHandler.ButtonD || inputHandler.ButtonF)
+        //    data.targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+        //input.Set(data);
+        //inputHandler.ResetInputValue();
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
@@ -75,20 +75,20 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (_runner.IsServer)
-        {
-            SpawnTestPlayers(player);
-        }
+        //if (_runner.IsServer)
+        //{
+        //    SpawnTestPlayers(player);
+        //}
         Debug.Log("success player join");
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        if (_runner.IsServer)
-        {
-            runner.Despawn(players[player]);
-            players.Remove(player);
-        }
+        //if (_runner.IsServer)
+        //{
+        //    runner.Despawn(players[player]);
+        //    players.Remove(player);
+        //}
     }
 
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
@@ -121,7 +121,7 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Awake()
     {
-        inputHandler = GetComponent<PlayerInputHandler>();
+        //inputHandler = GetComponent<PlayerInputHandler>();
     }
 
     async private void StartGame(GameMode mode)

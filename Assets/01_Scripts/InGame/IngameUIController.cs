@@ -29,24 +29,24 @@ public class IngameUIController : MonoBehaviour
     public void Init((int masterScore, int otherScore)score)
     {
         // 플레이어 수 가져오기 from IngameController
-        int playerCount = IngameController.Instance.Players.Count;
+        int playerCount = IngameController.Instance.PlayerCharacters.Count;
 
-        if (playerCount > 0)
-        {
-            // HpBar 배열 생성
-            HpBars = new HpBar[playerCount];
+        //if (playerCount > 0)
+        //{
+        //    // HpBar 배열 생성
+        //    HpBars = new HpBar[playerCount];
 
-            // HpBar 생성 및 할당
-            // HpBar에 플레이어를 지정하여 초기화
-            for (int i = 0; i < playerCount; ++i)
-            {
-                HpBars[i] = Instantiate(hpBarPrefab, transform).GetComponent<HpBar>();
-                HpBars[i].Init(IngameController.Instance.Players[i]);
-            }
+        //    // HpBar 생성 및 할당
+        //    // HpBar에 플레이어를 지정하여 초기화
+        //    for (int i = 0; i < playerCount; ++i)
+        //    {
+        //        HpBars[i] = Instantiate(hpBarPrefab, transform).GetComponent<HpBar>();
+        //        HpBars[i].Init(IngameController.Instance.Players[i]);
+        //    }
 
-            // 초기화 된 상태로 설정
-            isInitialized = true;
-        }
+        //    // 초기화 된 상태로 설정
+        //    isInitialized = true;
+        //}
         Debug.Log($"스코어 연동 호스트 :  {score.masterScore} 클라이언트 : {score.otherScore}");
         topPanelUI.InitScore(score.masterScore, score.otherScore);
     }
