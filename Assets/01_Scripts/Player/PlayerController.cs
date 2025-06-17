@@ -73,6 +73,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
         movement.Initialize(this);
         attack.Initialize(this);
         health.Initialize(this);
+        playerSpell.Initialize(this);
         stats = new PlayerStats();
     }
 
@@ -99,13 +100,18 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
                 if (data.movePoint == Vector3.zero) return;
                 ChangeState(EPlayerState.Move, new(data.movePoint));
             }
-            if (data.buttons.IsSet(NetworkInputData.BUTTONF))
+            if (data.buttons.IsSet(NetworkInputData.BUTTOND))
             {
-                // 마우스 위치 저장
                 if (data.targetPoint == Vector3.zero) return;
 
-                ChangeState(EPlayerState.Idle);
-                // 플레쉬 실행 추가
+                playerSpell.ExecuteD(data.targetPoint);
+            }
+
+            if (data.buttons.IsSet(NetworkInputData.BUTTONF))
+            {
+                if (data.targetPoint == Vector3.zero) return;
+
+                playerSpell.ExecuteF(data.targetPoint);
             }
         }
 

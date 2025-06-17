@@ -53,10 +53,9 @@ public class TestSceneManager : MonoBehaviour, INetworkRunnerCallbacks
 
         if (inputHandler.RightClick)
         {
-
             data.movePoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
         }
-        if (inputHandler.LeftClick)
+        if (inputHandler.LeftClick || inputHandler.ButtonD || inputHandler.ButtonF)
             data.targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
         input.Set(data);
         inputHandler.ResetInputValue();

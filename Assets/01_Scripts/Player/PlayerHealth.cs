@@ -45,6 +45,14 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         CurrentHealth = context.Stats.GetCurrentHealth();
     }
 
+    public void Heal(float healAmount)
+    {
+        if (healAmount <= 0.0f) return;
+
+        context.Stats.ModifyCurrentHealth(healAmount);
+        CurrentHealth = context.Stats.GetCurrentHealth();
+    }
+
     public override void Render()
     {
         if (testHpBar != null)

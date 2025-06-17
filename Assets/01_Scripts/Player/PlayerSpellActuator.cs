@@ -3,102 +3,59 @@ using System.Collections;
 using UnityEngine;
 using Mundo_dodgeball.Spell;
 
-public class PlayerSpellActuator : NetworkBehaviour, IPlayerComponent
+public class PlayerSpellActuator : NetworkBehaviour
 {
-    public void Initialize(IPlayerContext context, bool isOfflineMode = false)
+    public void Initialize(IPlayerContext context)
     {
         this.context = context;
-        this.isOfflineMode = isOfflineMode;
     }
 
-    public void OnEnabled()
+    public void ExecuteD(Vector3 targetPoint)
     {
-    }
-
-    public void OnDisabled()
-    {
-    }
-
-    public void HandleInput(NetworkInputData data)
-    {
-        if (data.buttons.IsSet(NetworkInputData.BUTTOND))
+        if (CoolTimerD.ExpiredOrNotRunning(Runner))
         {
-            if (HasStateAuthority && delayD.ExpiredOrNotRunning(Runner))
-            {
-                delayD = TickTimer.CreateFromSeconds(Runner, spellD._maxCoolTime);
-                ExecuteSpell(spellD, data);
-            }
-        }
+            ExecuteSpell(spellD, targetPoint);
+            CoolTimerD = TickTimer.CreateFromSeconds(Runner, spellD._maxCoolTime);
+        }   
+    }
 
-        if (data.buttons.IsSet(NetworkInputData.BUTTONF))
+    public void ExecuteF(Vector3 targetPoint)
+    {
+        if (CoolTimerF.ExpiredOrNotRunning(Runner))
         {
-            if (HasStateAuthority && delayF.ExpiredOrNotRunning(Runner))
-            {
-                delayF = TickTimer.CreateFromSeconds(Runner, spellF._maxCoolTime);
-                ExecuteSpell(spellF, data);
-            }
+            ExecuteSpell(spellF, targetPoint);
+            CoolTimerF = TickTimer.CreateFromSeconds(Runner, spellF._maxCoolTime);
         }
     }
 
-    private void ExecuteSpell(SpellData spellData, NetworkInputData inputData)
+    private void ExecuteSpell(SpellData spellData, Vector3 targetPoint)
     {
         switch (spellData._category)
         {
             case SpellCategory.None:
                 break;
-            //case SpellCategory.Heal:
-            //    context.Stats.ModifyCurrentHealth(spellData._valueAmount);
-            //    RPC_SpawnEffect("HealEffect", context.NCC.transform.position);
-            //    break;
-            //case SpellCategory.Flash:
-            //    Vector3 direction = inputData.targetPoint - context.NCC.transform.position;
-            //    float distance = direction.magnitude;
-            //    if (distance > spellData._valueAmount)
-            //    {
-            //        distance = spellData._valueAmount;
-            //        direction = direction.normalized * distance;
-            //    }
-            //    Quaternion targetRotation = Quaternion.LookRotation(inputData.targetPoint - context.NCC.transform.position);
-            //    context.NCC.Teleport(context.NCC.transform.position + direction, targetRotation);
-            //    RPC_SpawnEffect("FlashEffect", context.NCC.transform.position);
-            //    break;
+            case SpellCategory.Heal:
+                context.Health.Heal(spellData._valueAmount);
+                break;
+            case SpellCategory.Flash:
+
+                Vector3 direction = targetPoint - context.Movement.transform.position;
+                Vector3 destination = context.Movement.transform.position;
+                if (direction.magnitude > spellData._valueAmount) destination += direction.normalized * spellData._valueAmount;
+                else destination += direction;
+                Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
+                context.Movement.Teleport(destination);
+                context.Movement.transform.rotation = targetRotation;
+                break;
         }
-    }
-
-    private IEnumerator SpawnEffect(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild=false)
-    {
-        GameObject effect = ObjectPooler.GetLocal(effectTag);
-
-        if (effect == null)
-        {
-            Debug.LogError($"Effect with tag {effectTag} not found in ObjectPooler.");
-            yield break;
-        }
-
-        effect.transform.position = targetPoint;
-        if (isChild)
-            effect.transform.parent = context.Movement.transform;
-
-        yield return new WaitForSeconds(duration);
-
-        ObjectPooler.ReleaseLocal(effectTag, effect);
-    }
-
-    [Rpc]
-    private void RPC_SpawnEffect(string effectTag, Vector3 targetPoint, float duration = 1.0f, bool isChild = false)
-    {
-        StartCoroutine(SpawnEffect(effectTag, targetPoint, duration, isChild));
     }
 
     public IPlayerContext context;
-    private bool isOfflineMode;
 
     public SpellData spellD;
     public SpellData spellF;
 
-    public bool Controllable { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-
-    [Networked] private TickTimer delayD { get; set; }
-    [Networked] private TickTimer delayF { get; set; }
+    [Networked] private TickTimer CoolTimerD { get; set; }
+    [Networked] private TickTimer CoolTimerF { get; set; }
 }
 
