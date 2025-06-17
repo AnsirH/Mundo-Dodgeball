@@ -17,3 +17,5 @@ MonoBehaviour:
     \uCD5C\uB300 \uAC70\uB9AC\uB294 5\uC785\uB2C8\uB2E4."
   _maxCoolTime: 60
   _valueAmount: 5
+  _effectPrefab:
+    RawGuidValue: 4e9617b2734167247a2d6491e821b27b

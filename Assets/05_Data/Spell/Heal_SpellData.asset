@@ -17,3 +17,5 @@ MonoBehaviour:
     \uCFE8\uD0C0\uC784\uC740 60\uCD08 \uC785\uB2C8\uB2E4."
   _maxCoolTime: 60
   _valueAmount: 50
+  _effectPrefab:
+    RawGuidValue: 9d06d67921087d34985e927eb29a284a

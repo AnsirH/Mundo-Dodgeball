@@ -2,6 +2,7 @@ using Fusion;
 using System.Collections;
 using UnityEngine;
 using Mundo_dodgeball.Spell;
+using Mundo_dodgeball.Player.StateMachine;
 
 public class PlayerSpellActuator : NetworkBehaviour
 {
@@ -36,6 +37,8 @@ public class PlayerSpellActuator : NetworkBehaviour
                 break;
             case SpellCategory.Heal:
                 context.Health.Heal(spellData._valueAmount);
+                if (Object.HasStateAuthority)
+                    Runner.Spawn(spellData._effectPrefab, context.Movement.transform.position).GetComponent<EffectObject>();
                 break;
             case SpellCategory.Flash:
 
@@ -46,6 +49,11 @@ public class PlayerSpellActuator : NetworkBehaviour
                 Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
                 context.Movement.Teleport(destination);
                 context.Movement.transform.rotation = targetRotation;
+
+                context.ChangeState(EPlayerState.Idle);
+
+                if (Object.HasStateAuthority)
+                    Runner.Spawn(spellData._effectPrefab, context.Movement.transform.position).GetComponent<EffectObject>();
                 break;
         }
     }
