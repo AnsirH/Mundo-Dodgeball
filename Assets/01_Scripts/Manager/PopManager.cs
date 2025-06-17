@@ -60,6 +60,12 @@ public class PopManager : ManagerBase<PopManager>
         }
     }
     #endregion
+
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
     void Start()
     {
         

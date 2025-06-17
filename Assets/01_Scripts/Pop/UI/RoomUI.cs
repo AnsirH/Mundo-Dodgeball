@@ -43,6 +43,11 @@ public class RoomUI : MonoBehaviour
         noneReadyBtn.gameObject.SetActive(!player.IsReady);
         readyBtn.gameObject.SetActive(player.IsReady);
     }
+    public void OffReayToggle()
+    {
+        noneReadyBtn.gameObject.SetActive(true);
+        readyBtn.gameObject.SetActive(false);
+    }
     public void OnEnable()
     {
         initReady();

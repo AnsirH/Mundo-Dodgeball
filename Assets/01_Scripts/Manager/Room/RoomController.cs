@@ -30,6 +30,7 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     public int Round = 0;
     private void Awake()
     {
+        ServerManager.Instance.roomController = this;
         PopManager.instance.gameSelectPop.OnCreateRoomRequested += CreateOrJoinRoom;
         UIManager.instance.roomUI.OnLeaveRoomRequested += async () =>
         {
@@ -49,7 +50,6 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
 
         runner = Instantiate(runnerPrefab);
         runner.ProvideInput = false;
-
         await runner.StartGame(new StartGameArgs
         {
             GameMode = GameMode.Shared,
@@ -59,7 +59,7 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
         });
     }
     
-private async void CreateOrJoinRoom(string roomName, string password = "", string playerCount = "GeneralGameMode")
+    private async void CreateOrJoinRoom(string roomName, string password = "", string playerCount = "GeneralGameMode")
     {
         await DestroyRunner();
 
@@ -99,12 +99,14 @@ private async void CreateOrJoinRoom(string roomName, string password = "", strin
         if (runner != null)
         {
             Debug.Log("[LeaveRoom] 러너 종료 시작");
-            await runner.Shutdown(); // 반드시 기다리게
+            if(runner.IsRunning)
+                await runner.Shutdown(); // 러너가 실행 중이면 종료
             Debug.Log("[LeaveRoom] 러너 종료 완료");
 
             model.ClearSessionInfo();
             await InitRunner(); // 새로 시작
-            await runner.LoadScene(SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex), LoadSceneMode.Single);
+            //await runner.LoadScene(SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex), LoadSceneMode.Single);
+            UIManager.instance.ChangeLobbyUI();
             Debug.Log("[LeaveRoom] InitRunner 완료");
         }
     }
@@ -148,6 +150,7 @@ private async void CreateOrJoinRoom(string roomName, string password = "", strin
         if (allReady && runner.IsSceneAuthority)
         {
             Debug.Log("인게임 씬으로 전환");
+            await Task.Yield();
             await runner.LoadScene(SceneRef.FromIndex(1), LoadSceneMode.Single); // 보통 Additive는 필요 없을 경우 Single이 안정적
         }
     }
@@ -210,8 +213,16 @@ private async void CreateOrJoinRoom(string roomName, string password = "", strin
         return null;
     }
   
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { Debug.Log($"런너 종료됨: {shutdownReason}"); }
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { Debug.Log($"플레이어 {player.PlayerId} 퇴장"); }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+    {
+        Debug.Log($"런너 종료됨: {shutdownReason}");
+        LeaveRoom();
+    }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) 
+    {
+        Debug.Log($"플레이어 {player.PlayerId} 퇴장"); 
+        UpdateLobbyUI(); // 플레이어 나가서 Ui 갱신
+    }
     public void OnSceneLoadDone(NetworkRunner runner) 
     {
         SceneLoadDone(runner);
@@ -272,12 +283,35 @@ private async void CreateOrJoinRoom(string roomName, string password = "", strin
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+    {
+        Debug.LogWarning("호스트 마이그레이션 시작!");
+
+        if (runner != null)
+        {
+            runner.Shutdown();
+            Destroy(runner.gameObject);
+        }
+
+        runner = Instantiate(runnerPrefab);
+        runner.ProvideInput = true;
+        runner.AddCallbacks(this);
+
+        runner.StartGame(new StartGameArgs()
+        {
+            HostMigrationToken = hostMigrationToken,
+            SceneManager = runner.GetComponent<NetworkSceneManagerDefault>() ?? runner.gameObject.AddComponent<NetworkSceneManagerDefault>()
+        });
+    }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, System.ArraySegment<byte> data) { }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
+
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+    {
+        Debug.Log($"RoomController : s서버 연결 끊김: {reason}");
+    }
 }
