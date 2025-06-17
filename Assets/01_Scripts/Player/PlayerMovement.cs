@@ -51,7 +51,7 @@ public class PlayerMovement : NetworkBehaviour
 
         if (IngameController.Instance != null && IngameController.Instance.Ground != null)
         {
-            if (IngameController.Instance.Ground.GetAdjustedPoint(IngameController.Instance.GetPlayerIndex(Object.InputAuthority) - 1, context.Movement.transform.position, currentTargetPosition, out Vector3 adjustedPoint))
+            if (IngameController.Instance.Ground.GetAdjustedPoint(Object.InputAuthority.PlayerId - 1, context.Movement.transform.position, currentTargetPosition, out Vector3 adjustedPoint))
                 currentTargetPosition = adjustedPoint;
             else
             {

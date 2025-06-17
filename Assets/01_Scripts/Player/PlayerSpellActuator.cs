@@ -65,5 +65,8 @@ public class PlayerSpellActuator : NetworkBehaviour
 
     [Networked] private TickTimer CoolTimerD { get; set; }
     [Networked] private TickTimer CoolTimerF { get; set; }
+
+    public float CoolTimeD => CoolTimerD.RemainingTime(Runner).HasValue ? CoolTimerD.RemainingTime(Runner).Value : 0.0f;
+    public float CoolTimeF => CoolTimerF.RemainingTime(Runner).HasValue ? CoolTimerF.RemainingTime(Runner).Value : 0.0f;
 }
 

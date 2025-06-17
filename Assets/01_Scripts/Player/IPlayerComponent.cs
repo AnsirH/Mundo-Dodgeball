@@ -29,6 +29,8 @@ public interface IPlayerContext
     PlayerAttack Attack { get; }
 
     PlayerHealth Health { get; }
+
+    PlayerSpellActuator Spell { get; }
 }
 
 /// <summary>
