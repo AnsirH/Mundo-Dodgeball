@@ -2,7 +2,7 @@ using PlayerCharacterControl.State;
 using UnityEngine;
 namespace Mundo_dodgeball.Player.StateMachine
 {
-    /// <summary> 캐릭터의 상태를 나타낸다 </summary>
+    /// <summary> 캐릭?�의 ?�태�??��??�다 </summary>
     public enum EPlayerState
     {
         None = -1,
@@ -16,19 +16,19 @@ namespace Mundo_dodgeball.Player.StateMachine
     {
         public PlayerStateMachine(IPlayerContext playerContext)
         {
-            // 플레이어 상태 객체 생성 및 지정
+            // ?�레?�어 ?�태 객체 ?�성 �?지??
             states[(int)EPlayerState.Idle] = new PlayerIdleState(playerContext);
             states[(int)EPlayerState.Move] = new PlayerMoveState(playerContext);
             states[(int)EPlayerState.Attack] = new PlayerAttackState(playerContext);
             states[(int)EPlayerState.Die] = new PlayerDieState(playerContext);
             
             globalState = new PlayerGlobalState(playerContext);
-            //// 행동형 컴포넌트 행동 종료 이벤트 등록
+            //// ?�동??컴포?�트 ?�동 종료 ?�벤???�록
             //attack.OnActionCompleted += () => ChangeState(EPlayerState.Idle);
 
             //movement.OnActionCompleted += () => ChangeState(EPlayerState.Idle);
 
-            // 현재 상태 Idle 상태로 초기화
+            // ?�재 ?�태 Idle ?�태�?초기??
             ChangeState(EPlayerState.Idle);
         }
 
