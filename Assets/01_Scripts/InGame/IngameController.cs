@@ -14,22 +14,21 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     public static IngameController Instance { get; private set; }
     [SerializeField] private NetworkPrefabRef characterPrefab;
 
-    public int ExpectedPlayerCount = 2;
-
     private PlayerInputHandler inputHandler;
 
-    public Ground Ground { get; private set; }
+    public int ExpectedPlayerCount = 2;
 
     private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new();
     private HashSet<PlayerRef> playersCompletedSpawn = new();
 
     public Dictionary<PlayerRef, NetworkObject> PlayerCharacters => spawnedCharacters;
 
+    public Ground Ground { get; private set; }
 
-    public int GetPlayerIndex(PlayerRef player)
-    {
-        return player.PlayerId;
-    }
+    /// <summary>인게임 UI 컨트롤러</summary>
+    public IngameUIController ingameUIController;
+
+    public Transform[] playerSpawnPoints = new Transform[2];
 
     private void Awake()
     {
@@ -139,6 +138,9 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     {
         Runner.AddCallbacks(this);
 
+        ingameUIController.gameObject.SetActive(true);
+        ingameUIController.Init_new(PlayerCharacters[Runner.LocalPlayer].GetComponent<IPlayerContext>());
+
         foreach (var player in spawnedCharacters.Values)
         {
             player.GetComponent<PlayerController>().enabled = true;
@@ -242,13 +244,6 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     public void OnSceneLoadStart(NetworkRunner runner)
     {
     }
-
-    /// <summary>인게임 UI 컨트롤러</summary>
-    public IngameUIController ingameUIController;
-
-    public Transform[] playerSpawnPoints = new Transform[2];
-
-    public Ground ground;
 
     public void OnGUI()
     {

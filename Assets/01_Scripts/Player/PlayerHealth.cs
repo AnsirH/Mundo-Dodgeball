@@ -1,5 +1,4 @@
 ﻿using Fusion;
-using MoreMountains.Feedbacks;
 using Mundo_dodgeball.Player.StateMachine;
 using System.Collections;
 using UnityEngine;
@@ -9,7 +8,7 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
     private IPlayerContext context;
     //[SerializeField] MMF_Player damageTestController;
     //private MMF_FloatingText mMF_FloatingText;
-    [Networked] private float CurrentHealth { get; set; }
+    [Networked] public float CurrentHealth { get; set; }
 
 
     public bool IsDead => CurrentHealth <= 0.0f;
@@ -64,7 +63,7 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 
     private void OnGUI()
     {
-        if (context == null) return;
+        if (context == null || !Object.HasInputAuthority) return;
         GUI.Label(new Rect(0 + Object.InputAuthority.PlayerId * 200, 10, 300, 100), "Current Health" + CurrentHealth);
 
         if (GUI.Button(new Rect(0, 200, 300, 100), "Die"))

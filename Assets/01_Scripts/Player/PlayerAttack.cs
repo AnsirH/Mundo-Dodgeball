@@ -6,10 +6,10 @@ using UnityEngine;
 public class PlayerAttack : NetworkBehaviour
 {
     private IPlayerContext context;
-    [Networked] public TickTimer CoolTimer { get; set; }
-    [Networked] public TickTimer AttackTimer { get; set; }
+    [Networked] private TickTimer CoolTimer { get; set; }
+    [Networked] private TickTimer AttackTimer { get; set; }
     [Networked] public int AttackCount { get; set; } = 0;
-    public bool CoolTiming { get {  return !CoolTimer.ExpiredOrNotRunning(Runner); } }
+    public float CoolTime => CoolTimer.RemainingTime(Runner).HasValue ? CoolTimer.RemainingTime(Runner).Value : 0.0f;
     public bool Attacking { get { return !AttackTimer.ExpiredOrNotRunning(Runner); } }
 
 
@@ -63,7 +63,7 @@ public class PlayerAttack : NetworkBehaviour
         if (HasStateAuthority)
         {
             SpawnProjectile(shotPosition.position, direction);
-            StartCoolDown(5.0f);
+            StartCoolDown(context.Stats.GetAttackCooldown());
         }
     }
     private void SpawnProjectile(Vector3 startPos, Vector3 direction)

@@ -37,6 +37,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
     public PlayerMovement Movement => movement;
     public PlayerAttack Attack => attack;
     public PlayerHealth Health => health;
+    public PlayerSpellActuator Spell => playerSpell;
 
     // Unity Components
     public Animator Anim => anim;
@@ -85,7 +86,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
         {
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
             {
-                if (CurrentState is PlayerAttackState || attack.CoolTiming) return;
+                if (CurrentState is PlayerAttackState || attack.CoolTime > 0.0f) return;
                 if (data.targetPoint == Vector3.zero) return;
                 ChangeState(EPlayerState.Attack, new(data.targetPoint));
             }
