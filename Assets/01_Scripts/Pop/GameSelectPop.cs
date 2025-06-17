@@ -30,7 +30,7 @@ public class GameSelectPop : PopBase
     }
     public override void Close()
     {
-        ServerManager.Instance.roomManager.joinRoom = null;
+        //ServerManager.Instance.roomManager.joinRoom = null;
         base.Close();
     }
     public override void DetailOpen(GameObject g)
@@ -48,16 +48,18 @@ public class GameSelectPop : PopBase
     }
     public void CreateRoom()
     {
+        Debug.Log("방 생성했습니다.");
         OnCreateRoomRequested?.Invoke(roomNameField.text, passWordField.text, "GeneralGameMode");
     }
     public void JoinRoom()
     {
-        if(ServerManager.Instance.roomManager.joinRoom == null)
+        Debug.Log("방에 참여했습니다.");
+        if (roomNameField.text == null)
         {
             Debug.Log("no selected room!");
             return;
         }
-        OnCreateRoomRequested?.Invoke(roomNameField.text, "", "GeneralGameMode");
+        OnCreateRoomRequested?.Invoke(ServerManager.Instance.roomController.model.GetRoomName(), "", "GeneralGameMode");
     }
     public void PassWordJoinRoom()
     {

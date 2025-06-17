@@ -27,7 +27,8 @@ public class RoomSlot : MonoBehaviour
 
     public void ClickGetRoomId()
     {
-        ServerManager.Instance.roomManager.joinRoom = roomInfo;
+        ServerManager.Instance.roomController.model.SetSessionInfo(roomInfo);
+        Debug.Log(roomInfo.Name);
     }
 
     private string GetCleanRoomName(string rawName)
