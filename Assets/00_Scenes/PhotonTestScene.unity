@@ -320,8 +320,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioMixer: {fileID: 24100000, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
-  sfxGroup: {fileID: 0}
-  bgmGroup: {fileID: 0}
+  sfxGroup: {fileID: 1777681858334648493, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
+  bgmGroup: {fileID: -4595131212846509569, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
   bgmSource: {fileID: 0}
   lobbyBGM: {fileID: 8300000, guid: c9a2cfb4c107c754588bbaa4ff6e5a46, type: 3}
   uiSfxSource: {fileID: 0}
@@ -1719,7 +1719,7 @@ MonoBehaviour:
   _hpBar: {fileID: 280856792}
   _spell_D_UI: {fileID: 1056149654}
   _spell_F_UI: {fileID: 617683816}
-  _q_UI: {fileID: 0}
+  _q_UI: {fileID: 1245970563}
 --- !u!224 &1060132649
 RectTransform:
   m_ObjectHideFlags: 0

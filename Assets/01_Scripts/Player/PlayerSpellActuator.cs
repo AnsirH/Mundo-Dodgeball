@@ -38,7 +38,7 @@ public class PlayerSpellActuator : NetworkBehaviour
             case SpellCategory.Heal:
                 context.Health.Heal(spellData._valueAmount);
                 if (Object.HasStateAuthority)
-                    Runner.Spawn(spellData._effectPrefab, context.Movement.transform.position).GetComponent<EffectObject>();
+                    Runner.Spawn(spellData._effectPrefab, context.Movement.transform.position);
                 break;
             case SpellCategory.Flash:
 
@@ -53,7 +53,7 @@ public class PlayerSpellActuator : NetworkBehaviour
                 context.ChangeState(EPlayerState.Idle);
 
                 if (Object.HasStateAuthority)
-                    Runner.Spawn(spellData._effectPrefab, context.Movement.transform.position).GetComponent<EffectObject>();
+                    Runner.Spawn(spellData._effectPrefab, context.Movement.transform.position);
                 break;
         }
     }

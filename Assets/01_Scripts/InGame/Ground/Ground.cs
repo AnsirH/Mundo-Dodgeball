@@ -172,8 +172,8 @@ public class Ground : MonoBehaviour
             Color.magenta,
             Color.cyan,
             Color.white,
-            Color.black,
             Color.green,
+            Color.black,
             Color.gray
         };
 

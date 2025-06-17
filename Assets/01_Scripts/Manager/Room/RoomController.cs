@@ -109,7 +109,7 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
         await DestroyRunner();
 
         runner = Instantiate(runnerPrefab);
-        runner.ProvideInput = false;
+        runner.ProvideInput = true;
         runner.AddCallbacks(this);
         var properties = new Dictionary<string, SessionProperty>
         {
