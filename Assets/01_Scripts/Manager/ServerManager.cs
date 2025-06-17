@@ -189,7 +189,7 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        throw new NotImplementedException();
+        Debug.Log($"ServerManager : [Fusion] 서버 연결 끊김: {reason}");
     }
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
@@ -214,7 +214,7 @@ public partial class ServerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
     {
-        throw new NotImplementedException();
+        Debug.Log("ServerManager : Host Migration 발생!");
     }
 
     public void OnSceneLoadDone(NetworkRunner runner)

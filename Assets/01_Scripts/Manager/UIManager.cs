@@ -21,6 +21,7 @@ public class UIManager : ManagerBase<UIManager>
     }
     public void ChangeLobbyUI()
     {
+        roomUI.OffReayToggle();
         roomUI.gameObject.SetActive(false);
         lobbyUI.SetActive(true);
         PopManager.instance.AllPopClose();

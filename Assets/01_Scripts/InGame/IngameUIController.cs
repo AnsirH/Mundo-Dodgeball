@@ -8,6 +8,7 @@ public class IngameUIController : MonoBehaviour
 {
     [SerializeField] TopPanelUI topPanelUI;
     [SerializeField] InGameResultUI resultUI;
+    public InGameSettingPop InGameSettingPop;
     private void Start()
     {
         topPanelUI.StartTimer(2, 0);
