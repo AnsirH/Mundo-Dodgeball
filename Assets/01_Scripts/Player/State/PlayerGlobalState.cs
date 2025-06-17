@@ -7,7 +7,7 @@ namespace Mundo_dodgeball.Player.StateMachine
     {
         public PlayerGlobalState(IPlayerContext playerContext) : base(playerContext)
         {
-            _playerContext = playerContext;
+            this.playerContext = playerContext;
         }
 
         public override void EnterState(StateTransitionInputData inputData)
@@ -21,22 +21,16 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void UpdateState()
         {
+            if (playerContext.CurrentState is not PlayerDieState && playerContext.Health.IsDead)
+            {
+                playerContext.ChangeState(EPlayerState.Die);
+            }
         }
 
         public override void NetworkUpdateState(float runnerDeltaTime)
         {
-            if (!_playerContext.Health.IsDead)
-                //_playerContext.Stats.HandleHealthRegen(runnerDeltaTime);
-
-            if (!isDie && _playerContext.CurrentStatData.Health <= 0.0f)
-            {
-                isDie = true;
-                _playerContext.ChangeState(EPlayerState.Die);
-            }
-            Debug.Log(_playerContext.CurrentStatData.Health);
+            if (!playerContext.Health.IsDead)
+                playerContext.Stats.HandleHealthRegen(runnerDeltaTime);
         }
-
-        private bool isDie = false;
-        private IPlayerContext _playerContext;
     }
 }

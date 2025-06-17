@@ -29,8 +29,6 @@ public interface IPlayerContext
     PlayerAttack Attack { get; }
 
     PlayerHealth Health { get; }
-
-    PlayerStatData CurrentStatData { get; }
 }
 
 /// <summary>

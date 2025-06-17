@@ -1,33 +1,40 @@
 ﻿using Fusion;
 using MoreMountains.Feedbacks;
+using Mundo_dodgeball.Player.StateMachine;
 using System.Collections;
 using UnityEngine;
 
 public class PlayerHealth : NetworkBehaviour, IDamageable
 {
     private IPlayerContext context;
-    [SerializeField] MMF_Player damageTestController;
-    private MMF_FloatingText mMF_FloatingText;
-    public bool IsDead => context.Stats.CurrentStatData.Health <= 0.0f;
-    public float HealthPercentage => context.Stats.CurrentStatData.Health / context.Stats.GetMaxHealth();
+    //[SerializeField] MMF_Player damageTestController;
+    //private MMF_FloatingText mMF_FloatingText;
+    [Networked] private float CurrentHealth { get; set; }
+
+
+    public bool IsDead => CurrentHealth <= 0.0f;
+    public float HealthPercentage => CurrentHealth / context.Stats.GetMaxHealth();
+    
+    
     public RectTransform testHpBar;
 
-    private void Start()
-    {
-        foreach (var feedback in damageTestController.FeedbacksList)
-        {
-            if (feedback is MMF_FloatingText ft)
-            {
-                mMF_FloatingText = ft;
-                break;
-            }
-        }
-    }
+    //private void Start()
+    //{
+    //    foreach (var feedback in damageTestController.FeedbacksList)
+    //    {
+    //        if (feedback is MMF_FloatingText ft)
+    //        {
+    //            mMF_FloatingText = ft;
+    //            break;
+    //        }
+    //    }
+    //}
 
     public void Initialize(IPlayerContext context)
     {
         this.context = context;
         context.Stats.ResetHealth();
+        CurrentHealth = context.Stats.GetMaxHealth();
     }
 
     public void TakeDamage(float damage)
@@ -35,17 +42,10 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         if (damage <= 0.0f) return;
 
         context.Stats.ModifyCurrentHealth(-damage);
+        CurrentHealth = context.Stats.GetCurrentHealth();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    private void Damage_RPC(float damage)
-    {
-        context.Stats.ModifyCurrentHealth(-damage);
-        //mMF_FloatingText.Value = attackPower.ToString();
-        //damageTestController.PlayFeedbacks(this.transform.position);
-    }
-
-    public override void FixedUpdateNetwork()
+    public override void Render()
     {
         if (testHpBar != null)
         {
@@ -53,45 +53,19 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         }
     }
 
-    private void sendAddScore(int idx, int vaule)
+    private void OnGUI()
     {
-        object[] content = new object[] { idx, vaule};
+        GUI.Label(new Rect(0 + Object.InputAuthority.PlayerId * 200, 10, 300, 100), "Current Health" + CurrentHealth);
 
-        //RaiseEventOptions options = new RaiseEventOptions
-        //{
-        //    Receivers = ReceiverGroup.MasterClient // 모든 플레이어에게 브로드캐스트
-        //};
-
-        //SendOptions sendOptions = new SendOptions
-        //{
-        //    Reliability = true
-        //};
-        //PhotonNetwork.RaiseEvent(NetworkEventCodes.AddScoreEvent, content, options, sendOptions);
-    }
-
-    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    //{
-    //    if (stream.IsWriting)
-    //    {
-    //        // 내 로컬 currentHealth 절대값 전송
-    //        stream.SendNext(context.Stats.GetCurrentHealth());
-    //    }
-    //    else
-    //    {
-    //        // 받은 절대값으로 덮어쓰기
-    //        float receivedHealth = (float)stream.ReceiveNext();
-    //        context.Stats.SetCurrentHealth(receivedHealth);
-    //    }
-    //}
-
-
-    IEnumerator ActiveHitEffect()
-    {
-        GameObject hitEffect = ObjectPooler.GetLocal("HitEffect");
-        hitEffect.transform.position = transform.position;
-        yield return new WaitForSeconds(0.5f);
-
-        ObjectPooler.ReleaseLocal("HitEffect", hitEffect);
+        if (GUI.Button(new Rect(0, 200, 300, 100), "Die"))
+        {
+            //stats.SetCurrentHealth(0.0f);
+            context.ChangeState(EPlayerState.Die);
+        }
+        if (GUI.Button(new Rect(0, 300, 300, 100), "TakeDamage 30"))
+        {
+            TakeDamage(30);
+        }
     }
 }
 

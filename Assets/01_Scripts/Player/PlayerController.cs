@@ -42,10 +42,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
     public Animator Anim => anim;
     public AudioSource Audio => audioSource;
 
-    public PlayerStatData CurrentStatData => _currentStatData;
-
-    [Networked] private PlayerStatData _currentStatData { get; set; }
-
     public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
     {
         if (Object.HasStateAuthority)
@@ -78,18 +74,17 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
         attack.Initialize(this);
         health.Initialize(this);
         stats = new PlayerStats();
-        _currentStatData = stats.CurrentStatData;
     }
 
     public override void Render()
     {
         stateMachine.Updated();
-
-        _currentStatData = stats.CurrentStatData;
     }
 
     public override void FixedUpdateNetwork()
     {
+        if (CurrentState is PlayerDieState) return;
+
         if (GetInput(out NetworkInputData data))
         {
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
@@ -115,15 +110,5 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
         }
 
         stateMachine.NetworkUpdated(Runner.DeltaTime);
-    }
-
-    private void OnGUI()
-    {
-        GUI.Label(new Rect(0, 10, 300, 200), "Current Health" + _currentStatData.Health);
-
-        if (GUI.Button(new Rect(0, 200, 300, 200), "Set HP 0"))
-        {
-            stats.SetCurrentHealth(0.0f);
-        }
     }
 }

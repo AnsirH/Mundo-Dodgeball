@@ -1574,7 +1574,7 @@ MonoBehaviour:
     AttackCooldown:
       baseValue: 1
     HealthRegen:
-      baseValue: 1
+      baseValue: 0.2
   anim: {fileID: 6646368711127324858}
   audioSource: {fileID: 7047994121653018947}
   movement: {fileID: 7700144322300401899}

@@ -1,4 +1,5 @@
 using Fusion;
+using NUnit.Framework.Constraints;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -15,23 +16,14 @@ public struct PlayerStatData : INetworkStruct
 public class PlayerStats
 {
     [Header("Primary Stats")]
-    public ModifiableStat AttackPower = new ModifiableStat(30f);
-    public ModifiableStat MaxHealth = new ModifiableStat(100);
-    public ModifiableStat MoveSpeed = new ModifiableStat(5f);
-    public ModifiableStat AttackCooldown = new ModifiableStat(1f);
-    public ModifiableStat HealthRegen = new ModifiableStat(2f);
+    public ModifiableStat AttackPower = new(30);
+    public ModifiableStat MaxHealth = new(100);
+    public ModifiableStat MoveSpeed = new(3);
+    public ModifiableStat AttackCooldown = new(5);
+    public ModifiableStat HealthRegen = new(0.2f);
 
     private float _currentHealth;
     private float _regenAccumulator = 0f;
-
-    public PlayerStatData CurrentStatData =>
-        new PlayerStatData
-        {
-            AttackPower = GetAttackPower(),
-            Health = GetCurrentHealth(),
-            MoveSpeed = GetMoveSpeed(),
-            HealthRegen = GetHealthRegen()
-        };
 
     public PlayerStats()
     {
