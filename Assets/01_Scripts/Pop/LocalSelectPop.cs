@@ -18,7 +18,7 @@ public class LocalSelectPop : PopBase
     }
     public void ClickSelectLocal()
     {
-        ServerManager.Instance.ApplyRegionSetting(selectLocal);
+        //ServerManager.Instance.ApplyRegionSetting(selectLocal);
         Close();
     }
 }

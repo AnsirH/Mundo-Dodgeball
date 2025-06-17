@@ -11,6 +11,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private string _prevNickname = "";
     private bool? _prevReady = false;
+
     //플레이어가 Network에 Spawn 되었을 때 호출됨
     public override void Spawned()
     {

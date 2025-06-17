@@ -9,15 +9,16 @@ using System.Threading.Tasks;
 using System;
 using ExitGames.Client.Photon.StructWrapping;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using Fusion.Photon.Realtime;
 
 public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
 {
-    [SerializeField] private RoomModel model;
+    [SerializeField] public RoomModel model;
     public NetworkRunner runnerPrefab;
     public NetworkRunner runner;
     public NetworkPlayer playerPrefab;
     public MatchManager matchManagerPrefab;
-    private List<NetworkPlayer> allPlayerInfos = new();
+    [SerializeField] public List<NetworkPlayer> allPlayerInfos = new();
     private const string lobbyName = "default_lobby";
     private Dictionary<string, int> GameModePlayerCount = new Dictionary<string, int>{
         { "GeneralGameMode", 2 }
@@ -30,7 +31,7 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     public int Round = 0;
     private void Awake()
     {
-        ServerManager.Instance.roomController = this;
+        
         PopManager.instance.gameSelectPop.OnCreateRoomRequested += CreateOrJoinRoom;
         UIManager.instance.roomUI.OnLeaveRoomRequested += async () =>
         {
@@ -41,26 +42,70 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
 
     private async void Start()
     {
-        await InitRunner();
+        ServerManager.Instance.roomController = this;
+        if (runner == null)
+        {
+            await InitRunner();
+        }
     }
-
     private async Task InitRunner()
     {
+        UIManager.instance.SetLoadingUI(true);
         await DestroyRunner();
 
+        // ✅ NetworkRunner 생성
         runner = Instantiate(runnerPrefab);
         runner.ProvideInput = false;
-        await runner.StartGame(new StartGameArgs
+        runner.AddCallbacks(this);
+
+        // ✅ SceneManager 연결
+        var sceneManager = runner.GetComponent<NetworkSceneManagerDefault>();
+        if (sceneManager == null)
+            sceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>();
+
+        // ✅ AppSettings 복사 (자동 지역 설정: FixedRegion 미지정)
+        var appSettings = PhotonAppSettings.Global.AppSettings.GetCopy();
+        appSettings.FixedRegion = null; // ❗ null 또는 비우면 자동 선택
+        appSettings.UseNameServer = true; // ✅ NameServer 통해 지역 자동 측정
+
+        // ✅ StartGame 실행 (Shared 모드)
+        var result = await runner.StartGame(new StartGameArgs
         {
-            GameMode = GameMode.Shared,
+            GameMode = GameMode.Single,
             SessionName = "LOBBY",
-            Scene = SceneRef.FromIndex(0), // ✅ 0번 인덱스 씬을 명시
-            SceneManager = runner.GetComponent<NetworkSceneManagerDefault>()
+            SceneManager = sceneManager,
+            Scene = SceneRef.FromIndex(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex),
+            CustomPhotonAppSettings = appSettings
         });
+
+        if (!result.Ok)
+        {
+            Debug.LogError($"❌ StartGame 실패: {result.ShutdownReason}");
+            return;
+        }
+
+        Debug.Log($"✅ Runner 시작됨. 자동 연결 지역: {appSettings.FixedRegion}");
+
+        // ✅ 로비 입장
+        var lobbyResult = await runner.JoinSessionLobby(SessionLobby.ClientServer);
+        if (lobbyResult.Ok)
+        {
+            Debug.Log("✅ Shared 로비 입장 성공");
+        }
+        else
+        {
+            Debug.LogError($"❌ Shared 로비 입장 실패: {lobbyResult.ShutdownReason}");
+        }
+        UIManager.instance.SetLoadingUI(false);
     }
-    
+
     private async void CreateOrJoinRoom(string roomName, string password = "", string playerCount = "GeneralGameMode")
     {
+        if(runner == null)
+        {
+            Debug.Log("방만들거나 들어가려고 했는데 기존에 러너가 없어서 안만들게~");
+            return;
+        }
         await DestroyRunner();
 
         runner = Instantiate(runnerPrefab);
@@ -90,7 +135,10 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
             Debug.LogError($"StartGame Failed: {result.ShutdownReason}");
             return;
         }
-
+        else
+        {
+            Debug.LogError($"입장 성공");
+        }
         Debug.Log("RoomManager : 방 연결 시도 완료");
     }
 
@@ -104,9 +152,12 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
             Debug.Log("[LeaveRoom] 러너 종료 완료");
 
             model.ClearSessionInfo();
+            UIManager.instance.SetLoadingUI(true);
             await InitRunner(); // 새로 시작
+            UIManager.instance.SetLoadingUI(false);
             if (runner.IsSceneAuthority)
                 await runner.LoadScene(SceneRef.FromIndex(0), LoadSceneMode.Single);
+            UIManager.instance.ChangeLobbyUI();
             UIManager.instance.ChangeGame(true); // 게임 UI로 변경
             Debug.Log("[LeaveRoom] InitRunner 완료");
         }
@@ -114,21 +165,25 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log($"플레이어 {player.PlayerId} 입장");
-        int currentCount = runner.ActivePlayers.Count();
-        UIManager.instance.ChangeRoomUI();
-
-        if (runner.IsServer)
+        Debug.Log($"111111 플레이어 {player.PlayerId} 입장");
+        if (runner.GameMode == GameMode.Host || runner.GameMode == GameMode.Client)
         {
-            var info = runner.Spawn(playerPrefab, Vector3.zero, Quaternion.identity, player);
-            info.Nickname = PlayerPrefs.GetString("NickName", $"플레이어_{UnityEngine.Random.Range(1000, 9999)}");
-            allPlayerInfos.Add(info);
-        }
-        UpdateLobbyUI();
-    }
+            Debug.Log($"플레이어 {player.PlayerId} 입장");
+            int currentCount = runner.ActivePlayers.Count();
+            UIManager.instance.ChangeRoomUI();
 
+            if (runner.IsServer)
+            {
+                var info = runner.Spawn(playerPrefab, Vector3.zero, Quaternion.identity, player);
+                info.Nickname = PlayerPrefs.GetString("NickName", $"플레이어_{UnityEngine.Random.Range(1000, 9999)}");
+                allPlayerInfos.Add(info);
+            }
+        }
+    }
     public async void TryStartGameIfReady()
     {
+        if (runner == null)
+            return;
         var players = runner.ActivePlayers.ToList();
 
         // 인원수 확인
@@ -158,9 +213,9 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
 
     private async Task DestroyRunner()
     {
-        Debug.Log("DestoroyRunner에서 Shutdown하겠음. ㅅㄱ링");
         if (runner != null)
         {
+            Debug.Log("DestoroyRunner에서 Shutdown하겠음. ㅅㄱ링");
             if (runner.IsRunning)
                 await runner.Shutdown();
             Destroy(runner.gameObject);
@@ -169,6 +224,13 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
 
     public void UpdateLobbyUI()
     {
+        Debug.Log($"GameModePlayerCount Test");
+        if (runner == null)
+        {
+            Debug.Log("러너가 없습니다. ");
+            return;
+        }
+            
         var players = runner.ActivePlayers.OrderBy(p => p.PlayerId).ToList();
         Debug.Log($"GameModePlayerCount : {players.Count}");
 
@@ -193,6 +255,10 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     }
     private NetworkPlayer GetPlayerInfo(PlayerRef player)
     {
+        if(runner == null)
+        {
+            Debug.Log("runner가 null이라서 플레이어 데이터 못 줌.");
+        }
         foreach (var obj in runner.GetAllNetworkObjects())
         {
             var info = obj.GetComponent<NetworkPlayer>();
@@ -205,6 +271,7 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     }
     public NetworkPlayer FindMyPlayerInfo()
     {
+        Debug.Log(runner == null);
         foreach (var obj in runner.GetAllNetworkObjects())
         {
             var info = obj.GetComponent<NetworkPlayer>();
@@ -217,16 +284,32 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         Debug.Log($"런너 종료됨: {shutdownReason}");
-        LeaveRoom();
+        if(runner.GameMode == GameMode.Host || runner.GameMode == GameMode.Client)
+            LeaveRoom();
     }
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) 
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log($"플레이어 {player.PlayerId} 퇴장"); 
-        UpdateLobbyUI(); // 플레이어 나가서 Ui 갱신
+        Debug.Log($"플레이어 {player.PlayerId} 퇴장");
+
+        // ✅ 해당 PlayerRef를 가진 오브젝트 제거
+        foreach (var obj in runner.GetAllNetworkObjects())
+        {
+            var info = obj.GetComponent<NetworkPlayer>();
+            if (info != null && info.Object.InputAuthority == player)
+            {
+                runner.Despawn(obj); // ✅ Despawn
+                allPlayerInfos.Remove(info); // 리스트에서도 제거
+                Debug.Log($"퇴장한 플레이어 오브젝트 Despawn 완료: {player.PlayerId}");
+                break;
+            }
+        }
+
+        UpdateLobbyUI(); // UI 갱신
     }
     public void OnSceneLoadDone(NetworkRunner runner) 
     {
-        SceneLoadDone(runner);
+        if(runner.GameMode == GameMode.Host || runner.GameMode == GameMode.Client)
+            SceneLoadDone(runner);
     }
     public async void SceneLoadDone(NetworkRunner runner)
     {
@@ -267,17 +350,7 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         Debug.Log("세션 리스트 갱신");
-        if (model.CurrentSession == null)
-        {
-            foreach (var session in sessionList)
-            {
-                if (session.Name == model.GetRoomName())
-                {
-                    model.SetSessionInfo(session);
-                    break;
-                }
-            }
-        }
+        PopManager.instance?.gameSelectPop?.regularGamePop?.SetRoomListSlot(sessionList);
     }
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
