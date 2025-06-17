@@ -62,6 +62,7 @@ public class MatchManager : NetworkBehaviour
             }
         }
         Debug.Log("[MatchManager] 초기화 완료: 플레이어 점수 설정");
+        RPC_PlayRoundPanel();
     }
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestInitScore()
@@ -87,6 +88,11 @@ public class MatchManager : NetworkBehaviour
     {
         IngameController.Instance.ingameUIController.Init((host, client));
     }
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_PlayRoundPanel()
+    {
+        IngameController.Instance.ingameUIController.OnRoundPanel(Round);
+    }
     public void AddScore(PlayerRef player, int score = 1)
     {
         if (player.IsNone)
@@ -108,16 +114,39 @@ public class MatchManager : NetworkBehaviour
                 int idx = players[0] == player ? 0 : 1;
                 Debug.Log($"GameModePlayerCount : {players.Count}");
                 Round++;
-                RPC_UpdateScoreUI(idx);
+                RPC_UpdateScoreUI(idx, entry.Score < 3);
                 break;
             }
         }
     }
     [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RPC_UpdateScoreUI(int idx)
+    private void RPC_UpdateScoreUI(int idx, bool end)
     {
         IngameController.Instance.ingameUIController.addScore(idx);
-        Invoke(nameof(NextRound), 0.7f);
+        if(end)
+        {
+            Invoke(nameof(NextRound), 0.7f);
+        }
+        else // 게임 끝내기
+        {
+            bool win = false;
+            foreach (var player in PlayerScores) 
+            {
+                if (player.Player == ServerManager.Instance.roomController.runner.LocalPlayer)
+                {
+                    if (player.Score >= 3)
+                    {
+                        win = true;
+                    }
+                }
+            }
+            IngameController.Instance.ingameUIController.OnEndGameResult(win);
+            Invoke(nameof(EndGame), 1f);
+        }
+    }
+    public void EndGame()
+    {
+        ServerManager.Instance.roomController.LeaveRoom();
     }
     public void NextRound()
     {
