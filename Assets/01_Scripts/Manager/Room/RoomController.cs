@@ -54,7 +54,7 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
         {
             GameMode = GameMode.Shared,
             SessionName = "LOBBY",
-            Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
+            Scene = SceneRef.FromIndex(0), // ✅ 0번 인덱스 씬을 명시
             SceneManager = runner.GetComponent<NetworkSceneManagerDefault>()
         });
     }
@@ -94,7 +94,7 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
         Debug.Log("RoomManager : 방 연결 시도 완료");
     }
 
-    private async void LeaveRoom()
+    public async void LeaveRoom()
     {
         if (runner != null)
         {
@@ -105,8 +105,9 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
 
             model.ClearSessionInfo();
             await InitRunner(); // 새로 시작
-            //await runner.LoadScene(SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex), LoadSceneMode.Single);
-            UIManager.instance.ChangeLobbyUI();
+            if (runner.IsSceneAuthority)
+                await runner.LoadScene(SceneRef.FromIndex(0), LoadSceneMode.Single);
+            UIManager.instance.ChangeGame(true); // 게임 UI로 변경
             Debug.Log("[LeaveRoom] InitRunner 완료");
         }
     }
@@ -259,8 +260,10 @@ public class RoomController : NetworkBehaviour, INetworkRunnerCallbacks
         // 3. 안전하게 초기화
         result.Init(runner.ActivePlayers.ToList());
     }
-
-    public void OnSceneLoadStart(NetworkRunner runner) { Debug.Log("씬 로딩 시작"); }
+    public void OnSceneLoadStart(NetworkRunner runner) 
+    {
+        Debug.Log("씬 로딩 시작"); 
+    }
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         Debug.Log("세션 리스트 갱신");

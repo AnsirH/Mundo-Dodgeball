@@ -23,7 +23,7 @@ public class InGameSettingPop : PopBase
     public void SureGiveUp()
     {
         Close();
-        ServerManager.Instance.roomManager.LeaveRoom();
+        ServerManager.Instance.roomController.LeaveRoom();
         
     }
 }

@@ -26,6 +26,8 @@ public class MatchManager : NetworkBehaviour
         ServerManager.Instance.matchManager = this;
         Debug.Log("[MatchManager] 서버에서 matchManager 등록 완료");
         OnSpawned?.Invoke(this);
+        UIManager.instance.ChangeLobbyUI(); // 게임 UI로 변경
+        UIManager.instance.ChangeGame(false); // 게임 UI로 변경
     }
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
