@@ -19,15 +19,16 @@ public class IngameUIController : MonoBehaviour
     private void Update()
     {
         hud.UpdateHud();
-    }
-
-    private void LateUpdate()
-    {
         foreach (IPlayerContext player in IngameController.Instance.PlayerCharacters.Values)
         {
             hpBarHud.UpdateHpBar(player);
         }
     }
+
+    //private void LateUpdate()
+    //{
+        
+    //}
 
     public void Init_new(IPlayerContext playerContext)
     {
