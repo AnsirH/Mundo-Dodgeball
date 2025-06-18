@@ -2,6 +2,7 @@ using Fusion;
 using Fusion.Sockets;
 using Mundo_dodgeball.Player.StateMachine;
 using MyGame.Utils;
+using PlayerCharacterControl.Camera;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,9 @@ using UnityEngine.SceneManagement;
 public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 {
     public static IngameController Instance { get; private set; }
+    [Header("References")]
     [SerializeField] private NetworkPrefabRef characterPrefab;
+    [SerializeField] private PlayerCamMovement playerCam;
 
     private PlayerInputHandler inputHandler;
 
@@ -49,6 +52,8 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         inputHandler = GetComponent<PlayerInputHandler>();
 
         Ground = FindFirstObjectByType<Ground>();
+
+        if (playerCam == null) playerCam = FindFirstObjectByType<PlayerCamMovement>();
 
         //UIManager.instance.ChangeGame(false);
     }
@@ -115,6 +120,24 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         {
             await Task.Yield();
         }
+
+        while (true)
+        {
+            bool allPlayerIsSpawned = true;
+            foreach (var player in playersCompletedSpawn)
+            {
+                if (player.IsUnityNull())
+                {
+                    allPlayerIsSpawned = false;
+                    break;
+                }                
+            }
+
+            if (allPlayerIsSpawned)
+                break;
+
+            await Task.Yield();
+        }
     }
 
     private Transform GetSpawnPoint(PlayerRef playerRef)
@@ -145,6 +168,8 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         {
             player.Movement.GetComponent<PlayerController>().enabled = true;
         }
+
+        playerCam.SetCameraPosition(PlayerCharacters[Runner.LocalPlayer].Movement.transform.position);
     }
 
     void ReloadSceneRPC()
@@ -257,6 +282,7 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadStart(NetworkRunner runner)
     {
+
     }
 
     //public void OnGUI()

@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using UnityEngine;
 
-public class IngameHUD : MonoBehaviour
+public class UserHUD : MonoBehaviour
 {
     public HpBar _hpBar;
     public SkilllUI _spell_D_UI;

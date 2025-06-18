@@ -9,7 +9,7 @@ public class IngameUIController : MonoBehaviour
     [SerializeField] TopPanelUI topPanelUI;
     [SerializeField] InGameResultUI resultUI;
     public InGameSettingPop InGameSettingPop;
-    public IngameHUD hud;
+    public UserHUD hud;
     private void Start()
     {
         //topPanelUI.StartTimer(2, 0);

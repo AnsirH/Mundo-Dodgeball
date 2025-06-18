@@ -55,6 +55,13 @@ namespace PlayerCharacterControl.Camera
             return horizontalCheck || verticalCheck;
         }
 
+        public void SetCameraPosition(Vector3 targetPosition)
+        {
+            targetPosition.y = transform.position.y;
+            transform.position = targetPosition;
+            ClampPosition();
+        }
+
         [Header("¼öÄ¡")]
         public float moveSpeed = 5.0f;
         public float margin = 20.0f;

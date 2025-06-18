@@ -45,6 +45,12 @@ public class PlayerSpellActuator : NetworkBehaviour
                 break;
             case SpellCategory.Flash:
 
+                if (IngameController.Instance != null && IngameController.Instance.Ground != null)
+                {
+                    if (IngameController.Instance.Ground.GetAdjustedPoint(Object.InputAuthority.PlayerId - 1, context.Movement.transform.position, targetPoint, out Vector3 adjustedPoint))
+                        targetPoint = adjustedPoint;
+                } 
+
                 Vector3 direction = targetPoint - context.Movement.transform.position;
                 Vector3 destination = context.Movement.transform.position;
                 if (direction.magnitude > spellData._valueAmount) destination += direction.normalized * spellData._valueAmount;
