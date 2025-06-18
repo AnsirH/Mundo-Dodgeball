@@ -13,7 +13,7 @@ public class IngameUIController : MonoBehaviour
     public HpBarHUD hpBarHud;
     private void Start()
     {
-        //topPanelUI.StartTimer(2, 0);
+        topPanelUI.StartTimer(2, 0);
     }
 
     private void Update()
@@ -37,8 +37,7 @@ public class IngameUIController : MonoBehaviour
     /// <summary> UI 매니저 초기화. </summary>
     public void Init((int masterScore, int otherScore)score)
     {
-
-        //topPanelUI.InitScore(score.masterScore, score.otherScore);
+        topPanelUI.InitScore(score.masterScore, score.otherScore);
     }
     public void addScore(int idx)
     {

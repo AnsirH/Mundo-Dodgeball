@@ -183,7 +183,7 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         playerRef = PlayerRef.None;
         foreach (var player in spawnedCharacters.Values)
         {
-            if (player.CurrentState is PlayerDieState)
+            if (player.CurrentState is not PlayerDieState)
             {
                 playerRef = player.Runner.LocalPlayer;
                 return true;
