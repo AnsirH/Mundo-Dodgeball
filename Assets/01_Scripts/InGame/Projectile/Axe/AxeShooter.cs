@@ -105,7 +105,7 @@ public class AxeShooter : MonoBehaviour, IShooter
         axe.Initialize(context, transform.position, direction);
 
         // 소리 출력
-        SoundManager.instance.PlayOneShot(context.Audio, sounds[Random.Range(0, sounds.Length)]);
+        //SoundManager.instance.PlayOneShot(context.Sound, sounds[Random.Range(0, sounds.Length)]);
 
         // 쿨타임 시작
         currentCooldown = cooldownTime;

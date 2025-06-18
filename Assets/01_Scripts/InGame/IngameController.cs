@@ -206,6 +206,7 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         data.buttons.Set(NetworkInputData.BUTTONQ, inputHandler.ButtonQ);
         data.buttons.Set(NetworkInputData.BUTTOND, inputHandler.ButtonD);
         data.buttons.Set(NetworkInputData.BUTTONF, inputHandler.ButtonF);
+        data.buttons.Set(NetworkInputData.BUTTONSTOP, inputHandler.ButtonStopMove);
 
         if (inputHandler.RightClick)
         {

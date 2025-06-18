@@ -57,6 +57,8 @@ MonoBehaviour:
     m_Bits: 8
   damage: 10
   animator: {fileID: 548893592828688087}
+  hitEffectPrefab:
+    RawGuidValue: 7133621181a73924faa15c4df178f03f
 --- !u!114 &4441862596629715339
 MonoBehaviour:
   m_ObjectHideFlags: 0

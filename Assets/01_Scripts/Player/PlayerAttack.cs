@@ -24,7 +24,6 @@ public class PlayerAttack : NetworkBehaviour
 
     [SerializeField] private float attackDuration = 0.25f;
     public float RotationSpeed => rotationSpeed;
-    public float AttackDuration => attackDuration;
 
     private Vector3 targetPoint;
 
@@ -40,7 +39,7 @@ public class PlayerAttack : NetworkBehaviour
         SetTargetPoint(point);
         if(Object.HasStateAuthority)
             AttackCount++;
-        AttackTimer = TickTimer.CreateFromSeconds(Runner, 0.25f);
+        AttackTimer = TickTimer.CreateFromSeconds(Runner, attackDuration);
         axeObj.SetActive(false);
     }
 
@@ -64,6 +63,7 @@ public class PlayerAttack : NetworkBehaviour
         {
             SpawnProjectile(shotPosition.position, direction);
             StartCoolDown(context.Stats.GetAttackCooldown());
+            context.Sound.PlayOneShot_Attack();
         }
     }
     private void SpawnProjectile(Vector3 startPos, Vector3 direction)

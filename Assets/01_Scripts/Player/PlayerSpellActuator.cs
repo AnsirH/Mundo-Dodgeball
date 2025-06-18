@@ -38,7 +38,10 @@ public class PlayerSpellActuator : NetworkBehaviour
             case SpellCategory.Heal:
                 context.Health.Heal(spellData._valueAmount);
                 if (Object.HasStateAuthority)
+                {
                     Runner.Spawn(spellData._effectPrefab, context.Movement.transform.position);
+                    context.Sound.PlayOneShot_Heal();
+                }
                 break;
             case SpellCategory.Flash:
 
@@ -48,12 +51,15 @@ public class PlayerSpellActuator : NetworkBehaviour
                 else destination += direction;
                 Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
                 context.Movement.Teleport(destination);
-                context.Movement.transform.rotation = targetRotation;
+                context.Movement.SetRotation(targetRotation);
 
                 context.ChangeState(EPlayerState.Idle);
 
                 if (Object.HasStateAuthority)
+                {
                     Runner.Spawn(spellData._effectPrefab, context.Movement.transform.position);
+                    context.Sound.PlayOneShot_Flash();
+                }
                 break;
         }
     }

@@ -5,6 +5,7 @@ public class AxeProjectile : ProjectileBase
 {
     [Header("References")]
     public NetworkMecanimAnimator animator;
+    public NetworkPrefabRef hitEffectPrefab;
 
     [Networked] TickTimer DroppingTimer { get; set; }
 
@@ -43,8 +44,8 @@ public class AxeProjectile : ProjectileBase
                 if (hit.Hitbox.Root.gameObject.TryGetComponent(out IDamageable target))
                 {
                     target.TakeDamage(damage);
-                }                
-
+                }
+                SpawnHitEffect(hit);
                 OnHit();
             }
             else
@@ -71,5 +72,10 @@ public class AxeProjectile : ProjectileBase
                 Runner.Despawn(Object);
             }
         }        
+    }
+
+    private void SpawnHitEffect(LagCompensatedHit hit)
+    {
+        Runner.Spawn(hitEffectPrefab, hit.Point, Quaternion.LookRotation(hit.Normal));
     }
 }

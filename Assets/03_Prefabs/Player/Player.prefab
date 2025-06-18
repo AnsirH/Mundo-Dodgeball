@@ -1432,6 +1432,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3360747898045588358}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2997605128706659622}
     - targetCorrespondingSourceObject: {fileID: -780769333758982494, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3490007475169857344}
@@ -1558,7 +1561,7 @@ MonoBehaviour:
     HealthRegen:
       baseValue: 0.2
   anim: {fileID: 6646368711127324858}
-  audioSource: {fileID: 7047994121653018947}
+  sound: {fileID: 2997605128706659622}
   movement: {fileID: 7700144322300401899}
   attack: {fileID: 8439029551291699871}
   health: {fileID: 1822853794646474301}
@@ -1640,6 +1643,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fe56715cda9d194595ad954e57d7c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _CurrentHealth: 0
   testHpBar: {fileID: 415272827683858994}
 --- !u!82 &7047994121653018947
 AudioSource:
@@ -1761,7 +1765,7 @@ CharacterController:
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
+  m_MinMoveDistance: 0.005
   m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!114 &8658950931254880636
 MonoBehaviour:
@@ -1788,6 +1792,7 @@ MonoBehaviour:
   - {fileID: 1822853794646474301}
   - {fileID: 787278578202891627}
   - {fileID: 3360747898045588358}
+  - {fileID: 2997605128706659622}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &787278578202891627
 MonoBehaviour:
@@ -1825,6 +1830,35 @@ MonoBehaviour:
   Offset: {x: 0, y: 1, z: 0}
   GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   Hitboxes: []
+--- !u!114 &2997605128706659622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114658553885513850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cbf57178ec79a34daacdf924c6a9ff1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _attackSounds:
+  - {fileID: 8300000, guid: 482611fe6bc559142a00be6e726b4862, type: 3}
+  - {fileID: 8300000, guid: 4d4ef7516a431934681038a3dc391e55, type: 3}
+  _hitSounds:
+  - {fileID: 8300000, guid: e82879725b40ce444bca27d19a75f42c, type: 3}
+  - {fileID: 8300000, guid: 2b019c6187fca1e48b47e28c891dc66c, type: 3}
+  - {fileID: 8300000, guid: b883c27c88428884fb3a10dcc42b8b47, type: 3}
+  - {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
+  - {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
+  - {fileID: 8300000, guid: 58a5d36d6b134014ea5623d9802082e2, type: 3}
+  - {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
+  _healSounds:
+  - {fileID: 8300000, guid: 9457c331d7da634448ffc0210f6adfdd, type: 3}
+  - {fileID: 8300000, guid: 42d592f366bcd3947a75fc72e78e4cbb, type: 3}
+  - {fileID: 8300000, guid: d317fe283d224e34da3272ce1fcc39f1, type: 3}
+  _flashSounds:
+  - {fileID: 8300000, guid: a415341225ed39c45bf949928ba1b519, type: 3}
 --- !u!1 &142119297455900911 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 913905503029243332, guid: e93c5659e68727f428296bb07c0f449d, type: 3}
