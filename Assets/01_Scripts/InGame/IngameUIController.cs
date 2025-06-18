@@ -10,12 +10,23 @@ public class IngameUIController : MonoBehaviour
     [SerializeField] InGameResultUI resultUI;
     public InGameSettingPop InGameSettingPop;
     public UserHUD hud;
+    public HpBarHUD hpBarHud;
     private void Start()
     {
         //topPanelUI.StartTimer(2, 0);
     }
+
     private void Update()
     {
+        hud.UpdateHud();
+    }
+
+    private void LateUpdate()
+    {
+        foreach (IPlayerContext player in IngameController.Instance.PlayerCharacters.Values)
+        {
+            hpBarHud.UpdateHpBar(player);
+        }
     }
 
     public void Init_new(IPlayerContext playerContext)
@@ -33,10 +44,6 @@ public class IngameUIController : MonoBehaviour
     {
         topPanelUI.AddScoreToPlayer(idx);
     }
-
-    public GameObject hpBarPrefab;
-
-    public bool isInitialized = false;
 
     public void OnRoundPanel(int idx) 
     {

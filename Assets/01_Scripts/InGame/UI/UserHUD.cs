@@ -30,9 +30,9 @@ public class UserHUD : MonoBehaviour
 
     public void UpdateQCoolTime(float remainingCoolTime, float maxCoolTime) => _q_UI.UpdateCoolTime(remainingCoolTime, maxCoolTime);
 
-    public void Update()
+    public void UpdateHud()
     {
-        if (_playerContext != null)
+        if (_playerContext != null && _playerContext.Runner != null)
         {
             UpdateHpBar(_playerContext.Health.CurrentHealth / _playerContext.Stats.GetMaxHealth());
             UpdateSpellDCoolTime(_playerContext.Spell.CoolTimeD, _playerContext.Spell.spellD._maxCoolTime);
