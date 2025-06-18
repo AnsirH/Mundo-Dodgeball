@@ -1378,11 +1378,11 @@ MonoBehaviour:
     MaxHealth:
       baseValue: 100
     MoveSpeed:
-      baseValue: 5
+      baseValue: 3.5
     AttackCooldown:
-      baseValue: 1
+      baseValue: 4.5
     HealthRegen:
-      baseValue: 0.2
+      baseValue: 1.5
   anim: {fileID: 6646368711127324858}
   sound: {fileID: 2997605128706659622}
   movement: {fileID: 7700144322300401899}
@@ -1435,6 +1435,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _AttackCount: 0
+  _IsActivating: 0
   axePrefab:
     RawGuidValue: 75f3bb5d178abc94a98711c3754614ef
   shotPosition: {fileID: 2857566772510285011}

@@ -230,7 +230,7 @@ PrefabInstance:
       objectReference: {fileID: 397414227}
     - target: {fileID: 1003683060756051068, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
       propertyPath: ExpectedPlayerCount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2266615268428736154, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
       propertyPath: m_Name
@@ -2012,6 +2012,7 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 49498493}
   - {fileID: 2012040065}
   - {fileID: 721314735}
   - {fileID: 1661489009}
@@ -2021,6 +2022,5 @@ SceneRoots:
   - {fileID: 1821178605}
   - {fileID: 1028554740}
   - {fileID: 88674975}
-  - {fileID: 49498493}
   - {fileID: 1424112740}
   - {fileID: 22743947}

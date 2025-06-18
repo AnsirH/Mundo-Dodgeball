@@ -1,8 +1,5 @@
 ﻿using Fusion;
-using Mundo_dodgeball.Projectile;
 using MyGame.Utils;
-using TMPro;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class PlayerAttack : NetworkBehaviour
@@ -14,7 +11,7 @@ public class PlayerAttack : NetworkBehaviour
     public float CoolTime => CoolTimer.RemainingTime(Runner).HasValue ? CoolTimer.RemainingTime(Runner).Value : 0.0f;
     public bool Attacking { get { return !AttackTimer.ExpiredOrNotRunning(Runner); } }
 
-    public bool IsActivating => indicator.activeSelf;
+    [Networked] public bool IsActivating { get; set; }
 
 
     [Header("References")]
@@ -32,6 +29,7 @@ public class PlayerAttack : NetworkBehaviour
     public float RotationSpeed => rotationSpeed;
 
     private Vector3 targetPoint;
+    private int _visibleAttackCount;
 
     public void Initialize(IPlayerContext context)
     {
@@ -43,8 +41,11 @@ public class PlayerAttack : NetworkBehaviour
     public void StartAttack(Vector3 point)
     {
         SetTargetPoint(point);
-        if(Object.HasStateAuthority)
+        if (Object.HasStateAuthority)
+        {
             AttackCount++;
+            StartCoolDown(context.Stats.GetAttackCooldown());
+        }
         AttackTimer = TickTimer.CreateFromSeconds(Runner, attackDuration);
         axeObj.SetActive(false);
         ActivateIndicator(false);
@@ -69,7 +70,6 @@ public class PlayerAttack : NetworkBehaviour
         if (HasStateAuthority)
         {
             SpawnProjectile(shotPosition.position, direction);
-            StartCoolDown(context.Stats.GetAttackCooldown());
             context.Sound.PlayOneShot_Attack();
         }
     }
@@ -87,7 +87,9 @@ public class PlayerAttack : NetworkBehaviour
 
     public void ActivateIndicator(bool active)
     {
-        indicator.SetActive(active);
+        IsActivating = active;
+        if (HasInputAuthority)
+            indicator.SetActive(active);
     }
 
     public override void Render()
@@ -96,6 +98,14 @@ public class PlayerAttack : NetworkBehaviour
 
         if (CoolTime > 0 && axeObj.activeSelf) axeObj.SetActive(false);
         else if (CoolTime == 0 && !axeObj.activeSelf) axeObj.SetActive(true);
+
+
+        if (_visibleAttackCount < AttackCount)
+        {
+            context.Anim.SetTrigger("Attack");
+
+            _visibleAttackCount = AttackCount;
+        }
     }
 
     public void ResetCoolTime()
@@ -113,6 +123,6 @@ public class PlayerAttack : NetworkBehaviour
             Vector3 targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
             indicator.transform.rotation = Quaternion.LookRotation((targetPoint - transform.position).normalized);
         }
-
     }
+
 }

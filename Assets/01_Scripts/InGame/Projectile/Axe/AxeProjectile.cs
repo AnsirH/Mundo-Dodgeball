@@ -43,7 +43,7 @@ public class AxeProjectile : ProjectileBase
             {
                 if (hit.Hitbox.Root.gameObject.TryGetComponent(out IDamageable target))
                 {
-                    target.TakeDamage(damage);
+                    target.TakeDamage(damage, Owner);
                 }
                 SpawnHitEffect(hit);
                 OnHit();

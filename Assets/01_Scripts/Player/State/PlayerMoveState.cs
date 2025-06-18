@@ -18,7 +18,7 @@ namespace Mundo_dodgeball.Player.StateMachine
             Vector3 targetPoint = inputData.mousePosition;
             targetPoint.y = 0.0f;
 
-            if (!movement.SetMovementTarget(targetPoint))
+            if (!movement.TrySetMovementTarget(targetPoint))
                 playerContext.ChangeState(EPlayerState.Idle);
 
         }
@@ -30,19 +30,15 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void UpdateState()
         {
-        }
-
-        public override void NetworkUpdateState(float runnerDeltaTime)
-        {
-            if (!movement.IsArrived)
-            {
-                movement.MoveTowardTarget();
-            }
-            else
+            if (movement.IsArrived)
             {
                 movement.CompleteMove();
                 playerContext.ChangeState(EPlayerState.Idle);
             }
+        }
+
+        public override void NetworkUpdateState(float runnerDeltaTime)
+        {
         }
 
         private PlayerMovement movement;

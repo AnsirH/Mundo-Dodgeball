@@ -10,7 +10,7 @@ public class DummyTarget : NetworkBehaviour, IDamageable
         _hp = 50.0f;
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, PlayerRef sender)
     {
         _hp += -damage;
     }

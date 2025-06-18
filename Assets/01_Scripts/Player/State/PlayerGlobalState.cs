@@ -21,16 +21,14 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void UpdateState()
         {
-            if (playerContext.CurrentState is not PlayerDieState && playerContext.Health.IsDead)
-            {
-                playerContext.ChangeState(EPlayerState.Die);
-            }
+            //if (playerContext.CurrentState is not PlayerDieState && playerContext.Health.IsDead)
+            //{
+            //    playerContext.ChangeState(EPlayerState.Die);
+            //}
         }
 
         public override void NetworkUpdateState(float runnerDeltaTime)
         {
-            if (!playerContext.Health.IsDead)
-                playerContext.Stats.HandleHealthRegen(runnerDeltaTime);
         }
     }
 }

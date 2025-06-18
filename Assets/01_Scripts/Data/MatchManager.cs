@@ -64,6 +64,7 @@ public class MatchManager : NetworkBehaviour
         Debug.Log("[MatchManager] 초기화 완료: 플레이어 점수 설정");
         RPC_PlayRoundPanel();
     }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_RequestInitScore()
     {
@@ -78,7 +79,7 @@ public class MatchManager : NetworkBehaviour
         Debug.Log("daaaaahost :" + host + "dafafd client: " + client);
         RPC_UpdateScoreUI(host, client);
     }
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_RequestAddScore(PlayerRef player, int score = 1)
     {
         AddScore(player, score); // ✅ 서버에서만 실행되므로 안전

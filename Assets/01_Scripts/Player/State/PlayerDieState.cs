@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,8 @@ namespace Mundo_dodgeball.Player.StateMachine
         public override void EnterState(StateTransitionInputData inputData)
         {
             playerContext.Anim.SetTrigger("Die");
+
+            ServerManager.Instance.matchManager.RPC_RequestAddScore(playerContext.Health.Killer); // 플레이어가 죽으면 게임 종료
         }
 
         public override void ExitState()

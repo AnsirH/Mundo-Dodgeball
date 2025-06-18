@@ -43,7 +43,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
     // Unity Components
     public Animator Anim => anim;
 
-    private bool isAleadyDead = false;
     [Header("Test Mode")]
     public bool isTestMode = false;
     public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
@@ -75,7 +74,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
         health.Initialize(this);
         spell.Initialize(this);
         sound.Init();
-        isAleadyDead = false;
         stats = new PlayerStats();
     }
 
@@ -86,27 +84,22 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
 
     public override void FixedUpdateNetwork()
     {
-        if (CurrentState is PlayerDieState && !isAleadyDead)
-        {
-            isAleadyDead = true;
-            PlayerRef playerRef;
-            if (IngameController.Instance.CheckPlayerDie(out playerRef))
-            {
-                ServerManager.Instance.matchManager.RPC_RequestAddScore(playerRef, 1); // 플레이어가 죽으면 점수 추가
-            }
-        }
+        if (CurrentState is PlayerDieState) return;
 
         if (GetInput(out NetworkInputData data))
         {
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1)) // 우클릭
             {
-                if (ObjectPooler.Instance != null)
+                if (HasInputAuthority)
                 {
-                    GameObject clickEffect = ObjectPooler.GetLocal("MoveClickEffect");
-                    clickEffect.transform.position = data.movePoint;
+                    if (ObjectPooler.Instance != null)
+                    {
+                        GameObject clickEffect = ObjectPooler.GetLocal("MoveClickEffect");
+                        clickEffect.transform.position = data.movePoint;
+                    }
                 }
-                if (CurrentState is PlayerAttackState) return;
                 attack.ActivateIndicator(false);
+                if (CurrentState is PlayerAttackState) return;
                 if (data.movePoint == Vector3.zero) return;
                 ChangeState(EPlayerState.Move, new(data.movePoint));
             }
@@ -118,8 +111,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
             if (data.buttons.IsSet(NetworkInputData.BUTTONQ)) // Q 버튼
             {
                 if (CurrentState is PlayerAttackState || attack.CoolTime > 0.0f) return;
-                if (HasInputAuthority)
-                    attack.ActivateIndicator(!attack.IsActivating);
+                attack.ActivateIndicator(true);
             }
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
             {
@@ -161,7 +153,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
             }
             if (GUI.Button(new Rect(0, 300, 300, 100), "TakeDamage 30"))
             {
-                health.TakeDamage(30);
+                health.TakeDamage(30, PlayerRef.None);
             }
             if (GUI.Button(new Rect(0, 400, 300, 100), "Reset Cool Time"))
             {

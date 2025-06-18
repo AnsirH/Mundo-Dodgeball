@@ -12,7 +12,7 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void EnterState(StateTransitionInputData inputData)
         {
-            Debug.Log($"{GetType().Name} 상태 진입");
+            playerContext.Movement.StopMove();
         }
 
         public override void ExitState()

@@ -1693,7 +1693,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3161368748572591975, guid: 1bdc3c9f5cb7eac4a9162708cc1dd5d2, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 354.08008
+      value: 102.67273
       objectReference: {fileID: 0}
     - target: {fileID: 3161368748572591975, guid: 1bdc3c9f5cb7eac4a9162708cc1dd5d2, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -1701,7 +1701,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3161368748572591975, guid: 1bdc3c9f5cb7eac4a9162708cc1dd5d2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -177.04004
+      value: -51.336365
       objectReference: {fileID: 0}
     - target: {fileID: 4589295594259442493, guid: 1bdc3c9f5cb7eac4a9162708cc1dd5d2, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1717,7 +1717,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4589295594259442493, guid: 1bdc3c9f5cb7eac4a9162708cc1dd5d2, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 354.08008
+      value: 102.67273
       objectReference: {fileID: 0}
     - target: {fileID: 4589295594259442493, guid: 1bdc3c9f5cb7eac4a9162708cc1dd5d2, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -1725,7 +1725,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4589295594259442493, guid: 1bdc3c9f5cb7eac4a9162708cc1dd5d2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -177.04004
+      value: -51.336365
       objectReference: {fileID: 0}
     - target: {fileID: 6228669029733034494, guid: 1bdc3c9f5cb7eac4a9162708cc1dd5d2, type: 3}
       propertyPath: m_Name
@@ -2001,8 +2001,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timerText: {fileID: 874343448}
   scoreTexts:
-  - {fileID: 1034250343}
   - {fileID: 745370908}
+  - {fileID: 1034250343}
 --- !u!1 &1742138650
 GameObject:
   m_ObjectHideFlags: 0

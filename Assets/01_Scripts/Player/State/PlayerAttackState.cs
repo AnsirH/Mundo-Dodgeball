@@ -11,6 +11,7 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void EnterState(StateTransitionInputData inputData)
         {
+            playerContext.Movement.StopMove();
             Vector3 targetPoint = inputData.mousePosition;
             targetPoint.y = 0.0f;
             direction = (targetPoint - attack.transform.position).normalized;
@@ -22,12 +23,6 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         public override void UpdateState()
         {
-            if (_visibleAttackCount < attack.AttackCount)
-            {
-                playerContext.Anim.SetTrigger("Attack");
-
-                _visibleAttackCount = attack.AttackCount;
-            }
         }
 
         public override void NetworkUpdateState(float runnerDeltaTime)
@@ -42,6 +37,5 @@ namespace Mundo_dodgeball.Player.StateMachine
 
         private PlayerAttack attack;
         Vector3 direction = Vector3.zero;
-        int _visibleAttackCount = 0;
     }
 }

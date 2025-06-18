@@ -19,7 +19,7 @@ public class PlayerStats
     public ModifiableStat AttackPower = new(30);
     public ModifiableStat MaxHealth = new(100);
     public ModifiableStat MoveSpeed = new(3);
-    public ModifiableStat AttackCooldown = new(5);
+    public ModifiableStat AttackCooldown = new(3);
     public ModifiableStat HealthRegen = new(0.2f);
 
     private float _currentHealth;

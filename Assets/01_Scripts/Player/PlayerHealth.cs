@@ -7,7 +7,7 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 {
     private IPlayerContext context;
     [Networked] public float CurrentHealth { get; set; }
-
+    [Networked] public PlayerRef Killer { get; set; }
     public bool IsDead => CurrentHealth <= 0.0f;
     public float HealthPercentage => CurrentHealth / context.Stats.GetMaxHealth();
 
@@ -18,13 +18,18 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         CurrentHealth = context.Stats.GetMaxHealth();
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, PlayerRef sender)
     {
         if (damage <= 0.0f) return;
 
         context.Stats.ModifyCurrentHealth(-damage);
         CurrentHealth = context.Stats.GetCurrentHealth();
         context.Sound.PlayOneShot_Hit();
+        if (IsDead)
+        {
+            Killer = sender;
+            context.ChangeState(EPlayerState.Die);
+        }
     }
 
     public void Heal(float healAmount)
@@ -35,9 +40,11 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
         CurrentHealth = context.Stats.GetCurrentHealth();
     }
 
-    public override void Render()
+    public override void FixedUpdateNetwork()
     {
-        if (context == null) return;
+        if (IsDead) return;
+        context.Stats.HandleHealthRegen(Runner.DeltaTime);
+        CurrentHealth = context.Stats.GetCurrentHealth();
     }
 }
 

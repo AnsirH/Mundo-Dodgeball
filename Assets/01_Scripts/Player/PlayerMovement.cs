@@ -1,18 +1,15 @@
 ﻿using UnityEngine;
 using System;
-using UnityEngine.InputSystem;
 using Fusion;
 public class PlayerMovement : NetworkBehaviour
 {
     [SerializeField] private float rotateSpeed = 10f;
     [SerializeField] private float arrivalThreshold = 0.1f;
 
-    private Vector3 currentTargetPosition;
-    [Networked] private Vector3 CurrentPosition { get; set; }
-    [Networked] private Quaternion CurrentRotation { get; set; }
+    [Networked] private Vector3 currentTargetPosition { get; set; }
     [Networked] private Vector3 TargetDirection { get; set; }
 
-    public bool IsArrived { get { return Vector3.Distance(_cc.transform.position, currentTargetPosition) <= arrivalThreshold || currentTargetPosition == Vector3.zero; } }
+    public bool IsArrived { get { return Vector3.Distance(_cc.transform.position, currentTargetPosition) <= arrivalThreshold; } }
 
     private NetworkCharacterController _cc;
 
@@ -21,7 +18,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         this.context = context;
         _cc = GetComponent<NetworkCharacterController>();
-        CurrentPosition = transform.position;
+        _cc.maxSpeed = context.Stats.GetMoveSpeed();
     }
 
     public void Teleport(Vector3 targetPosition)
@@ -34,21 +31,11 @@ public class PlayerMovement : NetworkBehaviour
         _cc.transform.transform.rotation = rotation;
     }
 
-    public void MoveTowardTarget()
-    {
-        if (currentTargetPosition == Vector3.zero)
-        {
-            return;
-        }
-        Vector3 normalizedDirection = (currentTargetPosition - _cc.transform.position).normalized;
-        MoveForDeltaTime(normalizedDirection, Runner.DeltaTime);
-    }
-
     /// <summary>
     /// 이동 지점 설정
     /// </summary>
     /// <param name="targetPosition"></param>
-    public bool SetMovementTarget(Vector3 targetPosition)
+    public bool TrySetMovementTarget(Vector3 targetPosition)
     {
         targetPosition.y = 0.0f;
         currentTargetPosition = targetPosition;
@@ -59,18 +46,34 @@ public class PlayerMovement : NetworkBehaviour
                 currentTargetPosition = adjustedPoint;
             else
             {
-                currentTargetPosition = Vector3.zero;
+                currentTargetPosition = default;
             }
         }
 
-        if (currentTargetPosition == Vector3.zero) return false;
+        if (currentTargetPosition == default) return false;
+        else if (IsArrived)
+        {
+            currentTargetPosition = default;
+            return false;
+        }
         else return true;
     }
 
+    /// <summary>
+    /// 이동 정지. 현재 위치로 캐릭터 위치 지정
+    /// </summary>
+    public void StopMove()
+    {
+        currentTargetPosition = default;
+    }
+
+    /// <summary>
+    /// 이동 완료. 목적지로 캐릭터 위치 지정
+    /// </summary>
     public void CompleteMove()
     {
         _cc.Teleport(currentTargetPosition);
-        currentTargetPosition = Vector3.zero;
+        currentTargetPosition = default;
     }
 
     public void RotateForDeltaTime(Quaternion currentRotation, Vector3 direction, float rotateSpeed)
@@ -83,12 +86,30 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     //--- PRIVATE METHOD ---
-    private void MoveForDeltaTime(Vector3 normalizedDirection, float runnerDeltaTime)
+    private void MoveForDeltaTime(Vector3 normalizedDirection)
     {
-        //if (!Object.HasStateAuthority) return;
-        _cc.Move(context.Stats.GetMoveSpeed() * Runner.DeltaTime * normalizedDirection);
+        if (IsArrived)
+            return;
+        _cc.Move(/*context.Stats.GetMoveSpeed() * Runner.DeltaTime * */normalizedDirection);
+    }
+
+    private void MoveTowardTarget()
+    {
+        if (currentTargetPosition == default)
+        {
+            return;
+        }
+        Vector3 normalizedDirection = (currentTargetPosition - _cc.transform.position).normalized;
+        MoveForDeltaTime(normalizedDirection);
     }
 
     private IPlayerContext context;
 
+    public override void FixedUpdateNetwork()
+    {
+        if (currentTargetPosition != default)
+        {
+            MoveTowardTarget();
+        }
+    }
 }
