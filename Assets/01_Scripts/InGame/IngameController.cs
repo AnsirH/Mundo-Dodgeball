@@ -1,10 +1,12 @@
 using Fusion;
 using Fusion.Sockets;
+using Mundo_dodgeball.Player.StateMachine;
 using MyGame.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,10 +20,10 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
 
     public int ExpectedPlayerCount = 2;
 
-    private Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new();
+    private Dictionary<PlayerRef, IPlayerContext> spawnedCharacters = new();
     private HashSet<PlayerRef> playersCompletedSpawn = new();
 
-    public Dictionary<PlayerRef, NetworkObject> PlayerCharacters => spawnedCharacters;
+    public Dictionary<PlayerRef, IPlayerContext> PlayerCharacters => spawnedCharacters;
 
     public Ground Ground { get; private set; }
 
@@ -49,16 +51,14 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         Ground = FindFirstObjectByType<Ground>();
 
         //UIManager.instance.ChangeGame(false);
-
-
-        //if (Object.HasStateAuthority)
-        //{
-        //    _ = StartGameProcessAsync();
-        //}
     }
 
     public override void Spawned()
     {
+        if (Object.HasStateAuthority)
+        {
+            _ = StartGameProcessAsync();
+        }
     }
 
     private async Task StartGameProcessAsync()
@@ -105,7 +105,7 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         if (!playersCompletedSpawn.Contains(player))
         {
             playersCompletedSpawn.Add(player);
-            spawnedCharacters[player] = character;
+            spawnedCharacters[player] = character.GetComponent<IPlayerContext>();
         }
     }
 
@@ -139,11 +139,11 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         Runner.AddCallbacks(this);
 
         ingameUIController.gameObject.SetActive(true);
-        ingameUIController.Init_new(PlayerCharacters[Runner.LocalPlayer].GetComponent<IPlayerContext>());
+        ingameUIController.Init_new(PlayerCharacters[Runner.LocalPlayer]);
 
         foreach (var player in spawnedCharacters.Values)
         {
-            player.GetComponent<PlayerController>().enabled = true;
+            player.Movement.GetComponent<PlayerController>().enabled = true;
         }
     }
 
@@ -153,6 +153,19 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    public bool CheckPlayerDie(out PlayerRef playerRef)
+    {
+        playerRef = PlayerRef.None;
+        foreach (var player in spawnedCharacters.Values)
+        {
+            if (player.CurrentState is PlayerDieState)
+            {
+                playerRef = player.Runner.LocalPlayer;
+                return true;
+            }
+        }
+        return false;
+    }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
     }
@@ -246,20 +259,20 @@ public class IngameController : NetworkBehaviour, INetworkRunnerCallbacks
     {
     }
 
-    public void OnGUI()
-    {
-        if (Runner == null) return;
-        if (HasStateAuthority)
-        {
-            if (spawnedCharacters.Count > 0) return;
-            if (GUI.Button(new Rect(500, 500, 200, 100), "Start Game"))
-            {
-                _ = StartGameProcessAsync();
-            }
-        }
-        foreach (var player in Runner.ActivePlayers)
-        {
-            GUI.Label(new Rect(500, player.PlayerId * 100, 500, 100), player.PlayerId + " player is in");
-        }
-    }
+    //public void OnGUI()
+    //{
+    //    if (Runner == null) return;
+    //    if (HasStateAuthority)
+    //    {
+    //        if (spawnedCharacters.Count > 0) return;
+    //        if (GUI.Button(new Rect(500, 500, 200, 100), "Start Game"))
+    //        {
+    //            _ = StartGameProcessAsync();
+    //        }
+    //    }
+    //    foreach (var player in Runner.ActivePlayers)
+    //    {
+    //        GUI.Label(new Rect(500, player.PlayerId * 100, 500, 100), player.PlayerId + " player is in");
+    //    }
+    //}
 }

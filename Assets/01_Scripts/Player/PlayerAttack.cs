@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using Mundo_dodgeball.Projectile;
 using TMPro;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class PlayerAttack : NetworkBehaviour
@@ -11,7 +12,9 @@ public class PlayerAttack : NetworkBehaviour
     [Networked] public int AttackCount { get; set; } = 0;
     public float CoolTime => CoolTimer.RemainingTime(Runner).HasValue ? CoolTimer.RemainingTime(Runner).Value : 0.0f;
     public bool Attacking { get { return !AttackTimer.ExpiredOrNotRunning(Runner); } }
-    
+
+    public bool IsActivating => indicator.activeSelf;
+
 
     [Header("References")]
     [SerializeField] private NetworkPrefabRef axePrefab;
@@ -29,10 +32,10 @@ public class PlayerAttack : NetworkBehaviour
 
     private Vector3 targetPoint;
 
-
     public void Initialize(IPlayerContext context)
     {
         this.context = context;
+        indicator.SetActive(false);
     }
 
 
@@ -43,6 +46,7 @@ public class PlayerAttack : NetworkBehaviour
             AttackCount++;
         AttackTimer = TickTimer.CreateFromSeconds(Runner, attackDuration);
         axeObj.SetActive(false);
+        indicator.SetActive(false);
     }
 
     private void SetTargetPoint(Vector3 point)
@@ -78,6 +82,11 @@ public class PlayerAttack : NetworkBehaviour
             {
                 o.GetComponent<ProjectileBase>().Init(startPos, direction, context.Stats.GetAttackPower(), Object.InputAuthority);
             });
+    }
+
+    public void ActiveIndicator(bool active)
+    {
+        indicator.SetActive(active);
     }
 
     public override void Render()
