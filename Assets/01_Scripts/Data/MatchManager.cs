@@ -86,6 +86,7 @@ public class MatchManager : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_UpdateScoreUI(int host, int client)
     {
+        Debug.Log("[MatchManager] RPC_UpdateScoreUI 호출: 호스트 점수 = " + host + ", 클라이언트 점수 = " + client);
         IngameController.Instance.ingameUIController.Init((host, client));
     }
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -134,7 +135,7 @@ public class MatchManager : NetworkBehaviour
             {
                 if (player.Player == ServerManager.Instance.roomController.runner.LocalPlayer)
                 {
-                    if (player.Score >= 3)
+                    if (player.Score < 3)
                     {
                         win = true;
                     }

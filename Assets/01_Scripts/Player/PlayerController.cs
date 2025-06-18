@@ -43,6 +43,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
     // Unity Components
     public Animator Anim => anim;
 
+    private bool isAleadyDead = false;
     public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
     {
         if (Object.HasStateAuthority)
@@ -71,6 +72,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
         health.Initialize(this);
         playerSpell.Initialize(this);
         sound.Init();
+        isAleadyDead = false;
         stats = new PlayerStats();
     }
 
@@ -81,7 +83,15 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
 
     public override void FixedUpdateNetwork()
     {
-        if (CurrentState is PlayerDieState) return;
+        if (CurrentState is PlayerDieState && !isAleadyDead)
+        {
+            isAleadyDead = true;
+            PlayerRef playerRef;
+            if (IngameController.Instance.CheckPlayerDie(out playerRef))
+            {
+                ServerManager.Instance.matchManager.RPC_RequestAddScore(playerRef, 1); // 플레이어가 죽으면 점수 추가
+            }
+        }
 
         if (GetInput(out NetworkInputData data))
         {
