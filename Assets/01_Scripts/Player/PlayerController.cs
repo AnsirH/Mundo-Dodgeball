@@ -48,14 +48,15 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
     public bool isTestMode = false;
     public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
     {
-        if (Object.HasStateAuthority)
-        {
-            RPC_ChangeState(state, inputData);
-        }
-        else
-        {
-            stateMachine.ChangeState(state, inputData);
-        }
+        stateMachine.ChangeState(state, inputData);
+        //if (Object.HasStateAuthority)
+        //{
+        //    RPC_ChangeState(state, inputData);
+        //}
+        //else
+        //{
+        //    stateMachine.ChangeState(state, inputData);
+        //}
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -97,22 +98,6 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
 
         if (GetInput(out NetworkInputData data))
         {
-            if (data.buttons.IsSet(NetworkInputData.BUTTONSTOP)) // 스탑 버튼
-            {
-                if (CurrentState is PlayerAttackState) return;
-                ChangeState(EPlayerState.Idle);
-            }
-            if (data.buttons.IsSet(NetworkInputData.BUTTONQ)) // Q 버튼
-            {
-                if (CurrentState is PlayerAttackState || attack.CoolTime > 0.0f) return;
-                attack.ActivateIndicator(!attack.IsActivating);
-            }
-            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
-            {
-                if (CurrentState is PlayerAttackState || attack.CoolTime > 0.0f || !attack.IsActivating) return;
-                if (data.targetPoint == Vector3.zero) return;
-                ChangeState(EPlayerState.Attack, new(data.targetPoint));
-            }
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1)) // 우클릭
             {
                 if (ObjectPooler.Instance != null)
@@ -124,6 +109,23 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
                 attack.ActivateIndicator(false);
                 if (data.movePoint == Vector3.zero) return;
                 ChangeState(EPlayerState.Move, new(data.movePoint));
+            }
+            if (data.buttons.IsSet(NetworkInputData.BUTTONSTOP)) // 스탑 버튼
+            {
+                if (CurrentState is PlayerAttackState) return;
+                ChangeState(EPlayerState.Idle);
+            }
+            if (data.buttons.IsSet(NetworkInputData.BUTTONQ)) // Q 버튼
+            {
+                if (CurrentState is PlayerAttackState || attack.CoolTime > 0.0f) return;
+                if (HasInputAuthority)
+                    attack.ActivateIndicator(!attack.IsActivating);
+            }
+            if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
+            {
+                if (CurrentState is PlayerAttackState || attack.CoolTime > 0.0f || !attack.IsActivating) return;
+                if (data.targetPoint == Vector3.zero) return;
+                ChangeState(EPlayerState.Attack, new(data.targetPoint));
             }
             if (data.buttons.IsSet(NetworkInputData.BUTTOND)) // D 스펠
             {

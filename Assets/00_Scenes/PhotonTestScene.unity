@@ -230,7 +230,7 @@ PrefabInstance:
       objectReference: {fileID: 397414227}
     - target: {fileID: 1003683060756051068, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
       propertyPath: ExpectedPlayerCount
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2266615268428736154, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
       propertyPath: m_Name

@@ -16,30 +16,22 @@ public class PlayerMovement : NetworkBehaviour
 
     private NetworkCharacterController _cc;
 
-    public override void Render()
-    {
-        _cc.transform.position = CurrentPosition;
-        _cc.transform.rotation = CurrentRotation;
-    }
 
     public void Initialize(IPlayerContext context)
     {
         this.context = context;
         _cc = GetComponent<NetworkCharacterController>();
-        CurrentPosition = _cc.transform.position;
-        CurrentRotation = _cc.transform.rotation;
+        CurrentPosition = transform.position;
     }
 
     public void Teleport(Vector3 targetPosition)
     {
         _cc.Teleport(targetPosition);
-        CurrentPosition = _cc.transform.position;
     }
 
     public void SetRotation(Quaternion rotation)
     {
         _cc.transform.transform.rotation = rotation;
-        CurrentRotation = rotation;
     }
 
     public void MoveTowardTarget()
@@ -58,7 +50,6 @@ public class PlayerMovement : NetworkBehaviour
     /// <param name="targetPosition"></param>
     public bool SetMovementTarget(Vector3 targetPosition)
     {
-        _cc.Velocity = Vector3.zero;
         targetPosition.y = 0.0f;
         currentTargetPosition = targetPosition;
 
@@ -88,18 +79,16 @@ public class PlayerMovement : NetworkBehaviour
         
         TargetDirection = direction;
         Quaternion targetRotation = Quaternion.LookRotation(direction);
-        CurrentRotation = Quaternion.Slerp(currentRotation, targetRotation, rotateSpeed * Runner.DeltaTime);
-        _cc.transform.rotation = CurrentRotation;
+        _cc.transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, rotateSpeed * Runner.DeltaTime);
     }
 
     //--- PRIVATE METHOD ---
     private void MoveForDeltaTime(Vector3 normalizedDirection, float runnerDeltaTime)
     {
         //if (!Object.HasStateAuthority) return;
-        _cc.Move(context.Stats.GetMoveSpeed() * runnerDeltaTime * normalizedDirection);
-        CurrentPosition = _cc.transform.position;
-        CurrentRotation = _cc.transform.rotation;
+        _cc.Move(context.Stats.GetMoveSpeed() * Runner.DeltaTime * normalizedDirection);
     }
 
     private IPlayerContext context;
+
 }

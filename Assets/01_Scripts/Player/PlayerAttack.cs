@@ -96,12 +96,6 @@ public class PlayerAttack : NetworkBehaviour
 
         if (CoolTime > 0 && axeObj.activeSelf) axeObj.SetActive(false);
         else if (CoolTime == 0 && !axeObj.activeSelf) axeObj.SetActive(true);
-
-        if (IsActivating)
-        {
-            Vector3 targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
-            indicator.transform.rotation = Quaternion.LookRotation((targetPoint - transform.position).normalized);
-        }
     }
 
     public void ResetCoolTime()
@@ -110,5 +104,15 @@ public class PlayerAttack : NetworkBehaviour
         {
             CoolTimer = TickTimer.None;
         }
+    }
+
+    private void Update()
+    {
+        if (IsActivating)
+        {
+            Vector3 targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+            indicator.transform.rotation = Quaternion.LookRotation((targetPoint - transform.position).normalized);
+        }
+
     }
 }
