@@ -6,5 +6,5 @@ public class HpBarHUD : MonoBehaviour
     [Header("References")]
     [SerializeField] GameObject _hpBarPrefab;
 
-    private Dictionary<IPlayerContext, HpBar> 
+    //private Dictionary<IPlayerContext, HpBar> 
 }
