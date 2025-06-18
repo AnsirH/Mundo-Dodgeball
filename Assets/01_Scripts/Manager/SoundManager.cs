@@ -68,7 +68,7 @@ public class SoundManager : ManagerBase<SoundManager>
     {
         foreach (var playerContent in playerContexts)
         {
-            AddSourceToGroup(playerContent.Audio, sfxGroup);
+            AddSourceToGroup(playerContent.Sound.Audio, sfxGroup);
         }
     }
 
@@ -79,6 +79,7 @@ public class SoundManager : ManagerBase<SoundManager>
 
     public void PlayOneShot(AudioSource source, AudioClip clip)
     {
+        if (source.outputAudioMixerGroup == null) source.outputAudioMixerGroup = sfxGroup;
         source.PlayOneShot(clip);
     }
 }

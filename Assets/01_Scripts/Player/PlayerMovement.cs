@@ -16,6 +16,12 @@ public class PlayerMovement : NetworkBehaviour
 
     private NetworkCharacterController _cc;
 
+    public override void Render()
+    {
+        _cc.transform.position = CurrentPosition;
+        _cc.transform.rotation = CurrentRotation;
+    }
+
     public void Initialize(IPlayerContext context)
     {
         this.context = context;
@@ -27,6 +33,13 @@ public class PlayerMovement : NetworkBehaviour
     public void Teleport(Vector3 targetPosition)
     {
         _cc.Teleport(targetPosition);
+        CurrentPosition = _cc.transform.position;
+    }
+
+    public void SetRotation(Quaternion rotation)
+    {
+        _cc.transform.transform.rotation = rotation;
+        CurrentRotation = rotation;
     }
 
     public void MoveTowardTarget()

@@ -18,7 +18,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
 
     [SerializeField] private Animator anim;
 
-    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private PlayerSound sound;
 
     // 이동
     [SerializeField] private PlayerMovement movement;
@@ -38,10 +38,10 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
     public PlayerAttack Attack => attack;
     public PlayerHealth Health => health;
     public PlayerSpellActuator Spell => playerSpell;
+    public PlayerSound Sound => sound;
 
     // Unity Components
     public Animator Anim => anim;
-    public AudioSource Audio => audioSource;
 
     public void ChangeState(EPlayerState state, StateTransitionInputData inputData = new())
     {
@@ -70,6 +70,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
         attack.Initialize(this);
         health.Initialize(this);
         playerSpell.Initialize(this);
+        sound.Init();
         stats = new PlayerStats();
     }
 
@@ -84,6 +85,11 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
 
         if (GetInput(out NetworkInputData data))
         {
+            if (data.buttons.IsSet(NetworkInputData.BUTTONSTOP)) // 스탑 버튼
+            {
+                if (CurrentState is PlayerAttackState) return;
+                ChangeState(EPlayerState.Idle);
+            }
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0)) // 좌클릭
             {
                 if (CurrentState is PlayerAttackState || attack.CoolTime > 0.0f) return;
@@ -92,18 +98,23 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
             }
             if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON1)) // 우클릭
             {
+                if (ObjectPooler.Instance != null)
+                {
+                    GameObject clickEffect = ObjectPooler.GetLocal("MoveClickEffect");
+                    clickEffect.transform.position = data.movePoint;
+                }
                 if (CurrentState is PlayerAttackState) return;
                 if (data.movePoint == Vector3.zero) return;
                 ChangeState(EPlayerState.Move, new(data.movePoint));
             }
-            if (data.buttons.IsSet(NetworkInputData.BUTTOND))
+            if (data.buttons.IsSet(NetworkInputData.BUTTOND)) // D 스펠
             {
                 if (data.targetPoint == Vector3.zero) return;
 
                 playerSpell.ExecuteD(data.targetPoint);
             }
 
-            if (data.buttons.IsSet(NetworkInputData.BUTTONF))
+            if (data.buttons.IsSet(NetworkInputData.BUTTONF)) // F 스펠
             {
                 if (data.targetPoint == Vector3.zero) return;
 

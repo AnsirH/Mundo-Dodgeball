@@ -6,10 +6,10 @@ using UnityEngine;
 public class PlayerHealth : NetworkBehaviour, IDamageable
 {
     private IPlayerContext context;
+
     //[SerializeField] MMF_Player damageTestController;
     //private MMF_FloatingText mMF_FloatingText;
     [Networked] public float CurrentHealth { get; set; }
-
 
     public bool IsDead => CurrentHealth <= 0.0f;
     public float HealthPercentage => CurrentHealth / context.Stats.GetMaxHealth();
@@ -42,6 +42,7 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
 
         context.Stats.ModifyCurrentHealth(-damage);
         CurrentHealth = context.Stats.GetCurrentHealth();
+        context.Sound.PlayOneShot_Hit();
     }
 
     public void Heal(float healAmount)

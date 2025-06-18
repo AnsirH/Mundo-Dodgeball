@@ -8,6 +8,7 @@ public struct NetworkInputData : INetworkInput
     public const byte BUTTONQ = 3;
     public const byte BUTTOND = 4;
     public const byte BUTTONF = 5;
+    public const byte BUTTONSTOP = 6;
 
     public Vector3 movePoint;
     public Vector3 targetPoint;

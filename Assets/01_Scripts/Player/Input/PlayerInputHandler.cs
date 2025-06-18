@@ -8,6 +8,7 @@ public class PlayerInputHandler : MonoBehaviour
     public bool ButtonQ { get; private set; }
     public bool ButtonD { get; private set; }
     public bool ButtonF { get; private set; }
+    public bool ButtonStopMove { get; private set; }
 
     private InputActionMap mainActionMap;
     private PlayerInput playerInput;
@@ -21,6 +22,7 @@ public class PlayerInputHandler : MonoBehaviour
         mainActionMap.FindAction("Q").performed += ctx => ButtonQ = true;
         mainActionMap.FindAction("D").performed += ctx => ButtonD = true;
         mainActionMap.FindAction("F").performed += ctx => ButtonF = true;
+        mainActionMap.FindAction("StopMove").performed += ctx => ButtonStopMove = true;
 
     }
 
@@ -36,5 +38,6 @@ public class PlayerInputHandler : MonoBehaviour
         ButtonQ = false;
         ButtonD = false;
         ButtonF = false;
+        ButtonStopMove = false;
     }
 }
