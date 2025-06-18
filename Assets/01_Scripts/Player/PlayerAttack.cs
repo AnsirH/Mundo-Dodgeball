@@ -11,7 +11,7 @@ public class PlayerAttack : NetworkBehaviour
     [Networked] public int AttackCount { get; set; } = 0;
     public float CoolTime => CoolTimer.RemainingTime(Runner).HasValue ? CoolTimer.RemainingTime(Runner).Value : 0.0f;
     public bool Attacking { get { return !AttackTimer.ExpiredOrNotRunning(Runner); } }
-
+    
 
     [Header("References")]
     [SerializeField] private NetworkPrefabRef axePrefab;
@@ -19,6 +19,8 @@ public class PlayerAttack : NetworkBehaviour
 
     // 캐릭터 도끼 모델링
     [SerializeField] private GameObject axeObj;
+
+    [SerializeField] private GameObject indicator;
 
     [SerializeField] private float rotationSpeed = 8.0f;
 
