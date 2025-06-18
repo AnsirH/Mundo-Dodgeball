@@ -6,28 +6,10 @@ using UnityEngine;
 public class PlayerHealth : NetworkBehaviour, IDamageable
 {
     private IPlayerContext context;
-
-    //[SerializeField] MMF_Player damageTestController;
-    //private MMF_FloatingText mMF_FloatingText;
     [Networked] public float CurrentHealth { get; set; }
 
     public bool IsDead => CurrentHealth <= 0.0f;
     public float HealthPercentage => CurrentHealth / context.Stats.GetMaxHealth();
-    
-    
-    public RectTransform testHpBar;
-
-    //private void Start()
-    //{
-    //    foreach (var feedback in damageTestController.FeedbacksList)
-    //    {
-    //        if (feedback is MMF_FloatingText ft)
-    //        {
-    //            mMF_FloatingText = ft;
-    //            break;
-    //        }
-    //    }
-    //}
 
     public void Initialize(IPlayerContext context)
     {
@@ -56,26 +38,6 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
     public override void Render()
     {
         if (context == null) return;
-        if (testHpBar != null)
-        {
-            testHpBar.localScale = new Vector3(HealthPercentage, 1.0f, 1.0f);
-        }
-    }
-
-    private void OnGUI()
-    {
-        if (context == null || !Object.HasInputAuthority) return;
-        GUI.Label(new Rect(0 + Object.InputAuthority.PlayerId * 200, 10, 300, 100), "Current Health" + CurrentHealth);
-
-        if (GUI.Button(new Rect(0, 200, 300, 100), "Die"))
-        {
-            //stats.SetCurrentHealth(0.0f);
-            context.ChangeState(EPlayerState.Die);
-        }
-        if (GUI.Button(new Rect(0, 300, 300, 100), "TakeDamage 30"))
-        {
-            TakeDamage(30);
-        }
     }
 }
 

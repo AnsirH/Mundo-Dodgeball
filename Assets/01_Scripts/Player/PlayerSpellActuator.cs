@@ -70,6 +70,15 @@ public class PlayerSpellActuator : NetworkBehaviour
         }
     }
 
+    public void ResetCoolTime()
+    {
+        if (CoolTimerD.IsRunning)
+            CoolTimerD = TickTimer.None;
+
+        if (CoolTimerF.IsRunning)
+            CoolTimerF = TickTimer.None;
+    }
+
     public IPlayerContext context;
 
     public SpellData spellD;

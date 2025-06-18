@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using Mundo_dodgeball.Projectile;
+using MyGame.Utils;
 using TMPro;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
@@ -35,7 +36,7 @@ public class PlayerAttack : NetworkBehaviour
     public void Initialize(IPlayerContext context)
     {
         this.context = context;
-        indicator.SetActive(false);
+        ActivateIndicator(false);
     }
 
 
@@ -46,7 +47,7 @@ public class PlayerAttack : NetworkBehaviour
             AttackCount++;
         AttackTimer = TickTimer.CreateFromSeconds(Runner, attackDuration);
         axeObj.SetActive(false);
-        indicator.SetActive(false);
+        ActivateIndicator(false);
     }
 
     private void SetTargetPoint(Vector3 point)
@@ -84,7 +85,7 @@ public class PlayerAttack : NetworkBehaviour
             });
     }
 
-    public void ActiveIndicator(bool active)
+    public void ActivateIndicator(bool active)
     {
         indicator.SetActive(active);
     }
@@ -95,5 +96,19 @@ public class PlayerAttack : NetworkBehaviour
 
         if (CoolTime > 0 && axeObj.activeSelf) axeObj.SetActive(false);
         else if (CoolTime == 0 && !axeObj.activeSelf) axeObj.SetActive(true);
+
+        if (IsActivating)
+        {
+            Vector3 targetPoint = GroundClick.GetMousePosition(Camera.main, LayerMask.GetMask("Ground"));
+            indicator.transform.rotation = Quaternion.LookRotation((targetPoint - transform.position).normalized);
+        }
+    }
+
+    public void ResetCoolTime()
+    {
+        if (CoolTimer.IsRunning)
+        {
+            CoolTimer = TickTimer.None;
+        }
     }
 }
