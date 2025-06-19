@@ -137,6 +137,7 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
         stateMachine.NetworkUpdated(Runner.DeltaTime);
     }
 
+# if UNITY_EDITOR
     private void OnGUI()
     {
         if (!Object.HasInputAuthority) return;
@@ -169,4 +170,5 @@ public class PlayerController : NetworkBehaviour, IPlayerContext
             }
         }
     }
+#endif
 }

@@ -43,6 +43,10 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
     public override void FixedUpdateNetwork()
     {
         if (IsDead) return;
+        if (context.CurrentState is not PlayerDieState && CurrentHealth <= 0.0f)
+        {
+            context.ChangeState(EPlayerState.Die);
+        }
         context.Stats.SetCurrentHealth(CurrentHealth);
         if (context.Stats.HandleHealthRegen(Runner.DeltaTime, out float regendHealth))
             CurrentHealth = regendHealth;
