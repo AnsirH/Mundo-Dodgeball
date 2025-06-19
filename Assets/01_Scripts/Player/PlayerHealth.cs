@@ -43,8 +43,10 @@ public class PlayerHealth : NetworkBehaviour, IDamageable
     public override void FixedUpdateNetwork()
     {
         if (IsDead) return;
-        context.Stats.HandleHealthRegen(Runner.DeltaTime);
-        CurrentHealth = context.Stats.GetCurrentHealth();
+        context.Stats.SetCurrentHealth(CurrentHealth);
+        if (context.Stats.HandleHealthRegen(Runner.DeltaTime, out float regendHealth))
+            CurrentHealth = regendHealth;
+        //CurrentHealth = context.Stats.GetCurrentHealth();
     }
 }
 
