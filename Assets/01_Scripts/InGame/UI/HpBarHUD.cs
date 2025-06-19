@@ -36,6 +36,17 @@ public class HpBarHUD : MonoBehaviour
         // 화면 좌표 (픽셀 단위)
         Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
 
+        float updatedHealthRatio = 100;
+
+        try
+        {
+            updatedHealthRatio = playerContext.Health.CurrentHealth / playerContext.Stats.GetMaxHealth();
+        }
+        catch
+        {
+            updatedHealthRatio = 0.0f;
+        }
+
         // Canvas 상의 로컬 좌표로 변환
         Vector2 anchoredPos;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -49,13 +60,13 @@ public class HpBarHUD : MonoBehaviour
             if (spawnedHpBars.TryGetValue(playerContext, out var hpBar))
             {
                 hpBar.RectTransform.anchoredPosition = anchoredPos;
-                hpBar.UpdateHpBar(playerContext.Health.CurrentHealth / playerContext.Stats.GetMaxHealth());
+                hpBar.UpdateHpBar(updatedHealthRatio);
             }
             else
             {
                 HpBar newHpBar = CreateHpBar(playerContext);
                 newHpBar.RectTransform.anchoredPosition = anchoredPos;
-                newHpBar.UpdateHpBar(playerContext.Health.CurrentHealth / playerContext.Stats.GetMaxHealth());
+                newHpBar.UpdateHpBar(updatedHealthRatio);
             }
         }
     }

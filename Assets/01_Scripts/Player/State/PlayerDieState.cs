@@ -31,5 +31,6 @@ namespace Mundo_dodgeball.Player.StateMachine
         public override void UpdateState()
         {
         }
+        //[Networked]
     }
 }

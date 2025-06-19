@@ -230,7 +230,7 @@ PrefabInstance:
       objectReference: {fileID: 397414227}
     - target: {fileID: 1003683060756051068, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
       propertyPath: ExpectedPlayerCount
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2266615268428736154, guid: 3ff66937e9eba954a8c586ad8a46ffbb, type: 3}
       propertyPath: m_Name
@@ -376,6 +376,9 @@ MonoBehaviour:
   sfxGroup: {fileID: 1777681858334648493, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
   bgmGroup: {fileID: -4595131212846509569, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
   bgmSource: {fileID: 0}
+  ingameBgmSource: {fileID: 0}
+  inGameBGM_1: {fileID: 0}
+  inGameBGM_2: {fileID: 0}
   lobbyBGM: {fileID: 8300000, guid: c9a2cfb4c107c754588bbaa4ff6e5a46, type: 3}
   uiSfxSource: {fileID: 0}
   buttonClickClip: {fileID: 8300000, guid: 6df8ab6c51059e7478d3edefd02dd7b9, type: 3}
