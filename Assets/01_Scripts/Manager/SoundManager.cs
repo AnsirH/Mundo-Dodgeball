@@ -15,6 +15,7 @@ public class SoundManager : ManagerBase<SoundManager>
 
     [Header("오디오 소스")]
     public AudioSource bgmSource;
+    public AudioSource ingameBgmSource;
     public AudioClip inGameBGM_1;
     public AudioClip inGameBGM_2;
     public AudioClip lobbyBGM;
@@ -33,15 +34,12 @@ public class SoundManager : ManagerBase<SoundManager>
     // 로비/메뉴 (OutGame) 볼륨 조절
     public void SetOutGameVolume(float volume)
     {
-        float dB = Mathf.Lerp(MIN_DB, MAX_DB, volume);
-        audioMixer.SetFloat("OutGameVolume", dB);
-        audioMixer.FindMatchingGroups("Master/OutGameGroup");
+        bgmSource.volume = volume;
     }
     // 인게임 (InGame) 볼륨 조절
     public void SetInGameVolume(float volume)
     {
-        float dB = Mathf.Lerp(MIN_DB, MAX_DB, volume);
-        audioMixer.SetFloat("InGameVolume", dB);
+        ingameBgmSource.volume = volume;
     }
 
     // 버튼에 연결할 함수
@@ -73,16 +71,15 @@ public class SoundManager : ManagerBase<SoundManager>
             // 로비 BGM 재생
             if (inGameBGM_1 != null && result == 0)
             {
-                bgmSource.clip = inGameBGM_1;
+                ingameBgmSource.clip = inGameBGM_1;
             }
-            else if (bgmSource != null && result == 1)
+            else if (ingameBgmSource != null && result == 1)
             {
-                bgmSource.clip = inGameBGM_2;
+                ingameBgmSource.clip = inGameBGM_2;
             }
-            bgmSource.loop = true;
-            bgmSource.Play();
+            ingameBgmSource.loop = true;
+            ingameBgmSource.Play();
         }
-        SetOutGameVolume(1);
     }
 
     public void SetPlayerAudioGroup(List<IPlayerContext> playerContexts)
