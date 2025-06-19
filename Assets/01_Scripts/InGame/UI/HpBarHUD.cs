@@ -44,6 +44,7 @@ public class HpBarHUD : MonoBehaviour
             Camera.main,
             out anchoredPos))
         {
+            anchoredPos.y += 60f;
             // 체력바 등록 or 갱신
             if (spawnedHpBars.TryGetValue(playerContext, out var hpBar))
             {
