@@ -127,7 +127,7 @@ public class MatchManager : NetworkBehaviour
         IngameController.Instance.ingameUIController.addScore(idx);
         if(end)
         {
-            Invoke(nameof(NextRound), 0.7f);
+            Invoke(nameof(NextRound), 3f);
         }
         else // 게임 끝내기
         {
@@ -143,7 +143,7 @@ public class MatchManager : NetworkBehaviour
                 }
             }
             IngameController.Instance.ingameUIController.OnEndGameResult(win);
-            Invoke(nameof(EndGame), 1f);
+            Invoke(nameof(EndGame), 3f);
         }
     }
     public void EndGame()

@@ -2910,8 +2910,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c8c171aa345e8844e9af88242dec7139, type: 3}
   - {fileID: 21300000, guid: 2443f2f0e359d6c4cb5f9a83dac73483, type: 3}
   winAndLoseImageList:
-  - {fileID: 21300000, guid: b77ce469bdcea66448443065f75092fd, type: 3}
   - {fileID: 21300000, guid: 50c86e0914689054baea4c9d1e904ded, type: 3}
+  - {fileID: 21300000, guid: b77ce469bdcea66448443065f75092fd, type: 3}
 --- !u!1 &1187022772
 GameObject:
   m_ObjectHideFlags: 0
@@ -3550,6 +3550,7 @@ MonoBehaviour:
   sfxGroup: {fileID: 1777681858334648493, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
   bgmGroup: {fileID: -4595131212846509569, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
   bgmSource: {fileID: 145478167}
+  ingameBgmSource: {fileID: 0}
   inGameBGM_1: {fileID: 8300000, guid: c476071ae5b7a3d498788a046ba3b10d, type: 3}
   inGameBGM_2: {fileID: 8300000, guid: 7036e1f27a1570e448ceb27ee9eb76cb, type: 3}
   lobbyBGM: {fileID: 8300000, guid: d614d8c36d9a66d4d9943db95ce8c30c, type: 3}
