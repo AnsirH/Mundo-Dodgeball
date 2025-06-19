@@ -15,12 +15,15 @@ public class SoundManager : ManagerBase<SoundManager>
 
     [Header("오디오 소스")]
     public AudioSource bgmSource;
+    public AudioSource ingameBgmSource;
+    public AudioClip inGameBGM_1;
+    public AudioClip inGameBGM_2;
     public AudioClip lobbyBGM;
 
     public AudioSource uiSfxSource;
     public AudioClip buttonClickClip;
     // dB 최소/최대 (볼륨 0~1 → dB 변환 시)
-    private const float MIN_DB = -80f;
+    private const float MIN_DB = -2000f;
     private const float MAX_DB = -20f;
 
     protected override void Awake()
@@ -31,15 +34,12 @@ public class SoundManager : ManagerBase<SoundManager>
     // 로비/메뉴 (OutGame) 볼륨 조절
     public void SetOutGameVolume(float volume)
     {
-        float dB = Mathf.Lerp(MIN_DB, MAX_DB, volume);
-        audioMixer.SetFloat("OutGameVolume", dB);
-        audioMixer.FindMatchingGroups("Master/OutGameGroup");
+        bgmSource.volume = volume;
     }
     // 인게임 (InGame) 볼륨 조절
     public void SetInGameVolume(float volume)
     {
-        float dB = Mathf.Lerp(MIN_DB, MAX_DB, volume);
-        audioMixer.SetFloat("InGameVolume", dB);
+        ingameBgmSource.volume = volume;
     }
 
     // 버튼에 연결할 함수
@@ -55,12 +55,30 @@ public class SoundManager : ManagerBase<SoundManager>
     // out BGM 시작
     public void PlayOutGameBGM(Scene scene, LoadSceneMode mode)
     {
-        // 로비 BGM 재생
-        if (bgmSource != null && lobbyBGM != null)
+        if (SceneManager.GetActiveScene().buildIndex == 0)
         {
-            bgmSource.clip = lobbyBGM;
-            bgmSource.loop = true;
-            bgmSource.Play();
+            // 로비 BGM 재생
+            if (bgmSource != null && lobbyBGM != null)
+            {
+                bgmSource.clip = lobbyBGM;
+                bgmSource.loop = true;
+                bgmSource.Play();
+            }
+        }
+        else if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            int result = Random.Range(0, 2); // 0 또는 1
+            // 로비 BGM 재생
+            if (inGameBGM_1 != null && result == 0)
+            {
+                ingameBgmSource.clip = inGameBGM_1;
+            }
+            else if (ingameBgmSource != null && result == 1)
+            {
+                ingameBgmSource.clip = inGameBGM_2;
+            }
+            ingameBgmSource.loop = true;
+            ingameBgmSource.Play();
         }
     }
 

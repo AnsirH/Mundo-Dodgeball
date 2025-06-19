@@ -3547,10 +3547,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioMixer: {fileID: 24100000, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
-  sfxGroup: {fileID: 0}
-  bgmGroup: {fileID: 0}
+  sfxGroup: {fileID: 1777681858334648493, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
+  bgmGroup: {fileID: -4595131212846509569, guid: 03d7955e1a3acc3479de1e05be9e99f2, type: 2}
   bgmSource: {fileID: 145478167}
-  lobbyBGM: {fileID: 8300000, guid: c9a2cfb4c107c754588bbaa4ff6e5a46, type: 3}
+  inGameBGM_1: {fileID: 8300000, guid: c476071ae5b7a3d498788a046ba3b10d, type: 3}
+  inGameBGM_2: {fileID: 8300000, guid: 7036e1f27a1570e448ceb27ee9eb76cb, type: 3}
+  lobbyBGM: {fileID: 8300000, guid: d614d8c36d9a66d4d9943db95ce8c30c, type: 3}
   uiSfxSource: {fileID: 985292473}
   buttonClickClip: {fileID: 8300000, guid: 6df8ab6c51059e7478d3edefd02dd7b9, type: 3}
 --- !u!1 &1447115821
