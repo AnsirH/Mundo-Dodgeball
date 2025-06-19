@@ -12,7 +12,7 @@ public class TopPanelUI : MonoBehaviour
     private bool timerRunning = false;
     private Color defaultColor = Color.white;
     private Coroutine blinkCoroutine;
-
+    private bool isTimerEnded = false;
     public void StartTimer(int minutes, int seconds)
     {
         remainingTime = minutes * 60 + seconds;
@@ -50,6 +50,12 @@ public class TopPanelUI : MonoBehaviour
         int mins = Mathf.FloorToInt(remainingTime / 60);
         int secs = Mathf.FloorToInt(remainingTime % 60);
         timerText.text = $"{mins:00}:{secs:00}";
+
+        if (!isTimerEnded && remainingTime <= 0f)
+        {
+            isTimerEnded = true;
+            ServerManager.Instance.matchManager.RPC_TimeOver(); // 원하는 함수 호출
+        }
     }
 
     private IEnumerator BlinkTimerColor()

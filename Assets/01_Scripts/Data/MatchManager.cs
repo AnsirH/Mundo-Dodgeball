@@ -166,4 +166,12 @@ public class MatchManager : NetworkBehaviour
 
         return first.Score > second.Score ? first.Player : second.Player;
     }
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_TimeOver()
+    {
+        PlayerRef topPlayerRef = IngameController.Instance.PlayerCharacters
+        .OrderByDescending(kv => kv.Value.Health.CurrentHealth)
+        .First().Key;
+        RPC_RequestAddScore(topPlayerRef);
+    }
 }
