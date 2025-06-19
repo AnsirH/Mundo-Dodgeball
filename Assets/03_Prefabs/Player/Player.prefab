@@ -1378,7 +1378,7 @@ MonoBehaviour:
     MaxHealth:
       baseValue: 100
     MoveSpeed:
-      baseValue: 3.5
+      baseValue: 3
     AttackCooldown:
       baseValue: 4.5
     HealthRegen:
