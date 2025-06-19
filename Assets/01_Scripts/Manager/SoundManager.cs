@@ -15,12 +15,14 @@ public class SoundManager : ManagerBase<SoundManager>
 
     [Header("오디오 소스")]
     public AudioSource bgmSource;
+    public AudioClip inGameBGM_1;
+    public AudioClip inGameBGM_2;
     public AudioClip lobbyBGM;
 
     public AudioSource uiSfxSource;
     public AudioClip buttonClickClip;
     // dB 최소/최대 (볼륨 0~1 → dB 변환 시)
-    private const float MIN_DB = -80f;
+    private const float MIN_DB = -2000f;
     private const float MAX_DB = -20f;
 
     protected override void Awake()
@@ -55,13 +57,32 @@ public class SoundManager : ManagerBase<SoundManager>
     // out BGM 시작
     public void PlayOutGameBGM(Scene scene, LoadSceneMode mode)
     {
-        // 로비 BGM 재생
-        if (bgmSource != null && lobbyBGM != null)
+        if (SceneManager.GetActiveScene().buildIndex == 0)
         {
-            bgmSource.clip = lobbyBGM;
+            // 로비 BGM 재생
+            if (bgmSource != null && lobbyBGM != null)
+            {
+                bgmSource.clip = lobbyBGM;
+                bgmSource.loop = true;
+                bgmSource.Play();
+            }
+        }
+        else if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            int result = Random.Range(0, 2); // 0 또는 1
+            // 로비 BGM 재생
+            if (inGameBGM_1 != null && result == 0)
+            {
+                bgmSource.clip = inGameBGM_1;
+            }
+            else if (bgmSource != null && result == 1)
+            {
+                bgmSource.clip = inGameBGM_2;
+            }
             bgmSource.loop = true;
             bgmSource.Play();
         }
+        SetOutGameVolume(1);
     }
 
     public void SetPlayerAudioGroup(List<IPlayerContext> playerContexts)
