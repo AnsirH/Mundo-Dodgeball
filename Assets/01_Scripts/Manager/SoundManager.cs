@@ -55,6 +55,7 @@ public class SoundManager : ManagerBase<SoundManager>
     // out BGM 시작
     public void PlayOutGameBGM(Scene scene, LoadSceneMode mode)
     {
+        Debug.Log("씬이 로드됐어 노래ㅑ 큐!!!");
         if (SceneManager.GetActiveScene().buildIndex == 0)
         {
             // 로비 BGM 재생
@@ -63,7 +64,9 @@ public class SoundManager : ManagerBase<SoundManager>
                 bgmSource.clip = lobbyBGM;
                 bgmSource.loop = true;
                 bgmSource.Play();
+                Debug.Log("로비 브금 zb");
             }
+            ingameBgmSource.Stop();
         }
         else if (SceneManager.GetActiveScene().buildIndex == 1)
         {
@@ -77,8 +80,11 @@ public class SoundManager : ManagerBase<SoundManager>
             {
                 ingameBgmSource.clip = inGameBGM_2;
             }
+            Debug.Log("이게 인게임 노랮닷b");
+
             ingameBgmSource.loop = true;
             ingameBgmSource.Play();
+            bgmSource.Stop();
         }
     }
 
