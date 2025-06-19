@@ -29,8 +29,9 @@ public class PlayerStats
     {
         _currentHealth = GetMaxHealth();
     }
-    public void HandleHealthRegen(float deltaTime)
+    public bool HandleHealthRegen(float deltaTime, out float regenedHealth)
     {
+        regenedHealth = _currentHealth;
         _regenAccumulator += deltaTime;
         if (_regenAccumulator >= 1f)
         {
@@ -38,8 +39,11 @@ public class PlayerStats
             {
                 _regenAccumulator = 0f;
                 RegenerateHealth();
+                regenedHealth = _currentHealth;
+                return true;
             }
         }
+        return false;
     }
 
     private void RegenerateHealth()
